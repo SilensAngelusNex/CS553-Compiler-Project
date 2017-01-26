@@ -1,0 +1,16 @@
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+
+before_install:
+  - sudo wget http://smlnj.cs.uchicago.edu/dist/working/110.80/config.tgz
+  - gunzip <config.tgz | tar xf -
+  - config/install.sh
+
+
+script:
+  - sml
+  - use "test.sml"
