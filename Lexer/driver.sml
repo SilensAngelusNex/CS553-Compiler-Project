@@ -1,5 +1,5 @@
 structure Parse =
-struct 
+struct
   fun parse filename =
       let val file = TextIO.openIn filename
 	  fun get _ = TextIO.input file
@@ -14,4 +14,3 @@ struct
       end
 
 end
-
