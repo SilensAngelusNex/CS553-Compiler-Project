@@ -1,1 +1,1 @@
-val success = "success";
+val success := "success";
