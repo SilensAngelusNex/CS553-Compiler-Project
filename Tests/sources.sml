@@ -1,0 +1,1 @@
+use "Tests/lexerTests.sml"

@@ -9,5 +9,4 @@ before_install:
   - sudo apt-get install smlnj
 
 script:
-  - cd "Tests/"
-  - echo -n | sml lexerTests.sml
+  - echo -n | sml Tests/sources.sml
