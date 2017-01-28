@@ -7,7 +7,7 @@ let
 		if i then
 			print(s)
 		else
-			print("error")
+			print("bar\t")
 in
 	print_conditional("foo", 1)
 end

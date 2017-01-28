@@ -37,30 +37,26 @@ fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 val openedCommentCount = ref 0
 
+val str: string ref    = ref ""
+
 %%
 %s COMMENT STRING;
 %%
 
-<INITIAL>\n									=> (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
-<INITIAL>" "                                => (linePos := yypos + 1 :: !linePos; continue());
+<INITIAL>\n									=> (lineNum := !lineNum + 1; linePos := yypos :: !linePos; continue());
+<INITIAL>[ ]                                => (linePos := yypos + 1 :: !linePos; continue());
 <INITIAL>\t									=> (linePos := yypos + 4 :: !linePos; continue());
 
 <INITIAL>(_main)|([a-zA-Z][a-zA-Z0-9_]*) 	=> (keywordIdToken (yytext, yypos));
-<INITIAL>["]((\/")|([^"]))*["] 				=> (Tokens.STRING(yytext, yypos, yypos + String.size yytext));
 
+<INITIAL>\"                                 => (YYBEGIN STRING; str:= "" ; continue());
 
 <INITIAL>([-]?[1-9]\d*|0) 	 	            => (case Int.fromString yytext of
 									               SOME i => (Tokens.INT(i, yypos, yypos + String.size yytext))
                                                    | NONE   => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue()));
 
 <INITIAL>\/\*                                => (YYBEGIN COMMENT; openedCommentCount:= !openedCommentCount + 1 ; continue());
-<COMMENT>\/\*                                => (openedCommentCount:= !openedCommentCount + 1; continue());
-<COMMENT>\*\/                                => (openedCommentCount:= !openedCommentCount - 1;
-                                                    case !openedCommentCount of
-                                                        0 => YYBEGIN INITIAL
-                                                        | _ => ();
-                                                        continue());
-<COMMENT>.                                   => (continue());
+
 
 <INITIAL>&                                   => (Tokens.AND(yypos, yypos+1));
 <INITIAL>\|                                  => (Tokens.OR(yypos, yypos+1));
@@ -87,4 +83,23 @@ val openedCommentCount = ref 0
 <INITIAL>,                                   => (Tokens.COMMA(yypos, yypos+1));
 <INITIAL>:=                                  => (Tokens.ASSIGN(yypos, yypos+2));
 
-<INITIAL>.       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
+<INITIAL>.                                   => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
+
+
+<COMMENT>\/\*                                => (openedCommentCount:= !openedCommentCount + 1; continue());
+<COMMENT>\*\/                                => (openedCommentCount:= !openedCommentCount - 1;
+                                                    case !openedCommentCount of
+                                                        0 => YYBEGIN INITIAL
+                                                        | _ => ();
+                                                        continue());
+<COMMENT>.                                   => (continue());
+
+
+<STRING>\"                                  => (YYBEGIN INITIAL;
+                                                Tokens.STRING(!str, yypos + 1 - String.size (!str), yypos + 1));
+
+<STRING>\n|\t                               => (ErrorMsg.error yypos ("illegal character in string " ^ yytext); continue());
+
+<STRING>(\\\")|.                            => (str:= String.concat [!str, yytext]; continue());
+
+<STRING>\<\<eof\>\>                         => (Tokens.EOF(yypos,yypos));
