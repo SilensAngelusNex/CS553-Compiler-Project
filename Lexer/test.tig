@@ -1,3 +1,4 @@
+/* TEST/*ing*/ haha */
 let
 	function print_conditional(s : string, i : int) =
 
