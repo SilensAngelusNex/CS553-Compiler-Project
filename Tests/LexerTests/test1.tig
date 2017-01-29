@@ -1,21 +1,4 @@
-/* TEST/*ing*/ haha */
-let
-	function print_conditional(s : string, i : int) =
-
-		var one := 1
-		/* TEST/*ing*/
-
-		haha
-
-		*/
-		if i then
-			print(s)
-		else
-			print("bar\t")
-in
-	print_conditional("foo", 1)
-end
-
-_main
-
-|
+let /**/ let /*/*/**/*/*/ let /* hello /* test
+*/
+world
+*/

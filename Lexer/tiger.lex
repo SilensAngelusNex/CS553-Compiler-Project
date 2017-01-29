@@ -34,9 +34,63 @@ val constructorMap = foldl (fn ((k, v), m) => M.insert (m, k, v)) M.empty [ ("ty
 																			("if", Tokens.IF),
 																			("array", Tokens.ARRAY)];
 
+val controlCharMap = foldl (fn ((k, v), m) => M.insert (m, k, v)) M.empty [ ("\\^@", "\^@"),
+																			("\\0" , "\^@"),
+																			("\\^A", "\^A"),
+																			("\\^B", "\^B"),
+																			("\\^C", "\^C"),
+																			("\\^D", "\^D"),
+																			("\\^E", "\^E"),
+																			("\\^F", "\^F"),
+																			("\\^G", "\^G"),
+                                                                            ("\\a", "\^G"),
+																			("\\^H", "\^H"),
+                                                                            ("\\b", "\^H"),
+																			("\\^I", "\^I"),
+                                                                            ("\\t", "\^I"),
+																			("\\^J", "\^J"),
+                                                                            ("\\n", "\^J"),
+																			("\\^K", "\^K"),
+                                                                            ("\\k", "\^V"),
+																			("\\^L", "\^L"),
+                                                                            ("\\f", "\^L"),
+																			("\\^M", "\^M"),
+                                                                            ("\\r", "\^M"),
+																			("\\^N", "\^N"),
+																			("\\^O", "\^O"),
+                                                                            ("\\^P", "\^P"),
+																			("\\^Q", "\^Q"),
+																			("\\^R", "\^R"),
+																			("\\^S", "\^S"),
+																			("\\^T", "\^T"),
+																			("\\^U", "\^U"),
+																			("\\^V", "\^V"),
+																			("\\^W", "\^W"),
+                                                                            ("\\^X", "\^X"),
+																			("\\^Y", "\^Y"),
+																			("\\^Z", "\^Z"),
+                                                                            ("\\^]", "\^]"),
+                                                                            ("\\^\\", "\^\"),
+                                                                            ("\\^[", "\^["),
+                                                                            ("\\e", "\^["),
+                                                                            ("\\^^", "\^^"),
+                                                                            ("\\^_", "\^_"),
+                                                                            ("\\\\", "\\"),
+                                                                            ("\\\"", "\"")];
+
 fun keywordIdToken (s, pos) = case M.find (constructorMap, s) of
 								 SOME f => f (pos, pos + String.size s)
 							   | NONE => Tokens.ID(s, pos, pos + String.size s);
+
+fun appendAsciiInt v = if v >= 0 andalso v <= 255
+                       then
+                            let val asciiChar = chr v
+                                val strVal = Char.toString asciiChar
+                                val r = !str
+                            in
+                                str:= String.concat [r, strVal]
+                            end
+                       else ();
 
 fun eof() =
     let val pos = hd(!linePos)
@@ -45,11 +99,13 @@ fun eof() =
         case stack of
             [] => ()
           | (a::_) => ErrorMsg.error a ("Unclosed Comment beginning at " ^ (Int.toString a));
+        commentStack:= [];
         Tokens.EOF(pos,pos)
     end;
 
 %%
 %s COMMENT STRING;
+digit=[0-9];
 %%
 
 <INITIAL>\n									=> (lineNum := !lineNum + 1;
@@ -136,10 +192,29 @@ fun eof() =
                                                  Tokens.STRING(!str, yypos + 1 - String.size (!str), yypos + 1)
                                                 );
 
-<STRING>\n|\t                                => (ErrorMsg.error yypos ("illegal character in string " ^ yytext);
+
+<STRING>\n|\t                                => (ErrorMsg.error yypos ("Illegal character in string " ^ yytext);
                                                  continue()
                                                 );
 
-<STRING>(\\\")|.                             => (str:= String.concat [!str, yytext];
+<STRING>(\\\^.)|(\\.)                        => (case M.find (controlCharMap, yytext) of
+                                                 SOME txt => str:= String.concat [!str, txt]
+                                               | NONE     => ErrorMsg.error yypos ("Illegal escape character " ^ yytext);
+
+                                                 continue()
+                                                );
+
+<STRING>\\[0-9][0-9][0-9]                   => (let val text = substring(yytext,1,3)
+                                                     val intVal = valOf (Int.fromString text)
+
+                                                in
+                                                    appendAsciiInt intVal;
+                                                    continue()
+                                                end
+                                                );
+
+<STRING>\\[\t\n ]+\\                         => (continue());
+
+<STRING>.                                    => (str:= String.concat [!str, yytext];
                                                  continue()
                                                 );
