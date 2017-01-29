@@ -1,1 +1,1 @@
-use "Tests/lexerTests.sml"
+use "Tests/LexerTests/lexerTests.sml"
