@@ -20,9 +20,8 @@ val testFiles = [
 "ID(t)     25","ID(case)     20","EQ   18","ID(t)     16","ID(fact_tail)     6","ID(fun)     2"]),
 
 ("Tests/LexerTests/test4.tig",
-["EOF   37","INT(~123)   33","INT(~1)   30","INT(11)   27",
-"INT(1)   25","INT(12312)   19","WHILE   12","INT(99)   10",
-"ID(id)     7","var"])
+["EOF   37","INT(~123)   33","INT(~1)   30","INT(11)   27","INT(1)   25",
+"INT(12312)   19","WHILE   12","INT(99)   10","ID(id)     7","VAR   2"])
 ]
 
 fun compare ([], []) = true
