@@ -565,14 +565,22 @@ fun yyQ40 (strm, lastMatch : yymatch) = (case (yygetc(strm))
 fun yyQ60 (strm, lastMatch : yymatch) = (case (yygetc(strm))
        of NONE => yyAction5(strm, yyNO_MATCH)
         | SOME(inp, strm') =>
-            if inp = #"d"
+            if inp = #"0"
+              then yyQ60(strm', yyMATCH(strm, yyAction5, yyNO_MATCH))
+            else if inp < #"0"
+              then yyAction5(strm, yyNO_MATCH)
+            else if inp <= #"9"
               then yyQ60(strm', yyMATCH(strm, yyAction5, yyNO_MATCH))
               else yyAction5(strm, yyNO_MATCH)
       (* end case *))
 fun yyQ39 (strm, lastMatch : yymatch) = (case (yygetc(strm))
        of NONE => yyAction5(strm, yyNO_MATCH)
         | SOME(inp, strm') =>
-            if inp = #"d"
+            if inp = #"0"
+              then yyQ60(strm', yyMATCH(strm, yyAction5, yyNO_MATCH))
+            else if inp < #"0"
+              then yyAction5(strm, yyNO_MATCH)
+            else if inp <= #"9"
               then yyQ60(strm', yyMATCH(strm, yyAction5, yyNO_MATCH))
               else yyAction5(strm, yyNO_MATCH)
       (* end case *))
