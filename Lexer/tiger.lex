@@ -104,32 +104,28 @@ fun eof() =
     end;
 
 %%
-%s COMMENT STRING;
+%s COMMENT STRING MULTILINE;
 digit=[0-9];
 %%
 
 <INITIAL>\n									=> (lineNum := !lineNum + 1;
-                                                linePos := yypos :: !linePos;
+                                                linePos := yypos::(!linePos);
                                                 continue()
                                                 );
 
-<INITIAL>[ ]                                => (linePos := yypos + 1 :: !linePos;
-                                                continue()
-                                                );
+<INITIAL>[ ]                                => (continue());
 
-<INITIAL>\t									=> (linePos := yypos + 4 :: !linePos;
-                                                continue()
-                                                );
+<INITIAL>\t									=> (continue());
 
 <INITIAL>(_main)|([a-zA-Z][a-zA-Z0-9_]*) 	=> (keywordIdToken (yytext, yypos));
 
-<INITIAL>\"                                => (YYBEGIN STRING; str:= "";
+<INITIAL>\"                                 => (YYBEGIN STRING; str:= "";
                                                 continue()
                                                );
 
 <INITIAL>([-]?[1-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
 									               SOME i => (Tokens.INT(i, yypos, yypos + String.size yytext))
-                                                   | NONE   => (ErrorMsg.error yypos ("illegal character " ^ yytext);
+                                                   | NONE   => (ErrorMsg.error yypos ("Unexpected non-integer " ^ yytext);
                                                 continue())
                                                 );
 
@@ -164,7 +160,7 @@ digit=[0-9];
 <INITIAL>,                                   => (Tokens.COMMA(yypos, yypos+1));
 <INITIAL>:=                                  => (Tokens.ASSIGN(yypos, yypos+2));
 
-<INITIAL>.                                   => (ErrorMsg.error yypos ("illegal character " ^ yytext);
+<INITIAL>.                                   => (ErrorMsg.error yypos ("Illegal Character: " ^ yytext);
                                                  continue()
                                                  );
 
@@ -184,7 +180,12 @@ digit=[0-9];
                                                  continue()
                                                 );
 
-<COMMENT>[\t| |\n]                           => (continue());
+<COMMENT>\n                                  => (lineNum := !lineNum + 1;
+                                                 linePos := yypos::(!linePos);
+                                                 continue()
+                                                );
+
+<COMMENT>[\t ]                               => (continue());
 
 <COMMENT>.                                   => (continue());
 
@@ -193,28 +194,56 @@ digit=[0-9];
                                                 );
 
 
-<STRING>\n|\t                                => (ErrorMsg.error yypos ("Illegal character in string " ^ yytext);
-                                                 continue()
+<STRING>\n                                   => (ErrorMsg.error yypos ("Illegal Newline in String (\\n should be used). Did you forget to close the string: " ^ !str);
+                                                 YYBEGIN INITIAL;
+                                                 Tokens.STRING(!str, yypos + 1 - String.size (!str), yypos + 1)
                                                 );
 
-<STRING>(\\\^.)|(\\.)                        => (case M.find (controlCharMap, yytext) of
+<STRING>\t                                   => (ErrorMsg.error yypos ("Illegal Tab in String (\\t should be used). Did you forget to close the string: " ^ !str);
+                                                 YYBEGIN INITIAL;
+                                                 Tokens.STRING(!str, yypos + 1 - String.size (!str), yypos + 1)
+                                                );
+
+<STRING>(\\\^.)|(\\.)                        => (
+                                                 case M.find (controlCharMap, yytext) of
                                                  SOME txt => str:= String.concat [!str, txt]
-                                               | NONE     => ErrorMsg.error yypos ("Illegal escape character " ^ yytext);
+                                               | NONE     => ErrorMsg.error yypos ("Invalid Escape Character: " ^ yytext);
 
                                                  continue()
                                                 );
 
-<STRING>\\[0-9][0-9][0-9]                   => (let val text = substring(yytext,1,3)
-                                                     val intVal = valOf (Int.fromString text)
+<STRING>\\[0-9][0-9][0-9]                    => (let val text = substring(yytext,1,3)
+                                                    val intVal = valOf (Int.fromString text)
 
-                                                in
+                                                 in
                                                     appendAsciiInt intVal;
                                                     continue()
-                                                end
+                                                 end
                                                 );
 
-<STRING>\\[\t\n ]+\\                         => (continue());
+<STRING>\\\n                                 => (lineNum := !lineNum + 1;
+                                                 linePos := yypos::(!linePos);
+                                                 YYBEGIN MULTILINE;
+                                                 continue()
+                                                );
+
+<STRING>\\[\t ]                              => (YYBEGIN MULTILINE;
+                                                 continue()
+                                                );
 
 <STRING>.                                    => (str:= String.concat [!str, yytext];
                                                  continue()
                                                 );
+
+<MULTILINE>\n                                => (lineNum := !lineNum + 1;
+                                                 linePos := yypos::(!linePos);
+                                                 continue()
+                                                );
+
+<MULTILINE>[\t ]                             => (continue());
+
+<MULTILINE>\\                                => (YYBEGIN STRING;
+                                                 continue()
+                                                );
+
+<MULTILINE>.                                 => (continue());
