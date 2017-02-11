@@ -11,7 +11,8 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE
 
-%nonterm  exp | program
+%nonterm  exp | program | let | dec | varDec | typeDec | funcDec | typeDef | argDef | record | recArgs
+          | function | args | sequence | addExp | multExp | parenExp | boolExp | comparator | term | lvalue
 
 %pos int
 %verbose
@@ -30,6 +31,10 @@
 %value INT (1)
 %value STRING ("")
 
+%change EQ -> ASSIGN
+        | ASSIGN -> EQ
+        | SEMICOLON ELSE -> ELSE
+        |   -> IN INT END
 %%
 
 (* This is a skeleton grammar file, meant to illustrate what kind of
@@ -37,7 +42,92 @@
  *  to replace the two dummy productions below with an actual grammar.
  *)
 
-program	: exp				()
+program	: exp        			    ()
 
+exp : IF exp THEN exp ELSE exp      ()
+    | IF exp THEN exp               ()
+    | WHILE exp DO exp              ()
+    | FOR ID ASSIGN exp TO exp DO exp   ()
+    | record                        ()
+    | LPAREN sequence RPAREN        ()
+    | let                           ()
+    | function                      ()
+    | addExp                        ()
+    | term                          ()
+    | typeDef LBRACK exp RBRACK OF exp ()
 
-exp: 			()
+let : LET dec IN sequence END       ()
+
+dec : varDec dec                    ()
+    | typeDec dec                   ()
+    | funcDec dec                   ()
+    |                               ()
+
+varDec : VAR ID ASSIGN exp          ()
+       | VAR ID COLON ID ASSIGN exp ()
+
+typeDec : TYPE ID EQ typeDef        ()
+
+funcDec : FUNCTION ID LPAREN argDef RPAREN COLON ID EQ exp ()
+        | FUNCTION ID LPAREN RPAREN COLON ID EQ exp ()
+        | FUNCTION ID LPAREN argDef RPAREN EQ exp ()
+        | FUNCTION ID LPAREN RPAREN EQ exp ()
+
+typeDef : LBRACE argDef RBRACE      ()
+        | ID OF typeDef             ()
+        | ID                        ()
+
+argDef : ID COLON typeDef COMMA argDef   ()
+       | ID COLON typeDef                ()
+
+record : ID LBRACE RBRACE           ()
+       | ID LBRACE recArgs RBRACE   ()
+
+recArgs : ID EQ exp COMMA recArgs ()
+        | ID EQ exp              ()
+
+function : ID LPAREN RPAREN         ()
+         | ID LPAREN args RPAREN    ()
+
+args : exp COMMA args               ()
+     | exp                          ()
+
+sequence : exp SEMICOLON sequence   ()
+         | exp                      ()
+
+addExp : multExp PLUS addExp        ()
+       | multExp MINUS addExp       ()
+       | multExp                    ()
+
+multExp : parenExp DIVIDE multExp   ()
+        | parenExp TIMES multExp    ()
+        | parenExp                  ()
+
+parenExp : LPAREN exp RPAREN        ()
+         | term                     ()
+
+boolExp : addExp AND boolExp        ()
+        | addExp OR boolExp         ()
+        | addExp comparator addExp  ()
+        | addExp comparator LPAREN boolExp RPAREN ()
+        | LPAREN boolExp RPAREN comparator addExp ()
+        | LPAREN boolExp RPAREN     ()
+        | addExp                    ()
+
+comparator : EQ                     ()
+           | NEQ                    ()
+           | LT                     ()
+           | LE                     ()
+           | GT                     ()
+           | GE                     ()
+
+term : INT                          ()
+     | MINUS INT                    ()
+     | STRING                       ()
+     | lvalue                       ()
+     | LPAREN RPAREN                ()
+     | BREAK                        ()
+
+lvalue : lvalue LBRACK exp RBRACK   ()
+       | lvalue DOT ID              ()
+       | ID                         ()
