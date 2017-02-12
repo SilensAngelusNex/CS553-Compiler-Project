@@ -1,3 +1,5 @@
+structure A = Absyn
+
 %%
 %term
     EOF
@@ -11,7 +13,7 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE
 
-%nonterm  exp | program | let | dec | varDec | typeDec | funcDec | typeDef | argDef | record | recArgs
+%nonterm  exp | program of A.exp | let | dec | varDec | typeDec | funcDec | typeDef | argDef | record | recArgs
           | function | args | sequence | addExp | multExp | parenExp | boolExp | comparator | term | lvalue
 
 %pos int
@@ -42,7 +44,7 @@
  *  to replace the two dummy productions below with an actual grammar.
  *)
 
-program	: exp        			    ()
+program	: exp        			    (exp)
 
 exp : IF exp THEN exp ELSE exp      ()
     | IF exp THEN exp               ()
@@ -55,6 +57,7 @@ exp : IF exp THEN exp ELSE exp      ()
     | addExp                        ()
     | term                          ()
     | typeDef LBRACK exp RBRACK OF exp ()
+    | NIL                           (A.NilExp)
 
 let : LET dec IN sequence END       ()
 
@@ -104,7 +107,7 @@ multExp : parenExp DIVIDE multExp   ()
         | parenExp                  ()
 
 parenExp : LPAREN exp RPAREN        ()
-         | term                     ()
+         | term                     (term)
 
 boolExp : addExp AND boolExp        ()
         | addExp OR boolExp         ()
@@ -114,20 +117,20 @@ boolExp : addExp AND boolExp        ()
         | LPAREN boolExp RPAREN     ()
         | addExp                    ()
 
-comparator : EQ                     ()
+comparator : EQ                     (A.EqOp)
            | NEQ                    ()
            | LT                     ()
            | LE                     ()
            | GT                     ()
            | GE                     ()
 
-term : INT                          ()
+term : INT                          (A.IntExp)
      | MINUS INT                    ()
-     | STRING                       ()
+     | STRING                       (A.IntExp)
      | lvalue                       ()
      | LPAREN RPAREN                ()
      | BREAK                        ()
 
 lvalue : lvalue LBRACK exp RBRACK   ()
        | lvalue DOT ID              ()
-       | ID                         ()
+       | ID                         (A.VarExp(ID))
