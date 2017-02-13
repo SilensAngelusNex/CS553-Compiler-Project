@@ -9,9 +9,15 @@
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE
+  | FUNCTION | VAR | TYPE | UMINUS
 
-%nonterm  exp | program | dec | varDec | funcDec | typeDef | argDef | seqExp | sequence | boolExp | compExp | addExp | multExp | parenExp | comparator | term | lvalue
+%nonterm  exp | program
+        | dec | varDec | funcDec | typeDec | ty | argDef
+        | seqExp | sequence
+        | boolExp | compExp | addExp | multExp | parenExp | comparator | infix | infixOp | term | lvalue
+        | ifExp | whileExp | forExp | letExp
+        | arrCreate | recCreate | fields
+        | callExp | params | assignExp
 
 %pos int
 %verbose
@@ -38,6 +44,15 @@
 
 %nonassoc THEN
 %nonassoc ELSE
+
+%left ASSIGN OF (* Of precedence is used to override subscript vs. array creation*)
+%left AND OR
+%left EQ NEQ GT GE LT LE
+%left PLUS MINUS
+%left TIMES DIVIDE
+%left UMINUS
+
+%left DO (* I'm unsure which direction!!! If the lookahead token at this point is a binary operator, the parser doesn't know whether to shift the operator, making the trailing exp in the  WHILE expression longer, or to immediately reduce the WHILE. Obviously (to us, not to bison), the solution is to shift. bison doesn't know that because the production exp: WHILE exp DO exp doesn't have a precedence. The precedence of that production would be the precedence of its last terminal, which is DO, so the simple solution is to define a precedence for DO *)
 %%
 
 (* This is a skeleton grammar file, meant to illustrate what kind of
@@ -47,63 +62,120 @@
 
 program	: exp        			    ()
 
-exp : boolExp                       ()
-    | IF exp THEN exp    %prec THEN ()
-    | IF exp THEN exp ELSE exp      ()
-    | WHILE exp DO exp              ()
-    | FOR ID ASSIGN exp TO exp DO exp   ()
-    | dec                           ()
+exp : exp PLUS exp                  ()
+    | exp MINUS exp                 ()
+    | exp DIVIDE exp                ()
+    | exp TIMES exp                 ()
+    | exp EQ exp                    ()
+    | exp NEQ exp                   ()
+    | exp GT exp                    ()
+    | exp GE exp                    ()
+    | exp LT exp                    ()
+    | exp LE exp                    ()
+    | exp AND exp                   ()
+    | exp OR exp                    ()
+    | MINUS exp      %prec UMINUS   ()
+    | ifExp                         ()
+    | letExp                        ()
+    | forExp                        ()
+    | whileExp                      ()
+    | seqExp                        ()
+    | callExp                       ()
+    | assignExp                     ()
+    | recCreate                     ()
+    | arrCreate                     ()
+    | INT                           ()
+    | STRING                        ()
+    | NIL                           ()
+    | BREAK                         ()
+    | lvalue                        ()
 
-dec : varDec                        ()
-    | funcDec                       ()
 
-varDec : VAR ID ASSIGN exp          ()
-       | VAR ID COLON ID ASSIGN exp ()
+(**                      *
+ *                       *
+ * Compound Expressions  *
+ *                       *
+ *                      **)
 
-funcDec : FUNCTION ID LPAREN argDef RPAREN COLON ID EQ exp ()
-        | FUNCTION ID LPAREN RPAREN COLON ID EQ exp ()
-        | FUNCTION ID LPAREN argDef RPAREN EQ exp ()
-        | FUNCTION ID LPAREN RPAREN EQ exp ()
+ifExp : IF exp THEN exp    %prec THEN       ()
+      | IF exp THEN exp ELSE exp            ()
 
-typeDef : LBRACE argDef RBRACE      ()
-        | ID OF typeDef             ()
-        | ID                        ()
 
-argDef : ID COLON typeDef COMMA argDef   ()
-       | ID COLON typeDef                ()
+letExp : LET dec IN seqExp END              ()
 
-boolExp : compExp AND boolExp       ()
-        | compExp OR boolExp        ()
-        | compExp                   ()
+whileExp : WHILE exp DO exp                 ()
 
-compExp : addExp comparator addExp  ()
-        | addExp                    ()
+forExp : FOR ID ASSIGN exp TO exp DO exp    ()
 
-addExp : multExp PLUS addExp        ()
-       | multExp MINUS addExp       ()
-       | multExp                    ()
+(**                      *
+ *                       *
+ *          Usage        *
+ *                       *
+ *                       **)
 
-multExp : parenExp DIVIDE multExp   ()
-        | parenExp TIMES multExp    ()
-        | parenExp                  ()
+callExp : ID LPAREN exp params          ()
+        | ID LPAREN RPAREN              ()
 
-parenExp : LPAREN exp RPAREN        ()
-         | term                     ()
+params : COMMA exp params               ()
+       | RPAREN                         ()
 
-comparator : EQ                     ()
-       | NEQ                        ()
-       | LT                         ()
-       | LE                         ()
-       | GT                         ()
-       | GE                         ()
+assignExp : lvalue ASSIGN exp           ()
 
-term : INT                          ()
-     | MINUS INT                    ()
-     | STRING                       ()
-     | lvalue                       ()
-     | LPAREN RPAREN                ()
-     | BREAK                        ()
+seqExp : LPAREN exp sequence            ()
+       | LPAREN RPAREN                  ()
 
-lvalue : lvalue LBRACK exp RBRACK   ()
-       | lvalue DOT ID              ()
+sequence : SEMICOLON exp sequence       ()
+         | RPAREN                       ()
+
+
+(**                      *
+  *                       *
+  *       Creation        *
+  *                       *
+  *                      **)
+
+arrCreate : lvalue OF exp ()
+
+(*
+
+ID LBRACK exp RBRACK this is exactly an lvalue --> prec on OF :: still 1
+
+I have decided to change this to simply accept an lvalue and we will address it in the semantic analysis
+
+*)
+
+recCreate : ID LBRACE ID EQ exp fields  ()
+          | ID LBRACE RBRACE            ()
+
+fields : COMMA ID EQ exp                ()
+       | RBRACE                         ()
+(**                      *
+ *                       *
+ *      Declarations     *
+ *                       *
+ *                      **)
+
+dec : varDec dec                        ()
+    | funcDec dec                       ()
+    | typeDec dec                       ()
+
+varDec : VAR ID ASSIGN exp              ()
+       | VAR ID COLON ID ASSIGN exp     ()
+
+funcDec : FUNCTION ID LPAREN argDef RPAREN COLON ID EQ exp  ()
+        | FUNCTION ID LPAREN RPAREN COLON ID EQ exp         ()
+        | FUNCTION ID LPAREN argDef RPAREN EQ exp           ()
+        | FUNCTION ID LPAREN RPAREN EQ exp                  ()
+
+typeDec : TYPE ID EQ ty             ()
+
+ty   : ID                           ()
+     | ARRAY OF ty                  ()
+     | LBRACE argDef RBRACE         ()
+
+argDef : ID COLON ty COMMA argDef   ()
+       | ID COLON ty                ()
+
+lvalue : lvalue LBRACK exp RBRACK   () (* subscript *)
+       | lvalue DOT ID              () (* field expression *)
        | ID                         ()
