@@ -1,5 +1,3 @@
-structure A = Absyn
-
 %%
 %term
     EOF
@@ -13,8 +11,7 @@ structure A = Absyn
   | BREAK | NIL
   | FUNCTION | VAR | TYPE
 
-%nonterm  exp | program of A.exp | let | dec | varDec | typeDec | funcDec | typeDef | argDef | record | recArgs
-          | function | args | sequence | addExp | multExp | parenExp | boolExp | comparator | term | lvalue
+%nonterm  exp | program | dec | varDec | funcDec | typeDef | argDef | seqExp | sequence | boolExp | compExp | addExp | multExp | parenExp | comparator | term | lvalue
 
 %pos int
 %verbose
@@ -29,6 +26,7 @@ structure A = Absyn
 
 %prefer THEN ELSE LPAREN
 
+
 %value ID ("bogus")
 %value INT (1)
 %value STRING ("")
@@ -37,6 +35,9 @@ structure A = Absyn
         | ASSIGN -> EQ
         | SEMICOLON ELSE -> ELSE
         |   -> IN INT END
+
+%nonassoc THEN
+%nonassoc ELSE
 %%
 
 (* This is a skeleton grammar file, meant to illustrate what kind of
@@ -44,32 +45,20 @@ structure A = Absyn
  *  to replace the two dummy productions below with an actual grammar.
  *)
 
-program	: exp        			    (exp)
+program	: exp        			    ()
 
-exp : IF exp THEN exp ELSE exp      ()
-    | IF exp THEN exp               ()
+exp : boolExp                       ()
+    | IF exp THEN exp    %prec THEN ()
+    | IF exp THEN exp ELSE exp      ()
     | WHILE exp DO exp              ()
     | FOR ID ASSIGN exp TO exp DO exp   ()
-    | record                        ()
-    | LPAREN sequence RPAREN        ()
-    | let                           ()
-    | function                      ()
-    | addExp                        ()
-    | term                          ()
-    | typeDef LBRACK exp RBRACK OF exp ()
-    | NIL                           (A.NilExp)
+    | dec                           ()
 
-let : LET dec IN sequence END       ()
-
-dec : varDec dec                    ()
-    | typeDec dec                   ()
-    | funcDec dec                   ()
-    |                               ()
+dec : varDec                        ()
+    | funcDec                       ()
 
 varDec : VAR ID ASSIGN exp          ()
        | VAR ID COLON ID ASSIGN exp ()
-
-typeDec : TYPE ID EQ typeDef        ()
 
 funcDec : FUNCTION ID LPAREN argDef RPAREN COLON ID EQ exp ()
         | FUNCTION ID LPAREN RPAREN COLON ID EQ exp ()
@@ -83,20 +72,12 @@ typeDef : LBRACE argDef RBRACE      ()
 argDef : ID COLON typeDef COMMA argDef   ()
        | ID COLON typeDef                ()
 
-record : ID LBRACE RBRACE           ()
-       | ID LBRACE recArgs RBRACE   ()
+boolExp : compExp AND boolExp       ()
+        | compExp OR boolExp        ()
+        | compExp                   ()
 
-recArgs : ID EQ exp COMMA recArgs ()
-        | ID EQ exp              ()
-
-function : ID LPAREN RPAREN         ()
-         | ID LPAREN args RPAREN    ()
-
-args : exp COMMA args               ()
-     | exp                          ()
-
-sequence : exp SEMICOLON sequence   ()
-         | exp                      ()
+compExp : addExp comparator addExp  ()
+        | addExp                    ()
 
 addExp : multExp PLUS addExp        ()
        | multExp MINUS addExp       ()
@@ -107,30 +88,22 @@ multExp : parenExp DIVIDE multExp   ()
         | parenExp                  ()
 
 parenExp : LPAREN exp RPAREN        ()
-         | term                     (term)
+         | term                     ()
 
-boolExp : addExp AND boolExp        ()
-        | addExp OR boolExp         ()
-        | addExp comparator addExp  ()
-        | addExp comparator LPAREN boolExp RPAREN ()
-        | LPAREN boolExp RPAREN comparator addExp ()
-        | LPAREN boolExp RPAREN     ()
-        | addExp                    ()
+comparator : EQ                     ()
+       | NEQ                        ()
+       | LT                         ()
+       | LE                         ()
+       | GT                         ()
+       | GE                         ()
 
-comparator : EQ                     (A.EqOp)
-           | NEQ                    ()
-           | LT                     ()
-           | LE                     ()
-           | GT                     ()
-           | GE                     ()
-
-term : INT                          (A.IntExp)
+term : INT                          ()
      | MINUS INT                    ()
-     | STRING                       (A.IntExp)
+     | STRING                       ()
      | lvalue                       ()
      | LPAREN RPAREN                ()
      | BREAK                        ()
 
 lvalue : lvalue LBRACK exp RBRACK   ()
        | lvalue DOT ID              ()
-       | ID                         (A.VarExp(ID))
+       | ID                         ()
