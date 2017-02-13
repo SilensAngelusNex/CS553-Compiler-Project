@@ -45,14 +45,17 @@
 %nonassoc THEN
 %nonassoc ELSE
 
-%left ASSIGN OF (* Of precedence is used to override subscript vs. array creation*)
-%left AND OR
+%left ASSIGN OF DO
+    (* Of precedence is used to override subscript vs. array creation*)
+    (* I'm unsure which direction for DO!!! If the lookahead token at this point is a binary operator, the parser doesn't know whether to shift the operator, making the trailing exp in the  WHILE expression longer, or to immediately reduce the WHILE. Obviously (to us, not to bison), the solution is to shift. bison doesn't know that because the production exp: WHILE exp DO exp doesn't have a precedence. The precedence of that production would be the precedence of its last terminal, which is DO, so the simple solution is to define a precedence for DO *)
+    (*left is in favor of shifting! right is in favor or reducing *)
+%left OR
+%left AND
 %left EQ NEQ GT GE LT LE
 %left PLUS MINUS
 %left TIMES DIVIDE
 %left UMINUS
 
-%left DO (* I'm unsure which direction!!! If the lookahead token at this point is a binary operator, the parser doesn't know whether to shift the operator, making the trailing exp in the  WHILE expression longer, or to immediately reduce the WHILE. Obviously (to us, not to bison), the solution is to shift. bison doesn't know that because the production exp: WHILE exp DO exp doesn't have a precedence. The precedence of that production would be the precedence of its last terminal, which is DO, so the simple solution is to define a precedence for DO *)
 %%
 
 (* This is a skeleton grammar file, meant to illustrate what kind of
@@ -97,7 +100,7 @@ exp : exp PLUS exp                  ()
  *                       *
  *                      **)
 
-ifExp : IF exp THEN exp    %prec THEN       ()
+ifExp : IF exp THEN exp         %prec THEN  ()
       | IF exp THEN exp ELSE exp            ()
 
 

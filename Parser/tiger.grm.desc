@@ -1,3 +1,17 @@
+12 shift/reduce conflicts
+
+error:  state 55: shift/reduce conflict (shift OR, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift AND, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift GE, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift GT, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift LE, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift LT, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift NEQ, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift EQ, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift DIVIDE, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift TIMES, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift MINUS, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift PLUS, reduce by rule 37)
 
 state 0:
 
@@ -1155,6 +1169,18 @@ state 54:
 
 	.	reduce by rule 42
 
+error:  state 55: shift/reduce conflict (shift OR, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift AND, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift GE, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift GT, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift LE, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift LT, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift NEQ, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift EQ, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift DIVIDE, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift TIMES, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift MINUS, reduce by rule 37)
+error:  state 55: shift/reduce conflict (shift PLUS, reduce by rule 37)
 
 state 55:
 
@@ -1258,6 +1284,7 @@ state 58:
 	LE	shift 31
 	GT	shift 30
 	GE	shift 29
+	AND	shift 28
 
 
 	.	reduce by rule 12
@@ -1950,6 +1977,18 @@ state 94:
 	exp : exp . OR exp 
 	whileExp : WHILE exp DO exp .  (reduce by rule 31)
 
+	PLUS	shift 38
+	MINUS	shift 37
+	TIMES	shift 36
+	DIVIDE	shift 35
+	EQ	shift 34
+	NEQ	shift 33
+	LT	shift 32
+	LE	shift 31
+	GT	shift 30
+	GE	shift 29
+	AND	shift 28
+	OR	shift 27
 
 
 	.	reduce by rule 31
@@ -2887,6 +2926,18 @@ state 143:
 	exp : exp . OR exp 
 	forExp : FOR ID ASSIGN exp TO exp DO exp .  (reduce by rule 32)
 
+	PLUS	shift 38
+	MINUS	shift 37
+	TIMES	shift 36
+	DIVIDE	shift 35
+	EQ	shift 34
+	NEQ	shift 33
+	LT	shift 32
+	LE	shift 31
+	GT	shift 30
+	GE	shift 29
+	AND	shift 28
+	OR	shift 27
 
 
 	.	reduce by rule 32
@@ -3062,5 +3113,5 @@ state 150:
 
 	.	error
 
-376 of 945 action table entries left after compaction
+401 of 970 action table entries left after compaction
 436 goto table entries
