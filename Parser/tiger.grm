@@ -13,7 +13,7 @@ structure A = Absyn
   | BREAK | NIL
   | FUNCTION | VAR | TYPE | UMINUS | SHIFT
 
-%nonterm  exp of A.exp | program
+%nonterm  exp of A.exp | program of A.exp
         | dec of A.dec -> A.dec list
         | dec1 of A.dec -> A.dec list
         | dec2 of A.dec -> A.dec list
@@ -66,8 +66,8 @@ structure A = Absyn
 %nonassoc THEN
 %nonassoc ELSE
 
-%right SHIFT
-%left ASSIGN OF DO
+%right SHIFT OF ID
+%left ASSIGN DO
     (* Of precedence is used to override subscript vs. array creation*)
     (* I'm unsure which direction for DO!!! If the lookahead token at this point is a binary operator, the parser doesn't know whether to shift the operator, making the trailing exp in the  WHILE expression longer, or to immediately reduce the WHILE. Obviously (to us, not to bison), the solution is to shift. bison doesn't know that because the production exp: WHILE exp DO exp doesn't have a precedence. The precedence of that production would be the precedence of its last terminal, which is DO, so the simple solution is to define a precedence for DO *)
     (*left is in favor of shifting! right is in favor or reducing *)
@@ -164,7 +164,9 @@ sequence : SEMICOLON exp sequence       (fn e => e::(sequence (exp, expleft)))
   *                       *
   *                      **)
 
-arrCreate : ID LBRACK exp RBRACK OF exp (A.ArrayExp({typ=Symbol.symbol(ID), size=exp1, init=exp2, pos=IDleft}))
+arrCreate : lvalue LBRACK exp RBRACK OF exp (case lvalue of A.SimpleVar(s, p) => A.ArrayExp({typ=s, size=exp1, init=exp2, pos=p})
+                                                            | _ => ((ErrorMsg.error OFleft ("Illegal lValue used for array creation. Must use ID."));
+                                                                    A.NilExp))
 
 
 recCreate : ID LBRACE ID EQ exp fields  (A.RecordExp({fields = (fields (Symbol.symbol(ID), exp, IDleft)), typ = Symbol.symbol(ID), pos = IDleft}))
@@ -187,7 +189,6 @@ dec1 : funDecs dec2                     (fn e => e::(dec2 (A.FunctionDec(funDecs
      | typDecs dec3                     (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
      | IN                               (fn e => e::[])
 dec2 : varDec dec1                      (fn e => e::(dec1 varDec))
-     | funDec dec2
      | typDecs dec3                     (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
      | IN                               (fn e => e::[])
 dec3 : varDec dec1                      (fn e => e::(dec1 varDec))
@@ -254,6 +255,6 @@ ty   : ID                           (A.NameTy(Symbol.symbol(ID), IDleft))
 argDef : COMMA ID COLON ID argDef   (fn e => e::(argDef ({name=(Symbol.symbol(ID1)), escape=ref true, typ=(Symbol.symbol(ID2)), pos=IDleft})))
        | RBRACE                     (fn e => e::[])
 
-lvalue : lvalue LBRACK exp RBRACK   (A.SubscriptVar(lvalue, exp, LBRACKleft))      (* subscript *)
+lvalue : lvalue LBRACK exp RBRACK   (A.SubscriptVar(lvalue, exp, LBRACKleft))                      (* subscript *)
        | lvalue DOT ID              (A.FieldVar(lvalue, Symbol.symbol(ID), DOTleft))               (* field expression *)
        | ID                         (A.SimpleVar(Symbol.symbol(ID), IDleft))
