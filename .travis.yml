@@ -7,6 +7,7 @@ matrix:
 
 before_install:
   - sudo apt-get install smlnj
+  - sudo apt-get install ml-yacc
 
 script:
   - echo -n | sml Tests/sources.sml
