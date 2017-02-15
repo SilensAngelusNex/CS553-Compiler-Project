@@ -1,4 +1,4 @@
-structure Absyn = 
+structure Absyn =
 struct
 
 type pos = int   and   symbol = Symbol.symbol
@@ -47,6 +47,5 @@ withtype field = {name: symbol, escape: bool ref,
 		   result: (symbol * pos) option,
 		   body: exp,
 		   pos: pos}
-     
+
 end
-        
