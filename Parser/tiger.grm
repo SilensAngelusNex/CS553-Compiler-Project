@@ -1,3 +1,5 @@
+structure A = Absyn
+
 %%
 %term
     EOF
@@ -9,9 +11,36 @@
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE
+  | FUNCTION | VAR | TYPE | UMINUS
 
-%nonterm  exp | program
+%nonterm  exp of A.exp | program of A.exp
+        | dec of A.dec -> A.dec list
+        | dec1 of A.dec -> A.dec list
+        | dec2 of A.dec -> A.dec list
+        | dec3 of A.dec -> A.dec list
+        | typDecs of {name: A.symbol, ty: A.ty, pos: A.pos} option -> {name: A.symbol, ty: A.ty, pos: A.pos} list
+        | funDecs of A.fundec option -> A.fundec list
+        | ty of A.ty
+        | varDec of A.dec
+        | funDec of A.fundec
+        | typeDec of {name: A.symbol, ty: A.ty, pos: A.pos}
+        | argDef of A.field -> A.field list
+        | seqExp of A.exp
+        | sequence of (A.exp * int) -> (A.exp * int) list
+        | lvalue of A.var
+        | ifExp of A.exp
+        | whileExp of A.exp
+        | forExp of A.exp
+        | letExp of A.exp
+        | arrCreate of A.exp
+        | recCreate of A.exp
+        | fields of (A.symbol * A.exp * A.pos) -> (A.symbol * A.exp * A.pos) list
+        | callExp of A.exp
+        | params of A.exp -> A.exp list
+        | assignExp of A.exp
+        | letSequence of A.exp
+        | letTail of (A.exp * A.pos) -> (A.exp * A.pos) list
+
 
 %pos int
 %verbose
@@ -30,6 +59,22 @@
 %value INT (1)
 %value STRING ("")
 
+%change EQ -> ASSIGN
+        | ASSIGN -> EQ
+        | SEMICOLON ELSE -> ELSE
+        |   -> IN INT END
+
+%nonassoc THEN
+%nonassoc ELSE
+
+%right OF ID ASSIGN DO
+%left OR
+%left AND
+%left EQ NEQ GT GE LT LE
+%left PLUS MINUS
+%left TIMES DIVIDE
+%left UMINUS
+
 %%
 
 (* This is a skeleton grammar file, meant to illustrate what kind of
@@ -37,7 +82,182 @@
  *  to replace the two dummy productions below with an actual grammar.
  *)
 
-program	: exp				()
+program	: exp        			    (exp )
+
+exp : exp PLUS exp                  (A.OpExp({left = exp1, oper = A.PlusOp, pos = PLUSleft, right = exp2}))
+    | exp MINUS exp                 (A.OpExp({left = exp1, oper = A.MinusOp, pos = MINUSleft, right = exp2}))
+    | exp DIVIDE exp                (A.OpExp({left = exp1, oper = A.DivideOp, pos = DIVIDEleft, right = exp2}))
+    | exp TIMES exp                 (A.OpExp({left = exp1, oper = A.TimesOp, pos = TIMESleft, right = exp2}))
+    | exp EQ exp                    (A.OpExp({left = exp1, oper = A.EqOp, pos = EQleft, right = exp2}))
+    | exp NEQ exp                   (A.OpExp({left = exp1, oper = A.NeqOp, pos = NEQleft, right = exp2}))
+    | exp GT exp                    (A.OpExp({left = exp1, oper = A.GtOp, pos = GTleft, right = exp2}))
+    | exp GE exp                    (A.OpExp({left = exp1, oper = A.GeOp, pos = GEleft, right = exp2}))
+    | exp LT exp                    (A.OpExp({left = exp1, oper = A.LtOp, pos = LTleft, right = exp2}))
+    | exp LE exp                    (A.OpExp({left = exp1, oper = A.LeOp, pos = LEleft, right = exp2}))
+    | exp AND exp                   (A.IfExp({test = exp1, then' = exp2, else' = SOME (A.IntExp(0)), pos = ANDleft}))
+    | exp OR exp                    (A.IfExp({test = exp1, then' = A.IntExp(1), else' = SOME exp2, pos = ORleft}))
+    | MINUS exp      %prec UMINUS   (A.OpExp({left = A.IntExp(0), oper = A.MinusOp, pos = MINUSleft, right = exp}))
+    | ifExp                         (ifExp)
+    | letExp                        (letExp)
+    | forExp                        (forExp)
+    | whileExp                      (whileExp)
+    | seqExp                        (seqExp)
+    | LPAREN exp RPAREN             (exp)
+    | LPAREN RPAREN                 (A.NilExp)
+    | callExp                       (callExp)
+    | assignExp                     (assignExp)
+    | recCreate                     (recCreate)
+    | arrCreate                     (arrCreate)
+    | INT                           (A.IntExp(INT))
+    | STRING                        (A.StringExp(STRING, STRINGleft))
+    | NIL                           (A.NilExp)
+    | BREAK                         (A.BreakExp(BREAKleft))
+    | lvalue                        (A.VarExp(lvalue))
 
 
-exp: 			()
+(**                      *
+ *                       *
+ * Compound Expressions  *
+ *                       *
+ *                      **)
+
+ifExp : IF exp THEN exp         %prec THEN  (A.IfExp({test = exp1, then' = exp2, else' = NONE, pos = IFleft}))
+      | IF exp THEN exp ELSE exp            (A.IfExp({test = exp1, then' = exp2, else' = SOME exp3, pos = IFleft}))
+
+
+letExp : LET varDec dec letSequence               (A.LetExp({decs = (dec varDec), body = letSequence, pos = LETleft}))
+       | LET funDecs dec letSequence              (A.LetExp({decs = (dec (A.FunctionDec(funDecs NONE))), body = letSequence, pos = LETleft}))
+       | LET typDecs dec letSequence              (A.LetExp({decs = (dec (A.TypeDec(typDecs NONE))), body = letSequence, pos = LETleft}))
+       | LET IN letSequence                       (A.LetExp({decs = [], body = letSequence, pos = LETleft}))
+
+whileExp : WHILE exp DO exp                 (A.WhileExp({test = exp1, body = exp2, pos = WHILEleft}))
+
+forExp : FOR ID ASSIGN exp TO exp DO exp    (A.ForExp({var = Symbol.symbol(ID), escape = ref true,
+                                                        lo = exp1, hi = exp2, body = exp3, pos = FORleft}))
+
+(**                      *
+ *                       *
+ *          Usage        *
+ *                       *
+ *                       **)
+
+callExp : ID LPAREN exp params          (A.CallExp({func=Symbol.symbol(ID), args = (params exp), pos = IDleft}))
+        | ID LPAREN RPAREN              (A.CallExp({func=Symbol.symbol(ID), args = [], pos = IDleft}))
+
+params : COMMA exp params               (fn e => e::(params exp))
+       | RPAREN                         (fn e => e::[])
+
+assignExp : lvalue ASSIGN exp           (A.AssignExp({var = lvalue, exp = exp, pos = lvalue1left}))
+
+seqExp : LPAREN exp SEMICOLON exp sequence (A.SeqExp((exp1, exp1left)::(sequence (exp2, exp2left))))
+
+sequence : SEMICOLON exp sequence       (fn e => e::(sequence (exp, expleft)))
+         | RPAREN                       (fn e => e::[])
+
+letSequence : exp letTail               (A.SeqExp((letTail (exp, expleft))))
+            | END                       (A.NilExp)
+
+letTail : SEMICOLON exp letTail         (fn e => e::(letTail (exp, expleft)))
+        | END                           (fn e => e::[])
+
+
+(**                      *
+  *                       *
+  *       Creation        *
+  *                       *
+  *                      **)
+
+arrCreate : lvalue LBRACK exp RBRACK OF exp (case lvalue of A.SimpleVar(s, p) => A.ArrayExp({typ=s, size=exp1, init=exp2, pos=p})
+                                                            | _ => ((ErrorMsg.error OFleft ("Illegal lValue used for array creation. Must use ID."));
+                                                                    A.NilExp))
+
+
+recCreate : ID LBRACE ID EQ exp fields  (A.RecordExp({fields = (fields (Symbol.symbol(ID), exp, IDleft)), typ = Symbol.symbol(ID), pos = IDleft}))
+          | ID LBRACE RBRACE            (A.RecordExp({fields = [], typ = Symbol.symbol(ID), pos = IDleft}))
+
+fields : COMMA ID EQ exp fields         (fn e => e::(fields (Symbol.symbol(ID), exp, IDleft)))
+       | RBRACE                         (fn e => e::[])
+(**                      *
+ *                       *
+ *      Declarations     *
+ *                       *
+ *                      **)
+
+dec : varDec dec1                       (fn e => e::(dec1 varDec))
+    | funDecs dec2                      (fn e => e::(dec2 (A.FunctionDec(funDecs NONE))))
+    | typDecs dec3                      (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
+    | IN                                (fn e => e::[])
+
+dec1 : funDecs dec2                     (fn e => e::(dec2 (A.FunctionDec(funDecs NONE))))
+     | typDecs dec3                     (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
+     | IN                               (fn e => e::[])
+dec2 : varDec dec1                      (fn e => e::(dec1 varDec))
+     | typDecs dec3                     (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
+     | IN                               (fn e => e::[])
+dec3 : varDec dec1                      (fn e => e::(dec1 varDec))
+     | funDecs dec2                     (fn e => e::(dec2 (A.FunctionDec(funDecs NONE))))
+     | IN                               (fn e => e::[])
+
+funDecs : funDec funDecs                (fn SOME(e) => e::(funDecs (SOME(funDec)))
+                                          | NONE => funDecs (SOME(funDec)))
+        | funDec                        (fn SOME(e) => e::funDec::[]
+                                          | NONE => funDec::[])
+
+typDecs : typeDec typDecs                (fn SOME(e) => e::(typDecs (SOME(typeDec)))
+                                          | NONE => typDecs (SOME(typeDec)))
+        | typeDec                        (fn SOME(e) => e::typeDec::[]
+                                          | NONE => typeDec::[])
+
+varDec : VAR ID ASSIGN exp              (A.VarDec({  name=Symbol.symbol(ID),
+                                             escape=ref true,
+                                             typ=NONE,
+                                             init=exp,
+                                             pos=VARleft}))
+       | VAR ID COLON ID ASSIGN exp     (A.VarDec({  name=Symbol.symbol(ID1),
+                                            escape=ref true,
+                                            typ=SOME((Symbol.symbol ID2), ID2left),
+                                            init=exp,
+                                            pos=VARleft}))
+
+funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID EQ exp  ({ name=(Symbol.symbol(ID1)),
+                                                                                    params=(argDef
+                                                                                        {name=(Symbol.symbol(ID2)),
+                                                                                        escape=ref true,
+                                                                                        typ=(Symbol.symbol(ID3)),
+                                                                                        pos=ID2left}),
+                                                                                    result=SOME((Symbol.symbol(ID4)), ID4left),
+                                                                                    body=exp,
+                                                                                    pos=FUNCTIONleft})
+        | FUNCTION ID LPAREN RPAREN COLON ID EQ exp                     ({ name=(Symbol.symbol(ID1)),
+                                                                                    params=([]),
+                                                                                    result=SOME((Symbol.symbol(ID2)), ID2left),
+                                                                                    body=exp,
+                                                                                    pos=FUNCTIONleft})
+        | FUNCTION ID LPAREN ID COLON ID argDef RPAREN EQ exp           ({ name=(Symbol.symbol(ID1)),
+                                                                                    params=(argDef
+                                                                                        {name=(Symbol.symbol(ID2)),
+                                                                                        escape=ref true,
+                                                                                        typ=(Symbol.symbol(ID3)),
+                                                                                        pos=ID2left}),
+                                                                                    result=NONE,
+                                                                                    body=exp,
+                                                                                    pos=FUNCTIONleft})
+        | FUNCTION ID LPAREN RPAREN EQ exp                              ({ name=(Symbol.symbol(ID1)),
+                                                                                    params=([]),
+                                                                                    result=NONE,
+                                                                                    body=exp,
+                                                                                    pos=FUNCTIONleft})
+
+typeDec : TYPE ID EQ ty             ({name=Symbol.symbol(ID), ty=ty, pos=TYPEleft})
+
+ty   : ID                           (A.NameTy(Symbol.symbol(ID), IDleft))
+     | ARRAY OF ID                  (A.ArrayTy(Symbol.symbol(ID), ARRAYleft))
+     | LBRACE ID COLON ID argDef    (A.RecordTy(argDef ({name=(Symbol.symbol(ID1)), escape=ref true, typ=(Symbol.symbol(ID2)), pos=IDleft})))
+     | LBRACE RBRACE                (A.RecordTy([]))
+
+argDef : COMMA ID COLON ID argDef   (fn e => e::(argDef ({name=(Symbol.symbol(ID1)), escape=ref true, typ=(Symbol.symbol(ID2)), pos=IDleft})))
+       | RBRACE                     (fn e => e::[])
+
+lvalue : lvalue LBRACK exp RBRACK   (A.SubscriptVar(lvalue, exp, LBRACKleft))                      (* subscript *)
+       | lvalue DOT ID              (A.FieldVar(lvalue, Symbol.symbol(ID), DOTleft))               (* field expression *)
+       | ID                         (A.SimpleVar(Symbol.symbol(ID), IDleft))

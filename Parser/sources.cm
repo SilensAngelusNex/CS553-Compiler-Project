@@ -1,8 +1,14 @@
 Group is
 
-../Lexer/tiger.lex
-errormsg.sml
-parsetest.sml
+absyn.sml
+../Lexer/errormsg.sml
+table.sig
+table.sml
+symbol.sml
+parse.sml
+prabsyn.sml
+tiger.lex
 tiger.grm
-smlnj-lib.cm
-ml-yacc-lib.cm
+$/smlnj-lib.cm
+$/ml-yacc-lib.cm
+$/basis.cm
