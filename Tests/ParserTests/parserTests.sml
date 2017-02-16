@@ -6,14 +6,16 @@ val testLocation = "Tests/ParserTests/"
 val resultLocation = "Tests/ParserTests/"
 val testFiles = [
 
-("test1", ["OpExp(PlusOp,", "IntExp(4),", "SeqExp[", "IfExp(", "IntExp(0),", "IntExp(2),", "IntExp(6))])"]),
+("test1", ["OpExp(PlusOp,", "IntExp(4),", "IfExp(", "IntExp(0),", "IntExp(2),", "IntExp(6)))"]),
 
 ("test2", ["SeqExp[", "AssignExp(", "SimpleVar(a),", "IntExp(5)),", "OpExp(PlusOp,", "VarExp(", "SimpleVar(a)),", "IntExp(1))]"]),
 
-("test3", ["LetExp([", "VarDec(a,true,NONE,", "IntExp(5)),", "FunctionDec[", "(f,[],", "SOME(int),", "CallExp(g,[", "VarExp(", "SimpleVar(a))])),", "(g,[", "(i,true,int)],", "NONE,", "CallExp(f,[]))]],", "SeqExp[])"])
+("test3", ["LetExp([", "VarDec(a,true,NONE,", "IntExp(5)),", "FunctionDec[", "(f,[],", "SOME(int),", "CallExp(g,[", "VarExp(", "SimpleVar(a))])),", "(g,[", "(i,true,int)],", "NONE,", "CallExp(f,[]))]],", "SeqExp[", "CallExp(f,[])])"]),
 
+("test4", ["LetExp([],", "SeqExp[", "NilExp,", "IntExp(1),", "SeqExp[", "IntExp(2),", "IntExp(3)],", "SeqExp[", "IntExp(2),", "IntExp(3),", "IntExp(4)]])"]),
+
+("test5", ["AssignExp(", "SimpleVar(x),", "OpExp(PlusOp,", "IntExp(5),", "IntExp(4)))"])
 ];
-
 
 fun printStrList strs = app (fn i => print(i ^ ", ")) strs;
 

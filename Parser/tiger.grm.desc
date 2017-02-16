@@ -1,7 +1,7 @@
 2 shift/reduce conflicts
 
-error:  state 38: shift/reduce conflict (shift TYPE, reduce by rule 66)
-error:  state 39: shift/reduce conflict (shift FUNCTION, reduce by rule 64)
+error:  state 38: shift/reduce conflict (shift TYPE, reduce by rule 71)
+error:  state 39: shift/reduce conflict (shift FUNCTION, reduce by rule 69)
 
 state 0:
 
@@ -20,7 +20,7 @@ state 0:
 	NIL	shift 12
 
 	exp	goto 11
-	program	goto 189
+	program	goto 195
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -37,38 +37,38 @@ state 0:
 
 state 1:
 
-	exp : assignExp .  (reduce by rule 20)
+	exp : assignExp .  (reduce by rule 22)
 
 
 
-	.	reduce by rule 20
+	.	reduce by rule 22
 
 
 state 2:
 
-	exp : callExp .  (reduce by rule 19)
-
-
-
-	.	reduce by rule 19
-
-
-state 3:
-
-	exp : recCreate .  (reduce by rule 21)
+	exp : callExp .  (reduce by rule 21)
 
 
 
 	.	reduce by rule 21
 
 
+state 3:
+
+	exp : recCreate .  (reduce by rule 23)
+
+
+
+	.	reduce by rule 23
+
+
 state 4:
 
-	exp : arrCreate .  (reduce by rule 22)
+	exp : arrCreate .  (reduce by rule 24)
 
 
 
-	.	reduce by rule 22
+	.	reduce by rule 24
 
 
 state 5:
@@ -109,7 +109,7 @@ state 8:
 
 state 9:
 
-	exp : lvalue .  (reduce by rule 27)
+	exp : lvalue .  (reduce by rule 29)
 	lvalue : lvalue . LBRACK exp RBRACK 
 	lvalue : lvalue . DOT ID 
 	arrCreate : lvalue . LBRACK exp RBRACK OF exp 
@@ -120,7 +120,7 @@ state 9:
 	ASSIGN	shift 23
 
 
-	.	reduce by rule 27
+	.	reduce by rule 29
 
 
 state 10:
@@ -167,28 +167,28 @@ state 11:
 
 state 12:
 
-	exp : NIL .  (reduce by rule 25)
+	exp : NIL .  (reduce by rule 27)
 
 
 
-	.	reduce by rule 25
+	.	reduce by rule 27
 
 
 state 13:
 
-	exp : BREAK .  (reduce by rule 26)
+	exp : BREAK .  (reduce by rule 28)
 
 
 
-	.	reduce by rule 26
+	.	reduce by rule 28
 
 
 state 14:
 
-	letExp : LET . varDec dec seqExp END 
-	letExp : LET . funDecs dec seqExp END 
-	letExp : LET . typDecs dec seqExp END 
-	letExp : LET . IN seqExp END 
+	letExp : LET . varDec dec letSequence 
+	letExp : LET . funDecs dec letSequence 
+	letExp : LET . typDecs dec letSequence 
+	letExp : LET . IN letSequence 
 
 	IN	shift 46
 	FUNCTION	shift 45
@@ -310,8 +310,9 @@ state 18:
 
 state 19:
 
-	seqExp : LPAREN . exp sequence 
-	seqExp : LPAREN . RPAREN 
+	exp : LPAREN . exp RPAREN 
+	exp : LPAREN . RPAREN 
+	seqExp : LPAREN . exp SEMICOLON exp sequence 
 
 	ID	shift 22
 	INT	shift 21
@@ -343,25 +344,25 @@ state 19:
 
 state 20:
 
-	exp : STRING .  (reduce by rule 24)
+	exp : STRING .  (reduce by rule 26)
 
 
 
-	.	reduce by rule 24
+	.	reduce by rule 26
 
 
 state 21:
 
-	exp : INT .  (reduce by rule 23)
+	exp : INT .  (reduce by rule 25)
 
 
 
-	.	reduce by rule 23
+	.	reduce by rule 25
 
 
 state 22:
 
-	lvalue : ID .  (reduce by rule 82)
+	lvalue : ID .  (reduce by rule 87)
 	recCreate : ID . LBRACE ID EQ exp fields 
 	recCreate : ID . LBRACE RBRACE 
 	callExp : ID . LPAREN exp params 
@@ -371,7 +372,7 @@ state 22:
 	LBRACE	shift 53
 
 
-	.	reduce by rule 82
+	.	reduce by rule 87
 
 
 state 23:
@@ -818,38 +819,38 @@ state 37:
 
 	.	error
 
-error:  state 38: shift/reduce conflict (shift TYPE, reduce by rule 66)
+error:  state 38: shift/reduce conflict (shift TYPE, reduce by rule 71)
 
 state 38:
 
 	typDecs : typeDec . typDecs 
-	typDecs : typeDec .  (reduce by rule 66)
+	typDecs : typeDec .  (reduce by rule 71)
 
 	TYPE	shift 43
 
 	typDecs	goto 70
 	typeDec	goto 38
 
-	.	reduce by rule 66
+	.	reduce by rule 71
 
-error:  state 39: shift/reduce conflict (shift FUNCTION, reduce by rule 64)
+error:  state 39: shift/reduce conflict (shift FUNCTION, reduce by rule 69)
 
 state 39:
 
 	funDecs : funDec . funDecs 
-	funDecs : funDec .  (reduce by rule 64)
+	funDecs : funDec .  (reduce by rule 69)
 
 	FUNCTION	shift 45
 
 	funDecs	goto 71
 	funDec	goto 39
 
-	.	reduce by rule 64
+	.	reduce by rule 69
 
 
 state 40:
 
-	letExp : LET varDec . dec seqExp END 
+	letExp : LET varDec . dec letSequence 
 
 	IN	shift 76
 	FUNCTION	shift 45
@@ -868,7 +869,7 @@ state 40:
 
 state 41:
 
-	letExp : LET funDecs . dec seqExp END 
+	letExp : LET funDecs . dec letSequence 
 
 	IN	shift 76
 	FUNCTION	shift 45
@@ -887,7 +888,7 @@ state 41:
 
 state 42:
 
-	letExp : LET typDecs . dec seqExp END 
+	letExp : LET typDecs . dec letSequence 
 
 	IN	shift 76
 	FUNCTION	shift 45
@@ -940,11 +941,33 @@ state 45:
 
 state 46:
 
-	letExp : LET IN . seqExp END 
+	letExp : LET IN . letSequence 
 
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
 	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	END	shift 84
+	BREAK	shift 13
+	NIL	shift 12
 
-	seqExp	goto 82
+	exp	goto 83
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+	letSequence	goto 82
 
 	.	error
 
@@ -953,7 +976,7 @@ state 47:
 
 	forExp : FOR ID . ASSIGN exp TO exp DO exp 
 
-	ASSIGN	shift 83
+	ASSIGN	shift 85
 
 
 	.	error
@@ -987,7 +1010,7 @@ state 48:
 	GE	shift 28
 	AND	shift 27
 	OR	shift 26
-	DO	shift 84
+	DO	shift 86
 
 
 	.	error
@@ -1022,7 +1045,7 @@ state 49:
 	GE	shift 28
 	AND	shift 27
 	OR	shift 26
-	THEN	shift 85
+	THEN	shift 87
 
 
 	.	error
@@ -1063,10 +1086,11 @@ state 51:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	seqExp : LPAREN exp . sequence 
+	exp : LPAREN exp . RPAREN 
+	seqExp : LPAREN exp . SEMICOLON exp sequence 
 
-	SEMICOLON	shift 88
-	RPAREN	shift 87
+	SEMICOLON	shift 89
+	RPAREN	shift 88
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -1080,18 +1104,17 @@ state 51:
 	AND	shift 27
 	OR	shift 26
 
-	sequence	goto 86
 
 	.	error
 
 
 state 52:
 
-	seqExp : LPAREN RPAREN .  (reduce by rule 42)
+	exp : LPAREN RPAREN .  (reduce by rule 20)
 
 
 
-	.	reduce by rule 42
+	.	reduce by rule 20
 
 
 state 53:
@@ -1099,8 +1122,8 @@ state 53:
 	recCreate : ID LBRACE . ID EQ exp fields 
 	recCreate : ID LBRACE . RBRACE 
 
-	ID	shift 90
-	RBRACE	shift 89
+	ID	shift 91
+	RBRACE	shift 90
 
 
 	.	error
@@ -1115,7 +1138,7 @@ state 54:
 	INT	shift 21
 	STRING	shift 20
 	LPAREN	shift 19
-	RPAREN	shift 92
+	RPAREN	shift 93
 	MINUS	shift 18
 	IF	shift 17
 	WHILE	shift 16
@@ -1124,7 +1147,7 @@ state 54:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 91
+	exp	goto 92
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -1153,7 +1176,7 @@ state 55:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	assignExp : lvalue ASSIGN exp .  (reduce by rule 40)
+	assignExp : lvalue ASSIGN exp .  (reduce by rule 42)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -1169,16 +1192,16 @@ state 55:
 	OR	shift 26
 
 
-	.	reduce by rule 40
+	.	reduce by rule 42
 
 
 state 56:
 
-	lvalue : lvalue DOT ID .  (reduce by rule 81)
+	lvalue : lvalue DOT ID .  (reduce by rule 86)
 
 
 
-	.	reduce by rule 81
+	.	reduce by rule 86
 
 
 state 57:
@@ -1198,7 +1221,7 @@ state 57:
 	lvalue : lvalue LBRACK exp . RBRACK 
 	arrCreate : lvalue LBRACK exp . RBRACK OF exp 
 
-	RBRACK	shift 93
+	RBRACK	shift 94
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -1519,33 +1542,33 @@ state 69:
 
 state 70:
 
-	typDecs : typeDec typDecs .  (reduce by rule 65)
+	typDecs : typeDec typDecs .  (reduce by rule 70)
 
 
 
-	.	reduce by rule 65
+	.	reduce by rule 70
 
 
 state 71:
 
-	funDecs : funDec funDecs .  (reduce by rule 63)
+	funDecs : funDec funDecs .  (reduce by rule 68)
 
 
 
-	.	reduce by rule 63
+	.	reduce by rule 68
 
 
 state 72:
 
 	dec : varDec . dec1 
 
-	IN	shift 97
+	IN	shift 98
 	FUNCTION	shift 45
 	TYPE	shift 43
 
-	dec1	goto 96
-	typDecs	goto 95
-	funDecs	goto 94
+	dec1	goto 97
+	typDecs	goto 96
+	funDecs	goto 95
 	funDec	goto 39
 	typeDec	goto 38
 
@@ -1556,13 +1579,13 @@ state 73:
 
 	dec : funDecs . dec2 
 
-	IN	shift 101
+	IN	shift 102
 	VAR	shift 44
 	TYPE	shift 43
 
-	dec2	goto 100
-	typDecs	goto 99
-	varDec	goto 98
+	dec2	goto 101
+	typDecs	goto 100
+	varDec	goto 99
 	typeDec	goto 38
 
 	.	error
@@ -1572,13 +1595,13 @@ state 74:
 
 	dec : typDecs . dec3 
 
-	IN	shift 105
+	IN	shift 106
 	FUNCTION	shift 45
 	VAR	shift 44
 
-	dec3	goto 104
-	funDecs	goto 103
-	varDec	goto 102
+	dec3	goto 105
+	funDecs	goto 104
+	varDec	goto 103
 	funDec	goto 39
 
 	.	error
@@ -1586,42 +1609,108 @@ state 74:
 
 state 75:
 
-	letExp : LET varDec dec . seqExp END 
+	letExp : LET varDec dec . letSequence 
 
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
 	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	END	shift 84
+	BREAK	shift 13
+	NIL	shift 12
 
-	seqExp	goto 106
+	exp	goto 83
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+	letSequence	goto 107
 
 	.	error
 
 
 state 76:
 
-	dec : IN .  (reduce by rule 53)
+	dec : IN .  (reduce by rule 58)
 
 
 
-	.	reduce by rule 53
+	.	reduce by rule 58
 
 
 state 77:
 
-	letExp : LET funDecs dec . seqExp END 
+	letExp : LET funDecs dec . letSequence 
 
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
 	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	END	shift 84
+	BREAK	shift 13
+	NIL	shift 12
 
-	seqExp	goto 107
+	exp	goto 83
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+	letSequence	goto 108
 
 	.	error
 
 
 state 78:
 
-	letExp : LET typDecs dec . seqExp END 
+	letExp : LET typDecs dec . letSequence 
 
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
 	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	END	shift 84
+	BREAK	shift 13
+	NIL	shift 12
 
-	seqExp	goto 108
+	exp	goto 83
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+	letSequence	goto 109
 
 	.	error
 
@@ -1630,7 +1719,7 @@ state 79:
 
 	typeDec : TYPE ID . EQ ty 
 
-	EQ	shift 109
+	EQ	shift 110
 
 
 	.	error
@@ -1641,8 +1730,8 @@ state 80:
 	varDec : VAR ID . ASSIGN exp 
 	varDec : VAR ID . COLON ID ASSIGN exp 
 
-	COLON	shift 111
-	ASSIGN	shift 110
+	COLON	shift 112
+	ASSIGN	shift 111
 
 
 	.	error
@@ -1655,7 +1744,7 @@ state 81:
 	funDec : FUNCTION ID . LPAREN ID COLON ID argDef RPAREN EQ exp 
 	funDec : FUNCTION ID . LPAREN RPAREN EQ exp 
 
-	LPAREN	shift 112
+	LPAREN	shift 113
 
 
 	.	error
@@ -1663,129 +1752,61 @@ state 81:
 
 state 82:
 
-	letExp : LET IN seqExp . END 
-
-	END	shift 113
+	letExp : LET IN letSequence .  (reduce by rule 35)
 
 
-	.	error
+
+	.	reduce by rule 35
 
 
 state 83:
 
-	forExp : FOR ID ASSIGN . exp TO exp DO exp 
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	letSequence : exp . letTail 
 
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
+	SEMICOLON	shift 116
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
+	END	shift 115
 
-	exp	goto 114
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
+	letTail	goto 114
 
 	.	error
 
 
 state 84:
 
-	whileExp : WHILE exp DO . exp 
+	letSequence : END .  (reduce by rule 47)
 
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
 
-	exp	goto 115
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
 
-	.	error
+	.	reduce by rule 47
 
 
 state 85:
 
-	ifExp : IF exp THEN . exp 
-	ifExp : IF exp THEN . exp ELSE exp 
-
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
-
-	exp	goto 116
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
-
-	.	error
-
-
-state 86:
-
-	seqExp : LPAREN exp sequence .  (reduce by rule 41)
-
-
-
-	.	reduce by rule 41
-
-
-state 87:
-
-	sequence : RPAREN .  (reduce by rule 44)
-
-
-
-	.	reduce by rule 44
-
-
-state 88:
-
-	sequence : SEMICOLON . exp sequence 
+	forExp : FOR ID ASSIGN . exp TO exp DO exp 
 
 	ID	shift 22
 	INT	shift 21
@@ -1814,26 +1835,129 @@ state 88:
 	.	error
 
 
+state 86:
+
+	whileExp : WHILE exp DO . exp 
+
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
+
+	exp	goto 118
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+
+	.	error
+
+
+state 87:
+
+	ifExp : IF exp THEN . exp 
+	ifExp : IF exp THEN . exp ELSE exp 
+
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
+
+	exp	goto 119
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+
+	.	error
+
+
+state 88:
+
+	exp : LPAREN exp RPAREN .  (reduce by rule 19)
+
+
+
+	.	reduce by rule 19
+
+
 state 89:
 
-	recCreate : ID LBRACE RBRACE .  (reduce by rule 47)
+	seqExp : LPAREN exp SEMICOLON . exp sequence 
 
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
 
+	exp	goto 120
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
 
-	.	reduce by rule 47
+	.	error
 
 
 state 90:
 
+	recCreate : ID LBRACE RBRACE .  (reduce by rule 52)
+
+
+
+	.	reduce by rule 52
+
+
+state 91:
+
 	recCreate : ID LBRACE ID . EQ exp fields 
 
-	EQ	shift 118
+	EQ	shift 121
 
 
 	.	error
 
 
-state 91:
+state 92:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -1849,8 +1973,8 @@ state 91:
 	exp : exp . OR exp 
 	callExp : ID LPAREN exp . params 
 
-	COMMA	shift 121
-	RPAREN	shift 120
+	COMMA	shift 124
+	RPAREN	shift 123
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -1864,160 +1988,144 @@ state 91:
 	AND	shift 27
 	OR	shift 26
 
-	params	goto 119
+	params	goto 122
 
 	.	error
-
-
-state 92:
-
-	callExp : ID LPAREN RPAREN .  (reduce by rule 37)
-
-
-
-	.	reduce by rule 37
 
 
 state 93:
 
-	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 80)
-	arrCreate : lvalue LBRACK exp RBRACK . OF exp 
-
-	OF	shift 122
+	callExp : ID LPAREN RPAREN .  (reduce by rule 39)
 
 
-	.	reduce by rule 80
+
+	.	reduce by rule 39
 
 
 state 94:
 
-	dec1 : funDecs . dec2 
+	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 85)
+	arrCreate : lvalue LBRACK exp RBRACK . OF exp 
 
-	IN	shift 101
-	VAR	shift 44
-	TYPE	shift 43
+	OF	shift 125
 
-	dec2	goto 123
-	typDecs	goto 99
-	varDec	goto 98
-	typeDec	goto 38
 
-	.	error
+	.	reduce by rule 85
 
 
 state 95:
 
-	dec1 : typDecs . dec3 
+	dec1 : funDecs . dec2 
 
-	IN	shift 105
-	FUNCTION	shift 45
+	IN	shift 102
 	VAR	shift 44
+	TYPE	shift 43
 
-	dec3	goto 124
-	funDecs	goto 103
-	varDec	goto 102
-	funDec	goto 39
+	dec2	goto 126
+	typDecs	goto 100
+	varDec	goto 99
+	typeDec	goto 38
 
 	.	error
 
 
 state 96:
 
-	dec : varDec dec1 .  (reduce by rule 50)
+	dec1 : typDecs . dec3 
 
-
-
-	.	reduce by rule 50
-
-
-state 97:
-
-	dec1 : IN .  (reduce by rule 56)
-
-
-
-	.	reduce by rule 56
-
-
-state 98:
-
-	dec2 : varDec . dec1 
-
-	IN	shift 97
+	IN	shift 106
 	FUNCTION	shift 45
-	TYPE	shift 43
+	VAR	shift 44
 
-	dec1	goto 125
-	typDecs	goto 95
-	funDecs	goto 94
+	dec3	goto 127
+	funDecs	goto 104
+	varDec	goto 103
 	funDec	goto 39
-	typeDec	goto 38
 
 	.	error
 
 
+state 97:
+
+	dec : varDec dec1 .  (reduce by rule 55)
+
+
+
+	.	reduce by rule 55
+
+
+state 98:
+
+	dec1 : IN .  (reduce by rule 61)
+
+
+
+	.	reduce by rule 61
+
+
 state 99:
 
-	dec2 : typDecs . dec3 
+	dec2 : varDec . dec1 
 
-	IN	shift 105
+	IN	shift 98
 	FUNCTION	shift 45
-	VAR	shift 44
+	TYPE	shift 43
 
-	dec3	goto 126
-	funDecs	goto 103
-	varDec	goto 102
+	dec1	goto 128
+	typDecs	goto 96
+	funDecs	goto 95
 	funDec	goto 39
+	typeDec	goto 38
 
 	.	error
 
 
 state 100:
 
-	dec : funDecs dec2 .  (reduce by rule 51)
+	dec2 : typDecs . dec3 
 
-
-
-	.	reduce by rule 51
-
-
-state 101:
-
-	dec2 : IN .  (reduce by rule 59)
-
-
-
-	.	reduce by rule 59
-
-
-state 102:
-
-	dec3 : varDec . dec1 
-
-	IN	shift 97
+	IN	shift 106
 	FUNCTION	shift 45
-	TYPE	shift 43
+	VAR	shift 44
 
-	dec1	goto 127
-	typDecs	goto 95
-	funDecs	goto 94
+	dec3	goto 129
+	funDecs	goto 104
+	varDec	goto 103
 	funDec	goto 39
-	typeDec	goto 38
 
 	.	error
 
 
+state 101:
+
+	dec : funDecs dec2 .  (reduce by rule 56)
+
+
+
+	.	reduce by rule 56
+
+
+state 102:
+
+	dec2 : IN .  (reduce by rule 64)
+
+
+
+	.	reduce by rule 64
+
+
 state 103:
 
-	dec3 : funDecs . dec2 
+	dec3 : varDec . dec1 
 
-	IN	shift 101
-	VAR	shift 44
+	IN	shift 98
+	FUNCTION	shift 45
 	TYPE	shift 43
 
-	dec2	goto 128
-	typDecs	goto 99
-	varDec	goto 98
+	dec1	goto 130
+	typDecs	goto 96
+	funDecs	goto 95
+	funDec	goto 39
 	typeDec	goto 38
 
 	.	error
@@ -2025,53 +2133,66 @@ state 103:
 
 state 104:
 
-	dec : typDecs dec3 .  (reduce by rule 52)
+	dec3 : funDecs . dec2 
 
+	IN	shift 102
+	VAR	shift 44
+	TYPE	shift 43
 
+	dec2	goto 131
+	typDecs	goto 100
+	varDec	goto 99
+	typeDec	goto 38
 
-	.	reduce by rule 52
+	.	error
 
 
 state 105:
 
-	dec3 : IN .  (reduce by rule 62)
+	dec : typDecs dec3 .  (reduce by rule 57)
 
 
 
-	.	reduce by rule 62
+	.	reduce by rule 57
 
 
 state 106:
 
-	letExp : LET varDec dec seqExp . END 
-
-	END	shift 129
+	dec3 : IN .  (reduce by rule 67)
 
 
-	.	error
+
+	.	reduce by rule 67
 
 
 state 107:
 
-	letExp : LET funDecs dec seqExp . END 
-
-	END	shift 130
+	letExp : LET varDec dec letSequence .  (reduce by rule 32)
 
 
-	.	error
+
+	.	reduce by rule 32
 
 
 state 108:
 
-	letExp : LET typDecs dec seqExp . END 
-
-	END	shift 131
+	letExp : LET funDecs dec letSequence .  (reduce by rule 33)
 
 
-	.	error
+
+	.	reduce by rule 33
 
 
 state 109:
+
+	letExp : LET typDecs dec letSequence .  (reduce by rule 34)
+
+
+
+	.	reduce by rule 34
+
+
+state 110:
 
 	typeDec : TYPE ID EQ . ty 
 
@@ -2084,7 +2205,7 @@ state 109:
 	.	error
 
 
-state 110:
+state 111:
 
 	varDec : VAR ID ASSIGN . exp 
 
@@ -2115,7 +2236,7 @@ state 110:
 	.	error
 
 
-state 111:
+state 112:
 
 	varDec : VAR ID COLON . ID ASSIGN exp 
 
@@ -2125,7 +2246,7 @@ state 111:
 	.	error
 
 
-state 112:
+state 113:
 
 	funDec : FUNCTION ID LPAREN . ID COLON ID argDef RPAREN COLON ID EQ exp 
 	funDec : FUNCTION ID LPAREN . RPAREN COLON ID EQ exp 
@@ -2139,16 +2260,56 @@ state 112:
 	.	error
 
 
-state 113:
-
-	letExp : LET IN seqExp END .  (reduce by rule 33)
-
-
-
-	.	reduce by rule 33
-
-
 state 114:
+
+	letSequence : exp letTail .  (reduce by rule 46)
+
+
+
+	.	reduce by rule 46
+
+
+state 115:
+
+	letTail : END .  (reduce by rule 49)
+
+
+
+	.	reduce by rule 49
+
+
+state 116:
+
+	letTail : SEMICOLON . exp letTail 
+
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
+
+	exp	goto 140
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+
+	.	error
+
+
+state 117:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2176,13 +2337,13 @@ state 114:
 	GE	shift 28
 	AND	shift 27
 	OR	shift 26
-	TO	shift 140
+	TO	shift 141
 
 
 	.	error
 
 
-state 115:
+state 118:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2196,7 +2357,7 @@ state 115:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	whileExp : WHILE exp DO exp .  (reduce by rule 34)
+	whileExp : WHILE exp DO exp .  (reduce by rule 36)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -2212,10 +2373,10 @@ state 115:
 	OR	shift 26
 
 
-	.	reduce by rule 34
+	.	reduce by rule 36
 
 
-state 116:
+state 119:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2229,7 +2390,7 @@ state 116:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	ifExp : IF exp THEN exp .  (reduce by rule 28)
+	ifExp : IF exp THEN exp .  (reduce by rule 30)
 	ifExp : IF exp THEN exp . ELSE exp 
 
 	PLUS	shift 37
@@ -2244,13 +2405,13 @@ state 116:
 	GE	shift 28
 	AND	shift 27
 	OR	shift 26
-	ELSE	shift 141
+	ELSE	shift 142
 
 
-	.	reduce by rule 28
+	.	reduce by rule 30
 
 
-state 117:
+state 120:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2264,10 +2425,10 @@ state 117:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	sequence : SEMICOLON exp . sequence 
+	seqExp : LPAREN exp SEMICOLON exp . sequence 
 
-	SEMICOLON	shift 88
-	RPAREN	shift 87
+	SEMICOLON	shift 145
+	RPAREN	shift 144
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -2281,12 +2442,12 @@ state 117:
 	AND	shift 27
 	OR	shift 26
 
-	sequence	goto 142
+	sequence	goto 143
 
 	.	error
 
 
-state 118:
+state 121:
 
 	recCreate : ID LBRACE ID EQ . exp fields 
 
@@ -2302,56 +2463,7 @@ state 118:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 143
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
-
-	.	error
-
-
-state 119:
-
-	callExp : ID LPAREN exp params .  (reduce by rule 36)
-
-
-
-	.	reduce by rule 36
-
-
-state 120:
-
-	params : RPAREN .  (reduce by rule 39)
-
-
-
-	.	reduce by rule 39
-
-
-state 121:
-
-	params : COMMA . exp params 
-
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
-
-	exp	goto 144
+	exp	goto 146
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -2368,7 +2480,25 @@ state 121:
 
 state 122:
 
-	arrCreate : lvalue LBRACK exp RBRACK OF . exp 
+	callExp : ID LPAREN exp params .  (reduce by rule 38)
+
+
+
+	.	reduce by rule 38
+
+
+state 123:
+
+	params : RPAREN .  (reduce by rule 41)
+
+
+
+	.	reduce by rule 41
+
+
+state 124:
+
+	params : COMMA . exp params 
 
 	ID	shift 22
 	INT	shift 21
@@ -2382,7 +2512,7 @@ state 122:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 145
+	exp	goto 147
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -2397,45 +2527,49 @@ state 122:
 	.	error
 
 
-state 123:
-
-	dec1 : funDecs dec2 .  (reduce by rule 54)
-
-
-
-	.	reduce by rule 54
-
-
-state 124:
-
-	dec1 : typDecs dec3 .  (reduce by rule 55)
-
-
-
-	.	reduce by rule 55
-
-
 state 125:
 
-	dec2 : varDec dec1 .  (reduce by rule 57)
+	arrCreate : lvalue LBRACK exp RBRACK OF . exp 
 
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
 
+	exp	goto 148
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
 
-	.	reduce by rule 57
+	.	error
 
 
 state 126:
 
-	dec2 : typDecs dec3 .  (reduce by rule 58)
+	dec1 : funDecs dec2 .  (reduce by rule 59)
 
 
 
-	.	reduce by rule 58
+	.	reduce by rule 59
 
 
 state 127:
 
-	dec3 : varDec dec1 .  (reduce by rule 60)
+	dec1 : typDecs dec3 .  (reduce by rule 60)
 
 
 
@@ -2444,54 +2578,54 @@ state 127:
 
 state 128:
 
-	dec3 : funDecs dec2 .  (reduce by rule 61)
+	dec2 : varDec dec1 .  (reduce by rule 62)
 
 
 
-	.	reduce by rule 61
+	.	reduce by rule 62
 
 
 state 129:
 
-	letExp : LET varDec dec seqExp END .  (reduce by rule 30)
+	dec2 : typDecs dec3 .  (reduce by rule 63)
 
 
 
-	.	reduce by rule 30
+	.	reduce by rule 63
 
 
 state 130:
 
-	letExp : LET funDecs dec seqExp END .  (reduce by rule 31)
+	dec3 : varDec dec1 .  (reduce by rule 65)
 
 
 
-	.	reduce by rule 31
+	.	reduce by rule 65
 
 
 state 131:
 
-	letExp : LET typDecs dec seqExp END .  (reduce by rule 32)
+	dec3 : funDecs dec2 .  (reduce by rule 66)
 
 
 
-	.	reduce by rule 32
+	.	reduce by rule 66
 
 
 state 132:
 
-	typeDec : TYPE ID EQ ty .  (reduce by rule 73)
+	typeDec : TYPE ID EQ ty .  (reduce by rule 78)
 
 
 
-	.	reduce by rule 73
+	.	reduce by rule 78
 
 
 state 133:
 
 	ty : ARRAY . OF ID 
 
-	OF	shift 146
+	OF	shift 149
 
 
 	.	error
@@ -2502,8 +2636,8 @@ state 134:
 	ty : LBRACE . ID COLON ID argDef 
 	ty : LBRACE . RBRACE 
 
-	ID	shift 148
-	RBRACE	shift 147
+	ID	shift 151
+	RBRACE	shift 150
 
 
 	.	error
@@ -2511,11 +2645,11 @@ state 134:
 
 state 135:
 
-	ty : ID .  (reduce by rule 74)
+	ty : ID .  (reduce by rule 79)
 
 
 
-	.	reduce by rule 74
+	.	reduce by rule 79
 
 
 state 136:
@@ -2532,7 +2666,7 @@ state 136:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	varDec : VAR ID ASSIGN exp .  (reduce by rule 67)
+	varDec : VAR ID ASSIGN exp .  (reduce by rule 72)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -2548,14 +2682,14 @@ state 136:
 	OR	shift 26
 
 
-	.	reduce by rule 67
+	.	reduce by rule 72
 
 
 state 137:
 
 	varDec : VAR ID COLON ID . ASSIGN exp 
 
-	ASSIGN	shift 149
+	ASSIGN	shift 152
 
 
 	.	error
@@ -2566,8 +2700,8 @@ state 138:
 	funDec : FUNCTION ID LPAREN RPAREN . COLON ID EQ exp 
 	funDec : FUNCTION ID LPAREN RPAREN . EQ exp 
 
-	COLON	shift 151
-	EQ	shift 150
+	COLON	shift 154
+	EQ	shift 153
 
 
 	.	error
@@ -2578,13 +2712,49 @@ state 139:
 	funDec : FUNCTION ID LPAREN ID . COLON ID argDef RPAREN COLON ID EQ exp 
 	funDec : FUNCTION ID LPAREN ID . COLON ID argDef RPAREN EQ exp 
 
-	COLON	shift 152
+	COLON	shift 155
 
 
 	.	error
 
 
 state 140:
+
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	letTail : SEMICOLON exp . letTail 
+
+	SEMICOLON	shift 116
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
+	END	shift 115
+
+	letTail	goto 156
+
+	.	error
+
+
+state 141:
 
 	forExp : FOR ID ASSIGN exp TO . exp DO exp 
 
@@ -2600,38 +2770,7 @@ state 140:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 153
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
-
-	.	error
-
-
-state 141:
-
-	ifExp : IF exp THEN exp ELSE . exp 
-
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
-
-	exp	goto 154
+	exp	goto 157
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -2648,14 +2787,85 @@ state 141:
 
 state 142:
 
-	sequence : SEMICOLON exp sequence .  (reduce by rule 43)
+	ifExp : IF exp THEN exp ELSE . exp 
+
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
+
+	exp	goto 158
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+
+	.	error
+
+
+state 143:
+
+	seqExp : LPAREN exp SEMICOLON exp sequence .  (reduce by rule 43)
 
 
 
 	.	reduce by rule 43
 
 
-state 143:
+state 144:
+
+	sequence : RPAREN .  (reduce by rule 45)
+
+
+
+	.	reduce by rule 45
+
+
+state 145:
+
+	sequence : SEMICOLON . exp sequence 
+
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
+
+	exp	goto 159
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+
+	.	error
+
+
+state 146:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2671,8 +2881,8 @@ state 143:
 	exp : exp . OR exp 
 	recCreate : ID LBRACE ID EQ exp . fields 
 
-	COMMA	shift 157
-	RBRACE	shift 156
+	COMMA	shift 162
+	RBRACE	shift 161
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -2686,12 +2896,12 @@ state 143:
 	AND	shift 27
 	OR	shift 26
 
-	fields	goto 155
+	fields	goto 160
 
 	.	error
 
 
-state 144:
+state 147:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2707,8 +2917,8 @@ state 144:
 	exp : exp . OR exp 
 	params : COMMA exp . params 
 
-	COMMA	shift 121
-	RPAREN	shift 120
+	COMMA	shift 124
+	RPAREN	shift 123
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -2722,12 +2932,12 @@ state 144:
 	AND	shift 27
 	OR	shift 26
 
-	params	goto 158
+	params	goto 163
 
 	.	error
 
 
-state 145:
+state 148:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2741,7 +2951,7 @@ state 145:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	arrCreate : lvalue LBRACK exp RBRACK OF exp .  (reduce by rule 45)
+	arrCreate : lvalue LBRACK exp RBRACK OF exp .  (reduce by rule 50)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -2757,39 +2967,39 @@ state 145:
 	OR	shift 26
 
 
-	.	reduce by rule 45
-
-
-state 146:
-
-	ty : ARRAY OF . ID 
-
-	ID	shift 159
-
-
-	.	error
-
-
-state 147:
-
-	ty : LBRACE RBRACE .  (reduce by rule 77)
-
-
-
-	.	reduce by rule 77
-
-
-state 148:
-
-	ty : LBRACE ID . COLON ID argDef 
-
-	COLON	shift 160
-
-
-	.	error
+	.	reduce by rule 50
 
 
 state 149:
+
+	ty : ARRAY OF . ID 
+
+	ID	shift 164
+
+
+	.	error
+
+
+state 150:
+
+	ty : LBRACE RBRACE .  (reduce by rule 82)
+
+
+
+	.	reduce by rule 82
+
+
+state 151:
+
+	ty : LBRACE ID . COLON ID argDef 
+
+	COLON	shift 165
+
+
+	.	error
+
+
+state 152:
 
 	varDec : VAR ID COLON ID ASSIGN . exp 
 
@@ -2805,7 +3015,7 @@ state 149:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 161
+	exp	goto 166
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -2820,7 +3030,7 @@ state 149:
 	.	error
 
 
-state 150:
+state 153:
 
 	funDec : FUNCTION ID LPAREN RPAREN EQ . exp 
 
@@ -2836,7 +3046,7 @@ state 150:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 162
+	exp	goto 167
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -2851,28 +3061,37 @@ state 150:
 	.	error
 
 
-state 151:
+state 154:
 
 	funDec : FUNCTION ID LPAREN RPAREN COLON . ID EQ exp 
 
-	ID	shift 163
+	ID	shift 168
 
 
 	.	error
 
 
-state 152:
+state 155:
 
 	funDec : FUNCTION ID LPAREN ID COLON . ID argDef RPAREN COLON ID EQ exp 
 	funDec : FUNCTION ID LPAREN ID COLON . ID argDef RPAREN EQ exp 
 
-	ID	shift 164
+	ID	shift 169
 
 
 	.	error
 
 
-state 153:
+state 156:
+
+	letTail : SEMICOLON exp letTail .  (reduce by rule 48)
+
+
+
+	.	reduce by rule 48
+
+
+state 157:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -2900,68 +3119,7 @@ state 153:
 	GE	shift 28
 	AND	shift 27
 	OR	shift 26
-	DO	shift 165
-
-
-	.	error
-
-
-state 154:
-
-	exp : exp . PLUS exp 
-	exp : exp . MINUS exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . TIMES exp 
-	exp : exp . EQ exp 
-	exp : exp . NEQ exp 
-	exp : exp . GT exp 
-	exp : exp . GE exp 
-	exp : exp . LT exp 
-	exp : exp . LE exp 
-	exp : exp . AND exp 
-	exp : exp . OR exp 
-	ifExp : IF exp THEN exp ELSE exp .  (reduce by rule 29)
-
-	PLUS	shift 37
-	MINUS	shift 36
-	TIMES	shift 35
-	DIVIDE	shift 34
-	EQ	shift 33
-	NEQ	shift 32
-	LT	shift 31
-	LE	shift 30
-	GT	shift 29
-	GE	shift 28
-	AND	shift 27
-	OR	shift 26
-
-
-	.	reduce by rule 29
-
-
-state 155:
-
-	recCreate : ID LBRACE ID EQ exp fields .  (reduce by rule 46)
-
-
-
-	.	reduce by rule 46
-
-
-state 156:
-
-	fields : RBRACE .  (reduce by rule 49)
-
-
-
-	.	reduce by rule 49
-
-
-state 157:
-
-	fields : COMMA . ID EQ exp fields 
-
-	ID	shift 166
+	DO	shift 170
 
 
 	.	error
@@ -2969,237 +3127,131 @@ state 157:
 
 state 158:
 
-	params : COMMA exp params .  (reduce by rule 38)
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	ifExp : IF exp THEN exp ELSE exp .  (reduce by rule 31)
+
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
 
 
-
-	.	reduce by rule 38
+	.	reduce by rule 31
 
 
 state 159:
 
-	ty : ARRAY OF ID .  (reduce by rule 75)
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	sequence : SEMICOLON exp . sequence 
 
+	SEMICOLON	shift 145
+	RPAREN	shift 144
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
 
+	sequence	goto 171
 
-	.	reduce by rule 75
+	.	error
 
 
 state 160:
 
-	ty : LBRACE ID COLON . ID argDef 
-
-	ID	shift 167
+	recCreate : ID LBRACE ID EQ exp fields .  (reduce by rule 51)
 
 
-	.	error
+
+	.	reduce by rule 51
 
 
 state 161:
 
-	exp : exp . PLUS exp 
-	exp : exp . MINUS exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . TIMES exp 
-	exp : exp . EQ exp 
-	exp : exp . NEQ exp 
-	exp : exp . GT exp 
-	exp : exp . GE exp 
-	exp : exp . LT exp 
-	exp : exp . LE exp 
-	exp : exp . AND exp 
-	exp : exp . OR exp 
-	varDec : VAR ID COLON ID ASSIGN exp .  (reduce by rule 68)
-
-	PLUS	shift 37
-	MINUS	shift 36
-	TIMES	shift 35
-	DIVIDE	shift 34
-	EQ	shift 33
-	NEQ	shift 32
-	LT	shift 31
-	LE	shift 30
-	GT	shift 29
-	GE	shift 28
-	AND	shift 27
-	OR	shift 26
+	fields : RBRACE .  (reduce by rule 54)
 
 
-	.	reduce by rule 68
+
+	.	reduce by rule 54
 
 
 state 162:
 
-	exp : exp . PLUS exp 
-	exp : exp . MINUS exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . TIMES exp 
-	exp : exp . EQ exp 
-	exp : exp . NEQ exp 
-	exp : exp . GT exp 
-	exp : exp . GE exp 
-	exp : exp . LT exp 
-	exp : exp . LE exp 
-	exp : exp . AND exp 
-	exp : exp . OR exp 
-	funDec : FUNCTION ID LPAREN RPAREN EQ exp .  (reduce by rule 72)
+	fields : COMMA . ID EQ exp fields 
 
-	PLUS	shift 37
-	MINUS	shift 36
-	TIMES	shift 35
-	DIVIDE	shift 34
-	EQ	shift 33
-	NEQ	shift 32
-	LT	shift 31
-	LE	shift 30
-	GT	shift 29
-	GE	shift 28
-	AND	shift 27
-	OR	shift 26
+	ID	shift 172
 
 
-	.	reduce by rule 72
+	.	error
 
 
 state 163:
 
-	funDec : FUNCTION ID LPAREN RPAREN COLON ID . EQ exp 
-
-	EQ	shift 168
+	params : COMMA exp params .  (reduce by rule 40)
 
 
-	.	error
+
+	.	reduce by rule 40
 
 
 state 164:
 
-	funDec : FUNCTION ID LPAREN ID COLON ID . argDef RPAREN COLON ID EQ exp 
-	funDec : FUNCTION ID LPAREN ID COLON ID . argDef RPAREN EQ exp 
+	ty : ARRAY OF ID .  (reduce by rule 80)
 
-	COMMA	shift 171
-	RBRACE	shift 170
 
-	argDef	goto 169
 
-	.	error
+	.	reduce by rule 80
 
 
 state 165:
 
-	forExp : FOR ID ASSIGN exp TO exp DO . exp 
+	ty : LBRACE ID COLON . ID argDef 
 
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
+	ID	shift 173
 
-	exp	goto 172
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
 
 	.	error
 
 
 state 166:
 
-	fields : COMMA ID . EQ exp fields 
-
-	EQ	shift 173
-
-
-	.	error
-
-
-state 167:
-
-	ty : LBRACE ID COLON ID . argDef 
-
-	COMMA	shift 171
-	RBRACE	shift 170
-
-	argDef	goto 174
-
-	.	error
-
-
-state 168:
-
-	funDec : FUNCTION ID LPAREN RPAREN COLON ID EQ . exp 
-
-	ID	shift 22
-	INT	shift 21
-	STRING	shift 20
-	LPAREN	shift 19
-	MINUS	shift 18
-	IF	shift 17
-	WHILE	shift 16
-	FOR	shift 15
-	LET	shift 14
-	BREAK	shift 13
-	NIL	shift 12
-
-	exp	goto 175
-	seqExp	goto 10
-	lvalue	goto 9
-	ifExp	goto 8
-	whileExp	goto 7
-	forExp	goto 6
-	letExp	goto 5
-	arrCreate	goto 4
-	recCreate	goto 3
-	callExp	goto 2
-	assignExp	goto 1
-
-	.	error
-
-
-state 169:
-
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef . RPAREN COLON ID EQ exp 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef . RPAREN EQ exp 
-
-	RPAREN	shift 176
-
-
-	.	error
-
-
-state 170:
-
-	argDef : RBRACE .  (reduce by rule 79)
-
-
-
-	.	reduce by rule 79
-
-
-state 171:
-
-	argDef : COMMA . ID COLON ID argDef 
-
-	ID	shift 177
-
-
-	.	error
-
-
-state 172:
-
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
 	exp : exp . DIVIDE exp 
@@ -3212,7 +3264,7 @@ state 172:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	forExp : FOR ID ASSIGN exp TO exp DO exp .  (reduce by rule 35)
+	varDec : VAR ID COLON ID ASSIGN exp .  (reduce by rule 73)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -3228,12 +3280,68 @@ state 172:
 	OR	shift 26
 
 
-	.	reduce by rule 35
+	.	reduce by rule 73
 
 
-state 173:
+state 167:
 
-	fields : COMMA ID EQ . exp fields 
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	funDec : FUNCTION ID LPAREN RPAREN EQ exp .  (reduce by rule 77)
+
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
+
+
+	.	reduce by rule 77
+
+
+state 168:
+
+	funDec : FUNCTION ID LPAREN RPAREN COLON ID . EQ exp 
+
+	EQ	shift 174
+
+
+	.	error
+
+
+state 169:
+
+	funDec : FUNCTION ID LPAREN ID COLON ID . argDef RPAREN COLON ID EQ exp 
+	funDec : FUNCTION ID LPAREN ID COLON ID . argDef RPAREN EQ exp 
+
+	COMMA	shift 177
+	RBRACE	shift 176
+
+	argDef	goto 175
+
+	.	error
+
+
+state 170:
+
+	forExp : FOR ID ASSIGN exp TO exp DO . exp 
 
 	ID	shift 22
 	INT	shift 21
@@ -3262,65 +3370,93 @@ state 173:
 	.	error
 
 
-state 174:
+state 171:
 
-	ty : LBRACE ID COLON ID argDef .  (reduce by rule 76)
-
-
-
-	.	reduce by rule 76
+	sequence : SEMICOLON exp sequence .  (reduce by rule 44)
 
 
-state 175:
 
-	exp : exp . PLUS exp 
-	exp : exp . MINUS exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . TIMES exp 
-	exp : exp . EQ exp 
-	exp : exp . NEQ exp 
-	exp : exp . GT exp 
-	exp : exp . GE exp 
-	exp : exp . LT exp 
-	exp : exp . LE exp 
-	exp : exp . AND exp 
-	exp : exp . OR exp 
-	funDec : FUNCTION ID LPAREN RPAREN COLON ID EQ exp .  (reduce by rule 70)
-
-	PLUS	shift 37
-	MINUS	shift 36
-	TIMES	shift 35
-	DIVIDE	shift 34
-	EQ	shift 33
-	NEQ	shift 32
-	LT	shift 31
-	LE	shift 30
-	GT	shift 29
-	GE	shift 28
-	AND	shift 27
-	OR	shift 26
+	.	reduce by rule 44
 
 
-	.	reduce by rule 70
+state 172:
 
+	fields : COMMA ID . EQ exp fields 
 
-state 176:
-
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN . COLON ID EQ exp 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN . EQ exp 
-
-	COLON	shift 180
 	EQ	shift 179
 
 
 	.	error
 
 
+state 173:
+
+	ty : LBRACE ID COLON ID . argDef 
+
+	COMMA	shift 177
+	RBRACE	shift 176
+
+	argDef	goto 180
+
+	.	error
+
+
+state 174:
+
+	funDec : FUNCTION ID LPAREN RPAREN COLON ID EQ . exp 
+
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
+
+	exp	goto 181
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
+
+	.	error
+
+
+state 175:
+
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef . RPAREN COLON ID EQ exp 
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef . RPAREN EQ exp 
+
+	RPAREN	shift 182
+
+
+	.	error
+
+
+state 176:
+
+	argDef : RBRACE .  (reduce by rule 84)
+
+
+
+	.	reduce by rule 84
+
+
 state 177:
 
-	argDef : COMMA ID . COLON ID argDef 
+	argDef : COMMA . ID COLON ID argDef 
 
-	COLON	shift 181
+	ID	shift 183
 
 
 	.	error
@@ -3340,10 +3476,8 @@ state 178:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	fields : COMMA ID EQ exp . fields 
+	forExp : FOR ID ASSIGN exp TO exp DO exp .  (reduce by rule 37)
 
-	COMMA	shift 157
-	RBRACE	shift 156
 	PLUS	shift 37
 	MINUS	shift 36
 	TIMES	shift 35
@@ -3357,14 +3491,13 @@ state 178:
 	AND	shift 27
 	OR	shift 26
 
-	fields	goto 182
 
-	.	error
+	.	reduce by rule 37
 
 
 state 179:
 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN EQ . exp 
+	fields : COMMA ID EQ . exp fields 
 
 	ID	shift 22
 	INT	shift 21
@@ -3378,7 +3511,7 @@ state 179:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 183
+	exp	goto 184
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -3395,34 +3528,14 @@ state 179:
 
 state 180:
 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON . ID EQ exp 
-
-	ID	shift 184
+	ty : LBRACE ID COLON ID argDef .  (reduce by rule 81)
 
 
-	.	error
+
+	.	reduce by rule 81
 
 
 state 181:
-
-	argDef : COMMA ID COLON . ID argDef 
-
-	ID	shift 185
-
-
-	.	error
-
-
-state 182:
-
-	fields : COMMA ID EQ exp fields .  (reduce by rule 48)
-
-
-
-	.	reduce by rule 48
-
-
-state 183:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -3436,7 +3549,7 @@ state 183:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN EQ exp .  (reduce by rule 71)
+	funDec : FUNCTION ID LPAREN RPAREN COLON ID EQ exp .  (reduce by rule 75)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -3452,32 +3565,183 @@ state 183:
 	OR	shift 26
 
 
-	.	reduce by rule 71
+	.	reduce by rule 75
+
+
+state 182:
+
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN . COLON ID EQ exp 
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN . EQ exp 
+
+	COLON	shift 186
+	EQ	shift 185
+
+
+	.	error
+
+
+state 183:
+
+	argDef : COMMA ID . COLON ID argDef 
+
+	COLON	shift 187
+
+
+	.	error
 
 
 state 184:
 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID . EQ exp 
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	fields : COMMA ID EQ exp . fields 
 
-	EQ	shift 186
+	COMMA	shift 162
+	RBRACE	shift 161
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
 
+	fields	goto 188
 
 	.	error
 
 
 state 185:
 
-	argDef : COMMA ID COLON ID . argDef 
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN EQ . exp 
 
-	COMMA	shift 171
-	RBRACE	shift 170
+	ID	shift 22
+	INT	shift 21
+	STRING	shift 20
+	LPAREN	shift 19
+	MINUS	shift 18
+	IF	shift 17
+	WHILE	shift 16
+	FOR	shift 15
+	LET	shift 14
+	BREAK	shift 13
+	NIL	shift 12
 
-	argDef	goto 187
+	exp	goto 189
+	seqExp	goto 10
+	lvalue	goto 9
+	ifExp	goto 8
+	whileExp	goto 7
+	forExp	goto 6
+	letExp	goto 5
+	arrCreate	goto 4
+	recCreate	goto 3
+	callExp	goto 2
+	assignExp	goto 1
 
 	.	error
 
 
 state 186:
+
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON . ID EQ exp 
+
+	ID	shift 190
+
+
+	.	error
+
+
+state 187:
+
+	argDef : COMMA ID COLON . ID argDef 
+
+	ID	shift 191
+
+
+	.	error
+
+
+state 188:
+
+	fields : COMMA ID EQ exp fields .  (reduce by rule 53)
+
+
+
+	.	reduce by rule 53
+
+
+state 189:
+
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . EQ exp 
+	exp : exp . NEQ exp 
+	exp : exp . GT exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . LE exp 
+	exp : exp . AND exp 
+	exp : exp . OR exp 
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN EQ exp .  (reduce by rule 76)
+
+	PLUS	shift 37
+	MINUS	shift 36
+	TIMES	shift 35
+	DIVIDE	shift 34
+	EQ	shift 33
+	NEQ	shift 32
+	LT	shift 31
+	LE	shift 30
+	GT	shift 29
+	GE	shift 28
+	AND	shift 27
+	OR	shift 26
+
+
+	.	reduce by rule 76
+
+
+state 190:
+
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID . EQ exp 
+
+	EQ	shift 192
+
+
+	.	error
+
+
+state 191:
+
+	argDef : COMMA ID COLON ID . argDef 
+
+	COMMA	shift 177
+	RBRACE	shift 176
+
+	argDef	goto 193
+
+	.	error
+
+
+state 192:
 
 	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID EQ . exp 
 
@@ -3493,7 +3757,7 @@ state 186:
 	BREAK	shift 13
 	NIL	shift 12
 
-	exp	goto 188
+	exp	goto 194
 	seqExp	goto 10
 	lvalue	goto 9
 	ifExp	goto 8
@@ -3508,16 +3772,16 @@ state 186:
 	.	error
 
 
-state 187:
+state 193:
 
-	argDef : COMMA ID COLON ID argDef .  (reduce by rule 78)
-
-
-
-	.	reduce by rule 78
+	argDef : COMMA ID COLON ID argDef .  (reduce by rule 83)
 
 
-state 188:
+
+	.	reduce by rule 83
+
+
+state 194:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -3531,7 +3795,7 @@ state 188:
 	exp : exp . LE exp 
 	exp : exp . AND exp 
 	exp : exp . OR exp 
-	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID EQ exp .  (reduce by rule 69)
+	funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID EQ exp .  (reduce by rule 74)
 
 	PLUS	shift 37
 	MINUS	shift 36
@@ -3547,10 +3811,10 @@ state 188:
 	OR	shift 26
 
 
-	.	reduce by rule 69
+	.	reduce by rule 74
 
 
-state 189:
+state 195:
 
 
 	EOF	accept
@@ -3558,5 +3822,5 @@ state 189:
 
 	.	error
 
-423 of 1062 action table entries left after compaction
-488 goto table entries
+458 of 1172 action table entries left after compaction
+556 goto table entries

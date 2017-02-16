@@ -11,7 +11,7 @@ structure A = Absyn
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE | UMINUS | SHIFT
+  | FUNCTION | VAR | TYPE | UMINUS
 
 %nonterm  exp of A.exp | program of A.exp
         | dec of A.dec -> A.dec list
@@ -38,6 +38,8 @@ structure A = Absyn
         | callExp of A.exp
         | params of A.exp -> A.exp list
         | assignExp of A.exp
+        | letSequence of A.exp
+        | letTail of (A.exp * A.pos) -> (A.exp * A.pos) list
 
 
 %pos int
@@ -53,7 +55,6 @@ structure A = Absyn
 
 %prefer THEN ELSE LPAREN
 
-
 %value ID ("bogus")
 %value INT (1)
 %value STRING ("")
@@ -66,12 +67,7 @@ structure A = Absyn
 %nonassoc THEN
 %nonassoc ELSE
 
-%right SHIFT OF ID
-%left ASSIGN DO
-    (* Of precedence is used to override subscript vs. array creation*)
-    (* I'm unsure which direction for DO!!! If the lookahead token at this point is a binary operator, the parser doesn't know whether to shift the operator, making the trailing exp in the  WHILE expression longer, or to immediately reduce the WHILE. Obviously (to us, not to bison), the solution is to shift. bison doesn't know that because the production exp: WHILE exp DO exp doesn't have a precedence. The precedence of that production would be the precedence of its last terminal, which is DO, so the simple solution is to define a precedence for DO *)
-    (*left is in favor of shifting! right is in favor or reducing *)
-
+%right OF ID ASSIGN DO
 %left OR
 %left AND
 %left EQ NEQ GT GE LT LE
@@ -86,7 +82,7 @@ structure A = Absyn
  *  to replace the two dummy productions below with an actual grammar.
  *)
 
-program	: exp        			    (exp)
+program	: exp        			    (exp )
 
 exp : exp PLUS exp                  (A.OpExp({left = exp1, oper = A.PlusOp, pos = PLUSleft, right = exp2}))
     | exp MINUS exp                 (A.OpExp({left = exp1, oper = A.MinusOp, pos = MINUSleft, right = exp2}))
@@ -106,6 +102,8 @@ exp : exp PLUS exp                  (A.OpExp({left = exp1, oper = A.PlusOp, pos 
     | forExp                        (forExp)
     | whileExp                      (whileExp)
     | seqExp                        (seqExp)
+    | LPAREN exp RPAREN             (exp)
+    | LPAREN RPAREN                 (A.NilExp)
     | callExp                       (callExp)
     | assignExp                     (assignExp)
     | recCreate                     (recCreate)
@@ -127,10 +125,10 @@ ifExp : IF exp THEN exp         %prec THEN  (A.IfExp({test = exp1, then' = exp2,
       | IF exp THEN exp ELSE exp            (A.IfExp({test = exp1, then' = exp2, else' = SOME exp3, pos = IFleft}))
 
 
-letExp : LET varDec dec seqExp END              (A.LetExp({decs = (dec varDec), body = seqExp, pos = LETleft}))
-       | LET funDecs dec seqExp END              (A.LetExp({decs = (dec (A.FunctionDec(funDecs NONE))), body = seqExp, pos = LETleft}))
-       | LET typDecs dec seqExp END              (A.LetExp({decs = (dec (A.TypeDec(typDecs NONE))), body = seqExp, pos = LETleft}))
-       | LET IN seqExp END                       (A.LetExp({decs = [], body = seqExp, pos = LETleft}))
+letExp : LET varDec dec letSequence               (A.LetExp({decs = (dec varDec), body = letSequence, pos = LETleft}))
+       | LET funDecs dec letSequence              (A.LetExp({decs = (dec (A.FunctionDec(funDecs NONE))), body = letSequence, pos = LETleft}))
+       | LET typDecs dec letSequence              (A.LetExp({decs = (dec (A.TypeDec(typDecs NONE))), body = letSequence, pos = LETleft}))
+       | LET IN letSequence                       (A.LetExp({decs = [], body = letSequence, pos = LETleft}))
 
 whileExp : WHILE exp DO exp                 (A.WhileExp({test = exp1, body = exp2, pos = WHILEleft}))
 
@@ -151,11 +149,16 @@ params : COMMA exp params               (fn e => e::(params exp))
 
 assignExp : lvalue ASSIGN exp           (A.AssignExp({var = lvalue, exp = exp, pos = lvalue1left}))
 
-seqExp : LPAREN exp sequence            (A.SeqExp(sequence (exp, expleft)))
-       | LPAREN RPAREN                  (A.SeqExp([]))
+seqExp : LPAREN exp SEMICOLON exp sequence (A.SeqExp((exp1, exp1left)::(sequence (exp2, exp2left))))
 
 sequence : SEMICOLON exp sequence       (fn e => e::(sequence (exp, expleft)))
          | RPAREN                       (fn e => e::[])
+
+letSequence : exp letTail               (A.SeqExp((letTail (exp, expleft))))
+            | END                       (A.NilExp)
+
+letTail : SEMICOLON exp letTail         (fn e => e::(letTail (exp, expleft)))
+        | END                           (fn e => e::[])
 
 
 (**                      *

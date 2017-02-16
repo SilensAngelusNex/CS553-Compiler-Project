@@ -1,2 +1,7 @@
-type tree={key: int, children: treelist}
-type treelist = {head: tree, tail: treelist}
+let
+in
+();
+(1);
+(2; 3);
+(2; 3; 4)
+end
