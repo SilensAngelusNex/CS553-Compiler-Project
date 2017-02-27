@@ -1,5 +1,6 @@
 Group is
 
+types.sml
 ../Parser/absyn.sml
 ../Lexer/errormsg.sml
 ../Parser/table.sig
@@ -9,7 +10,8 @@ Group is
 ../Parser/prabsyn.sml
 ../Parser/tiger.lex
 ../Parser/tiger.grm
-types.sml
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm
+symbol_table.sig
+symbol_table.sml
