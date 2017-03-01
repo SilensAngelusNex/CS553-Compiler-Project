@@ -68,6 +68,38 @@ fun unNx(Ex, e) = EXP(e)
         SEQ(f(l1,l1, Label l1))
     end
 
-fun unCx(Ex, e) = 
+fun unCx(Ex, e) =
   | unCx(Nx, g) =
   | unCx(Cx, f) = f
+
+
+ We unEX (effect: Statement) --> unNX (value: expressions)--> unCx (control: label * label -> statement)
+
+
+ if e1 then e2 else e3
+
+ fun transIf(e1, e2, e3)
+    let
+        val i1 = unCx e1                // conditional branch T F
+        val i2 = unEx e2                 // T  
+        val i3 = unEx e3                     // r = e2
+                                             // end
+                                         // F
+                                            // r = e3
+                                            // end
+        val t = Label.newlabel()
+        val f = Label.newlabel()
+        val e = Label.newlabel()
+        val r = Label.newlabel()
+    in
+        ESEQ(SEQ [
+                i1(t, f)
+                LABEL t
+                MOVE(TEMP r, i2)
+                JUMP(NAME end, [end])
+                LABEL f
+                MOVE(TEMP r, i3)
+                JUMP(NAME end, [end])
+                ]
+            )
+    end;
