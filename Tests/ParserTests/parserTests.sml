@@ -14,8 +14,11 @@ val testFiles = [
 
 ("test4", ["LetExp([],", "SeqExp[", "NilExp,", "IntExp(1),", "SeqExp[", "IntExp(2),", "IntExp(3)],", "SeqExp[", "IntExp(2),", "IntExp(3),", "IntExp(4)]])"]),
 
-("test5", ["AssignExp(", "SimpleVar(x),", "OpExp(PlusOp,", "IntExp(5),", "IntExp(4)))"])
-];
+("test5", ["AssignExp(", "SimpleVar(x),", "OpExp(PlusOp,", "IntExp(5),", "IntExp(4)))"]),
+
+("test6", ["LetExp([", "VarDec(x,true,NONE,", "IntExp(4)),", "VarDec(y,true,NONE,", "IntExp(6)),", "TypeDec[", "(red,", "NameTy(int)),",
+"(blue,", "NameTy(string)),", "(fish,", "RecordTy[", "(one,true,red),", "(two,true,blue)])],", "VarDec(z,true,NONE,", "IntExp(4))],", "SeqExp[",
+"OpExp(PlusOp,", "OpExp(PlusOp,", "VarExp(", "SimpleVar(x)),", "VarExp(", "SimpleVar(y))),", "VarExp(", "SimpleVar(z)))])"])];
 
 fun printStrList strs = app (fn i => print(i ^ ", ")) strs;
 

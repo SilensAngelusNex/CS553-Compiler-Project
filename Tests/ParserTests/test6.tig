@@ -1,0 +1,10 @@
+let
+var x := 4
+var y := 6
+type red = int
+type blue = string
+type fish = {one: red, two: blue}
+var z := 4
+in
+x+y+z
+end

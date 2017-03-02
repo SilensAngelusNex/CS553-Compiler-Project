@@ -1,0 +1,25 @@
+LetExp([
+ VarDec(x,true,NONE,
+  IntExp(4)),
+ VarDec(y,true,NONE,
+  IntExp(6)),
+ TypeDec[
+  (red,
+   NameTy(int)),
+  (blue,
+   NameTy(string)),
+  (fish,
+   RecordTy[
+    (one,true,red),
+    (two,true,blue)])],
+ VarDec(z,true,NONE,
+  IntExp(4))],
+ SeqExp[
+  OpExp(PlusOp,
+   OpExp(PlusOp,
+    VarExp(
+     SimpleVar(x)),
+    VarExp(
+     SimpleVar(y))),
+   VarExp(
+    SimpleVar(z)))])

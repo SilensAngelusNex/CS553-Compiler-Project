@@ -14,17 +14,18 @@ structure A = Absyn
   | FUNCTION | VAR | TYPE | UMINUS
 
 %nonterm  exp of A.exp | program of A.exp
-        | dec of A.dec -> A.dec list
-        | dec1 of A.dec -> A.dec list
-        | dec2 of A.dec -> A.dec list
-        | dec3 of A.dec -> A.dec list
+        | dec of A.dec list
+        | dec2 of A.dec list
+        | dec3 of A.dec list
         | typDecs of {name: A.symbol, ty: A.ty, pos: A.pos} option -> {name: A.symbol, ty: A.ty, pos: A.pos} list
         | funDecs of A.fundec option -> A.fundec list
+        | varDecs
         | ty of A.ty
         | varDec of A.dec
         | funDec of A.fundec
         | typeDec of {name: A.symbol, ty: A.ty, pos: A.pos}
         | argDef of A.field -> A.field list
+        | argDefFun of A.field -> A.field list
         | seqExp of A.exp
         | sequence of (A.exp * int) -> (A.exp * int) list
         | lvalue of A.var
@@ -125,10 +126,7 @@ ifExp : IF exp THEN exp         %prec THEN  (A.IfExp({test = exp1, then' = exp2,
       | IF exp THEN exp ELSE exp            (A.IfExp({test = exp1, then' = exp2, else' = SOME exp3, pos = IFleft}))
 
 
-letExp : LET varDec dec letSequence               (A.LetExp({decs = (dec varDec), body = letSequence, pos = LETleft}))
-       | LET funDecs dec letSequence              (A.LetExp({decs = (dec (A.FunctionDec(funDecs NONE))), body = letSequence, pos = LETleft}))
-       | LET typDecs dec letSequence              (A.LetExp({decs = (dec (A.TypeDec(typDecs NONE))), body = letSequence, pos = LETleft}))
-       | LET IN letSequence                       (A.LetExp({decs = [], body = letSequence, pos = LETleft}))
+letExp : LET dec letSequence               (A.LetExp({decs = dec, body = letSequence, pos = LETleft}))
 
 whileExp : WHILE exp DO exp                 (A.WhileExp({test = exp1, body = exp2, pos = WHILEleft}))
 
@@ -183,20 +181,17 @@ fields : COMMA ID EQ exp fields         (fn e => e::(fields (Symbol.symbol(ID), 
  *                       *
  *                      **)
 
-dec : varDec dec1                       (fn e => e::(dec1 varDec))
-    | funDecs dec2                      (fn e => e::(dec2 (A.FunctionDec(funDecs NONE))))
-    | typDecs dec3                      (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
-    | IN                                (fn e => e::[])
+dec : varDec dec                        (varDec::dec)
+    | funDecs dec2                      (A.FunctionDec(funDecs NONE)::dec2)
+    | typDecs dec3                      (A.TypeDec(typDecs NONE)::dec3)
+    | IN                                ([])
 
-dec1 : funDecs dec2                     (fn e => e::(dec2 (A.FunctionDec(funDecs NONE))))
-     | typDecs dec3                     (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
-     | IN                               (fn e => e::[])
-dec2 : varDec dec1                      (fn e => e::(dec1 varDec))
-     | typDecs dec3                     (fn e => e::(dec3 (A.TypeDec(typDecs NONE))))
-     | IN                               (fn e => e::[])
-dec3 : varDec dec1                      (fn e => e::(dec1 varDec))
-     | funDecs dec2                     (fn e => e::(dec2 (A.FunctionDec(funDecs NONE))))
-     | IN                               (fn e => e::[])
+dec2 : varDec dec                       (varDec::dec)
+     | typDecs dec3                     (A.TypeDec(typDecs NONE)::dec3)
+     | IN                               ([])
+dec3 : varDec dec                       (varDec::dec)
+     | funDecs dec2                     (A.FunctionDec(funDecs NONE)::dec2)
+     | IN                               ([])
 
 funDecs : funDec funDecs                (fn SOME(e) => e::(funDecs (SOME(funDec)))
                                           | NONE => funDecs (SOME(funDec)))
@@ -207,6 +202,7 @@ typDecs : typeDec typDecs                (fn SOME(e) => e::(typDecs (SOME(typeDe
                                           | NONE => typDecs (SOME(typeDec)))
         | typeDec                        (fn SOME(e) => e::typeDec::[]
                                           | NONE => typeDec::[])
+
 
 varDec : VAR ID ASSIGN exp              (A.VarDec({  name=Symbol.symbol(ID),
                                              escape=ref true,
@@ -219,8 +215,8 @@ varDec : VAR ID ASSIGN exp              (A.VarDec({  name=Symbol.symbol(ID),
                                             init=exp,
                                             pos=VARleft}))
 
-funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID EQ exp  ({ name=(Symbol.symbol(ID1)),
-                                                                                    params=(argDef
+funDec : FUNCTION ID LPAREN ID COLON ID argDefFun COLON ID EQ exp  ({ name=(Symbol.symbol(ID1)),
+                                                                                    params=(argDefFun
                                                                                         {name=(Symbol.symbol(ID2)),
                                                                                         escape=ref true,
                                                                                         typ=(Symbol.symbol(ID3)),
@@ -233,8 +229,8 @@ funDec : FUNCTION ID LPAREN ID COLON ID argDef RPAREN COLON ID EQ exp  ({ name=(
                                                                                     result=SOME((Symbol.symbol(ID2)), ID2left),
                                                                                     body=exp,
                                                                                     pos=FUNCTIONleft})
-        | FUNCTION ID LPAREN ID COLON ID argDef RPAREN EQ exp           ({ name=(Symbol.symbol(ID1)),
-                                                                                    params=(argDef
+        | FUNCTION ID LPAREN ID COLON ID argDefFun EQ exp           ({ name=(Symbol.symbol(ID1)),
+                                                                                    params=(argDefFun
                                                                                         {name=(Symbol.symbol(ID2)),
                                                                                         escape=ref true,
                                                                                         typ=(Symbol.symbol(ID3)),
@@ -257,6 +253,9 @@ ty   : ID                           (A.NameTy(Symbol.symbol(ID), IDleft))
 
 argDef : COMMA ID COLON ID argDef   (fn e => e::(argDef ({name=(Symbol.symbol(ID1)), escape=ref true, typ=(Symbol.symbol(ID2)), pos=IDleft})))
        | RBRACE                     (fn e => e::[])
+
+argDefFun : COMMA ID COLON ID argDefFun   (fn e => e::(argDefFun ({name=(Symbol.symbol(ID1)), escape=ref true, typ=(Symbol.symbol(ID2)), pos=IDleft})))
+          | RPAREN                     (fn e => e::[])
 
 lvalue : lvalue LBRACK exp RBRACK   (A.SubscriptVar(lvalue, exp, LBRACKleft))                      (* subscript *)
        | lvalue DOT ID              (A.FieldVar(lvalue, Symbol.symbol(ID), DOTleft))               (* field expression *)

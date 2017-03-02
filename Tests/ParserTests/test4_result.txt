@@ -1,0 +1,11 @@
+LetExp([],
+ SeqExp[
+  NilExp,
+  IntExp(1),
+  SeqExp[
+   IntExp(2),
+   IntExp(3)],
+  SeqExp[
+   IntExp(2),
+   IntExp(3),
+   IntExp(4)]])
