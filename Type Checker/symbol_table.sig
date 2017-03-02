@@ -4,12 +4,13 @@ sig
 	val symbol : string -> symbol
 	val name : symbol -> string
 
-	type table
-	type node
-	val empty : table
-	val enter : table * symbol * node -> table
-	val look : table * symbol -> table
+	type 'a table
+	type 'a node
+	val empty : unit -> 'a table
+	val enter : 'a table * symbol * 'a -> 'a table
+	val look : 'a table * symbol -> 'a option
 
-	val beginScope : table -> table
-	val leaveScope : table -> table
+	val leaveScope : 'a table -> 'a table
+	val beginScope : 'a table -> 'a table
+
 end
