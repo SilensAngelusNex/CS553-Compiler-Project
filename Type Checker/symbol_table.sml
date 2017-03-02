@@ -1,4 +1,4 @@
-structure SymbolTable :> SymbolTableSig =
+structure Symbol :> SymbolSig =
 struct
 
 	type symbol = string
@@ -13,9 +13,13 @@ struct
 	type 'a linkedList = {head: 'a node option, tail: 'a node option, below: 'a linkedList option}
 	*)
 
+	(*
+	datatype 'a table of TABLE('a node StackMap.map * 'a linkedList * int ref)
+					   | EMPTY
+	*)
 
 	type 'a table = 'a node StackMap.map * 'a linkedList * int ref
-	fun empty = (StackMap.empty, LIST(NONE, NONE, NONE), ref 0)
+	fun empty () = (StackMap.empty, LIST(NONE, NONE, NONE), ref 0)
 
 
 

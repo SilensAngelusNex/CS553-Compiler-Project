@@ -1,4 +1,4 @@
-signature SymbolTableSig =
+signature SymbolSig =
 sig
 	eqtype symbol
 	val symbol : string -> symbol
@@ -6,7 +6,7 @@ sig
 
 	type 'a table
 	type 'a node
-	val empty : 'a table
+	val empty : unit -> 'a table
 	val enter : 'a table * symbol * 'a -> 'a table
 	val look : 'a table * symbol -> 'a option
 

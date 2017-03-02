@@ -1,10 +1,9 @@
 structure Semant :> SemantSig =
 struct
-	structure SymbolTable
 	structure A = Absyn
 
-	type venv  = ENV.enventry SymbolTable.table
-	type tenv  = ty SymbolTable.table
+	type venv  = ENV.enventry Symbol.table
+	type tenv  = ty Symbol.table
 	type expty = {exp: Translate.exp, ty: Types.ty}
 
 	(*								*
@@ -48,7 +47,7 @@ struct
 
 
 			and trvar (A.SimpleVar(id, pos)) =
-				(case SymbolTable.look(venv, id) of
+				(case Symbol.look(venv, id) of
 					SOME(E.VarEntry {ty}) => {exp=(), ty=actual_ty ty}
 				  | NONE => (error pos ("undefined variable " ^ S.name id); {exp=(), ty=Types.INT}))
 				| trvar (A.FieldVar(v, id, pos)) 	 = {exp=(), ty=Types.INT}
@@ -63,7 +62,7 @@ struct
 
 	fun transDecs (venv, tenv, decs) = foldl transDec (venv, tenv) decs;
 
-    fun transDec (FunctionDec(lst), (venv, tenv)) 							= {venv=insertList (lst, venv, insterFunc), , tenv=tenv}
+    fun transDec (FunctionDec(lst), (venv, tenv)) 							= {venv=insertList (lst, venv, insterFunc), tenv=tenv}
 	   | transDec (TypeDec(lst), (venv, tenv)) 							  	= {venv=venv,tenv=insertList (lst, tenv, insertType)}
 	   | transDec (VarDec({symName, escape, typ, init, pos}, (venv, tenv))) = insertTypes
 
@@ -80,20 +79,20 @@ struct
 
 	fun insertVar ({name, params, result, body, pos}, venv): venv = let
 															  		val entry = ENV.VarEntry({ty=params})
-																	val venv = SymbolTable.enter (venv, name, entry)
+																	val venv = Symbol.enter (venv, name, entry)
 																  	in
 																  	venv
 																  	end
 
 	fun insertType ({name, ty, pos}, tenv): tenv = let
-											 	   val tenv = SymbolTable.enter (tenv, name, ty)
+											 	   val tenv = Symbol.enter (tenv, name, ty)
 											 	   in
 											       tenv
 											       end
 
 	fun insertFunc ({name, params, result, body, pos}, venv) = let
-															   val entry = ENV.FunEntry({formals: ty list, result: lookUpSymbol result})
-															   val venv = SymbolTable.enter (venv, name, entry)
+															   val entry = ENV.FunEntry({formals=params, result = lookUpSymbol result})
+															   val venv = Symbol.enter (venv, name, entry)
 															   in
 															   venv
 														   	   end
@@ -109,15 +108,15 @@ struct
 
 	fun checkInt ({exp, ty}, pos ) = ()
 
-	fun lookUpSymbol symbol: Types.ty = case SymbolTable.look(venv, symbol) of
+	fun lookUpSymbol symbol: Types.ty = case Symbol.look(venv, symbol) of
 										   		SOME(E.VarEntry {ty}) 	=> lookUpActualSymType ty
-											  | SOME(function) 			=> (error pos ("undefined variable " ^ S.name id); Types.INT})
-										   	  | NONE 					=> (error pos ("undefined variable " ^ S.name id); Types.INT})
+											  | SOME(function) 			=> (error pos ("undefined variable " ^ S.name id); Types.INT)
+										   	  | NONE 					=> (error pos ("undefined variable " ^ S.name id); Types.INT)
 
 	(* Retrieves actual type form Type.NAME  *)
-	fun lookUpActualSymType NAME(sym, tyOpt) = case tyOpt of
+	fun lookUpActualSymType NAME(sym, tyOpt) = (case tyOpt of
 												  SOME(ty) 	=> ty
-												| NONE		=> (error pos ("undefined variable " ^ S.name id); Types.INT})
+												| NONE		=> (error pos ("undefined variable " ^ S.name id); Types.INT))
 	  | lookUpActualSymType ty = ty
 
 end

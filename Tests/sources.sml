@@ -3,4 +3,4 @@
 
 use "Tests/ParserTests/parserTests.sml";
 
-(*use "Tests/TypeCheckerTests/typeCheckerTests.sml";*)
+use "Tests/TypeCheckerTests/TypeCheckerTests.sml";

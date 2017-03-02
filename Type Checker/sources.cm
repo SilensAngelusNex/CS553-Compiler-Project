@@ -1,17 +1,19 @@
 Group is
 
 types.sml
-../Parser/absyn.sml
-../Lexer/errormsg.sml
-../Parser/table.sig
-../Parser/table.sml
-../Parser/symbol.sml
-../Parser/parse.sml
-../Parser/prabsyn.sml
-../Parser/tiger.lex
-../Parser/tiger.grm
+absyn.sml
+errormsg.sml
+parse.sml
+tiger.lex.sml
+tiger.grm.sig
+tiger.grm.sml
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm
+
 symbol_table.sig
 symbol_table.sml
+semant.sig
+semant.sml
+env.sig
+env.sml
