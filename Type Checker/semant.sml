@@ -1,15 +1,24 @@
-structure Semant : SemantSig =
+structure Semant :> SemantSig =
 struct
 	structure SymbolTable
 	structure A = Absyn
 
-	type venv  = ENV.enventry Symbol.table
-	type tenv  = ty Symbol.table
+	type venv  = ENV.enventry SymbolTable.table
+	type tenv  = ty SymbolTable.table
 	type expty = {exp: Translate.exp, ty: Types.ty}
 
-	val transVar = venv * tenv * Absyn.var -> expty
+	(*								*
+  	 * 	API							*
+  	 *  							*)
 
-	fun transExp (venv, tenv) = (*venv * tenv * Absyn.var -> expty*)
+	fun transProg exp: unit = ()
+
+
+	(*									*
+	 * 	Private Translation Functions	*
+	 *  								*)
+
+	fun transExp (venv, tenv) =
 	 	let
 			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos}) =
 						(checkInt(trexp left, pos);
@@ -41,28 +50,52 @@ struct
 			and trvar (A.SimpleVar(id, pos)) =
 				(case SymbolTable.look(venv, id) of
 					SOME(E.VarEntry {ty}) => {exp=(), ty=actual_ty ty}
-				  | NONE => (error pos ("undefined variable " ^ S.name id);
-				  			exp=(), ty=Types.INT))
-				(*
-				| trvar (A.FieldVar(v, id, pos)) =
-				| trvar(SubscriptVar(var, exp, pos)) =
-				*)
+				  | NONE => (error pos ("undefined variable " ^ S.name id); {exp=(), ty=Types.INT}))
+				| trvar (A.FieldVar(v, id, pos)) 	 = {exp=(), ty=Types.INT}
+				| trvar(SubscriptVar(var, exp, pos)) = {exp=(), ty=Types.INT}
 		in
 		trexp
 		end
 
+	fun transVar (A.SimpleVar(id, pos)) 		= {exp=(), ty=(lookUpSymbol id)}
+	   | transVar (A.FieldVar(v, id, pos)) 		= {exp=(), ty=(lookUpSymbol id)}
+	   | transVar(SubscriptVar(var, exp, pos)) 	= {exp=(), ty=Types.INT}
 
-	fun transDecs (venv, tenv, decs) = foldl
-										(fn ({venv: venv, tenv: tenv}, d) => transDec (venv, tenv, d))
-										{venv: venv, tenv: tenv}
-										decs;
+	fun transDecs (venv, tenv, decs) = foldl updateEnvWithDec {venv: venv, tenv: tenv} decs;
+
+    fun transDec (venv, tenv, FunctionDec(lst)) = {venv: venv, tenv: tenv}
+	   | transDec (venv, tenv, TypeDec(lst)) = {venv: venv, tenv: tenv}
+	   | transDec (venv, tenv, VarDec({symName, escape, typ, init, pos})) = {venv: venv, tenv: tenv}
+
+	fun transTy (tenv, NameTy(symbol, pos)) 	= Types.Name(symbol, nil)
+	  | transTy (tenv, ArrayTy(symbol, pos)) 	= Types.Array((lookUpSymbol symbol), int ref)
+	  | transTy (tenv, RecordTy(fields)) 		= Types.Record((convertFields fields), int ref)
+
+	(*								*
+	 * 	Private Helper Functions	*
+	 *  							*)
 
 
-	val transDec = venv * tenv * Absyn.dec -> {venv: venv, tenv: tenv}
-	val transTy  =        tenv * Absyn.ty -> Types.ty
+	(* Converts fields to (Symbol.symbol * ty) list *)
+	fun convertFields fields: (Symbol.symbol * ty) list = map convertField fields
 
-	val transProg : Absyn.exp -> unit
+	fun convertField {name, escape, typ, pos} = (name, (retrieveSymbolType name) )
 
+    (* Wrapper for transDec 											*
+ 	 * {venv: venv, tenv: tenv} * Absyn.Dec -> {venv: venv, tenv: tenv}	*)
+ 	fun updateEnvWithDec ({venv: venv, tenv: tenv}, d) = transDec (venv, tenv, d)
 
-	fun checkInt ({exp, ty}, pos ) = (...)
+	fun checkInt ({exp, ty}, pos ) = ()
+
+	fun lookUpSymbol symbol: Types.ty = case SymbolTable.look(venv, symbol) of
+										   		SOME(E.VarEntry {ty}) 	=> lookUpActualSymType ty
+											  | SOME(function) 			=> (error pos ("undefined variable " ^ S.name id); Types.INT})
+										   	  | NONE 					=> (error pos ("undefined variable " ^ S.name id); Types.INT})
+
+	(* Retrieves actual type form Type.NAME  *)
+	fun lookUpActualSymType NAME(sym, tyOpt) = case tyOpt of
+												  SOME(ty) 	=> ty
+												| NONE		=> (error pos ("undefined variable " ^ S.name id); Types.INT})
+	  | lookUpActualSymType ty = ty
+
 end
