@@ -35,7 +35,6 @@ struct
 
 	fun convertRecordFields (tenv, fields): (Symbol.symbol * Types.ty) list = map (fn (f) => convertRecordField (tenv, f)) fields;
 
-
 	fun convertFuncField (venv, {name, escape, typ, pos}): Types.ty = lookUpSymbol (venv, typ, pos)
 
 	fun convertFuncFields (venv, fields): Types.ty list = map (fn (field) => convertFuncField (venv, field)) fields;
@@ -166,22 +165,20 @@ struct
 															{exp=(), ty=Types.RECORD([],ref ())}
 															end
 
+				| trexp(A.ForExp{var=symbol,escape=escape,
+								lo=lo,hi=hi,body=body,pos=pos}) = 	let
+																	val (venv, tenv) = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
+																	val loTy = trexp lo
+																	val hiTy = trexp hi
+																	val tenv = Symbol.enter (tenv, symbol, Types.INT)
+																	in
+																	(checkInt(loTy, pos);
+																	 checkInt(hiTy, pos);
+																	 transExp (venv, tenv) body)
+																	end
 
-				(*
-				Symbol.symbol * ty) list * unique
+				| trexp(A.BreakExp(pos)) = {exp=(), ty=Types.UNIT}
 
-				| trexp(A.ForExp{symbol, escape, lo, hi, body, pos}) = let
-																		val (venv, tenv) = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
-																		val venv = transDec
-																		val testTy = transExp(venv, tenv) test
-																		val thenTy = transExp(venv, tenv) test
-																		in
-																		(checkInt(testTy, pos); thenTy)
-																		end
-
-				| trexp(A.BreakExp(pos)) =
-
-				*)
 				| trexp(l) = (print "anything else\n"; {exp=(), ty=Types.STRING})
 
 			and trvar (A.SimpleVar(id, pos)) 			= (print "simple var\n";{exp=(), ty=lookUpSymbol (venv, id, pos)})
