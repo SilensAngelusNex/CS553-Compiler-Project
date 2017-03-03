@@ -17,3 +17,6 @@ semant.sig
 semant.sml
 env.sig
 env.sml
+
+translate.sml
+main.sml

@@ -1,4 +1,4 @@
-structure Main : sig main : string -> unit end =
+structure Main : sig val main : string -> unit end =
 struct
 	fun main filename =
 	 	let

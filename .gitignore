@@ -1,3 +1,4 @@
 .DS_Store
 Lexer/.cm
 Parser/.cm
+Type\ Checker/.cm

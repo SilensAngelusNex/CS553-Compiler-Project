@@ -13,17 +13,16 @@ struct
 	type 'a linkedList = {head: 'a node option, tail: 'a node option, below: 'a linkedList option}
 	*)
 
-	(*
-	datatype 'a table of TABLE('a node StackMap.map * 'a linkedList * int ref)
-					   | EMPTY
-	*)
 
-	type 'a table = 'a node StackMap.map * 'a linkedList * int ref
-	fun empty () = (StackMap.empty, LIST(NONE, NONE, NONE), ref 0)
+	datatype 'a table = TABLE of 'a node StackMap.map * 'a linkedList * int ref
+					  | EMPTY
 
 
+	val empty = EMPTY
 
-	fun enter ((ns, LIST(listHead, tail, below), i), s, a) = let
+
+
+	fun enter (TABLE(ns, LIST(listHead, tail, below), i), s, a) = let
 																val newNode =
 																let
 																	val stackHead = StackMap.find (ns, s)
@@ -32,28 +31,33 @@ struct
 																	NODE (a, s, !i, stackHead, listHead)
 																end
 															in
-															(StackMap.insert (ns, s, newNode), LIST(SOME(newNode), tail, below), i)
+															TABLE(StackMap.insert (ns, s, newNode), LIST(SOME(newNode), tail, below), i)
 															end
+	 | enter (EMPTY, s, a) = enter (TABLE(StackMap.empty, LIST(NONE, NONE, NONE), ref 0), s, a)
 
-	fun look ((ns, ls, i), s) = case StackMap.find (ns, s) of
+
+	fun look (TABLE(ns, ls, i), s) = (case StackMap.find (ns, s) of
 									 SOME(NODE(a, _, _, _, _)) => SOME(a)
-								   | NONE => NONE
+								   | NONE => NONE)
+	  | look (EMPTY, s) = NONE
 
 
-	fun pop (ns, s) = case StackMap.find (ns, s) of
+	fun pop (ns, s) = (case StackMap.find (ns, s) of
 					       SOME(NODE(_, _, _, SOME(below), _)) => StackMap.insert (ns, s, below)
 						 | SOME(NODE(_, _, _, NONE, _)) => (case StackMap.remove (ns, s) of (a, _) => a)
-						 | NONE => ns
+						 | NONE => ns)
 
 	fun PopAll (ns, SOME(NODE(_, s, _, _, next))) =  PopAll(pop (ns, s), next)
 	  | PopAll (ns, NONE) = ns
 
 
-	fun leaveScope (ns, LIST(listHead, tail, below), i) = case below of
-													  SOME(list) => (PopAll (ns, listHead), list, i)
-													 | NONE => (PopAll (ns, listHead), LIST(NONE, NONE, NONE), i)
+	fun leaveScope (TABLE(ns, LIST(listHead, tail, below), i)) = (case below of
+													  SOME(list) => TABLE(PopAll (ns, listHead), list, i)
+													 | NONE => TABLE(PopAll (ns, listHead), LIST(NONE, NONE, NONE), i))
+	  | leaveScope EMPTY = EMPTY
 
 
-	fun beginScope (ns, ls, i) = (ns, LIST(NONE, NONE, SOME(ls)), i)
 
+	fun beginScope (TABLE(ns, ls, i)) = TABLE(ns, LIST(NONE, NONE, SOME(ls)), i)
+	| beginScope EMPTY = EMPTY
 end

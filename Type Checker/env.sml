@@ -13,7 +13,7 @@ struct
 				(Symbol.symbol ("unit"), Types.UNIT)
 				]
 
-	val empty: ty Symbol.table = Symbol.empty()
+	val empty: ty Symbol.table = Symbol.empty
 	val base_tenv: ty Symbol.table = (foldl (fn ((sym, ty), acc) => Symbol.enter(acc, sym, ty)) empty tenvs)
 
 	val venvs = [
@@ -29,7 +29,7 @@ struct
 				 (Symbol.symbol ("exit"), FunEntry({formals=[Types.INT], result=Types.INT}))
 				 ]
 
-	val empty: enventry Symbol.table = Symbol.empty()
+	val empty: enventry Symbol.table = Symbol.empty
 	val base_venv: enventry Symbol.table = (foldl (fn ((sym, env), acc) => Symbol.enter(acc, sym, env)) empty venvs)
 
 end
