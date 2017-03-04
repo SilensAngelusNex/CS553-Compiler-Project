@@ -19,14 +19,14 @@ struct
 	 	| lookUpActualSymType ty: Types.ty = ty;
 
 
-	fun lookUpSymbol (venv, symbol, pos): Types.ty = ( print ("looking up variable: " ^ (Symbol.name symbol) ^ "\n"); case Symbol.look(venv, symbol) of
+	fun lookUpSymbol (venv, symbol, pos): Types.ty = case Symbol.look(venv, symbol) of
 													   		SOME(ENV.VarEntry {ty})						=> (lookUpActualSymType ty)
 														  | SOME(ENV.FunEntry {formals=f,result=ty})	=> (lookUpActualSymType ty)
-													   	  | NONE										=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT))
+													   	  | NONE										=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT)
 
-	fun lookUpSymbolTENV (tenv, symbol, pos): Types.ty = (case Symbol.look(tenv, symbol) of
-												   		  	 	SOME(ty)	=> (lookUpActualSymType ty)
-												   	  		  | NONE		=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT))
+	fun lookUpSymbolTENV (tenv, symbol, pos): Types.ty option = (case Symbol.look(tenv, symbol) of
+												   		  	 		SOME(ty)	=> SOME(lookUpActualSymType ty)
+												   	  		  		| NONE		=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); NONE))
 
 	fun lookUpSymbolOpt (venv, SOME(sym, pos)): Types.ty = lookUpSymbol	(venv, sym, pos)
 	  | lookUpSymbolOpt (venv, NONE): Types.ty = (ErrorMsg.error 0 ("undefined variable"); Types.INT)
@@ -44,6 +44,19 @@ struct
 	  | checkInt (_, pos) = (ErrorMsg.error pos ("Expected INT Found: " ^ "other"))
 
 	fun compare (x, y) = x = y
+
+	fun checkIntPair (left, right, pos) =
+		(checkInt(left, pos);
+		checkInt(right, pos);
+		{exp=(), ty=Types.INT})
+
+
+	fun sameTypes (ty1, ty2, pos) =  case (ty1 = ty2) of
+									  true  => ({exp=(), ty=ty1})
+									| false => ((ErrorMsg.error pos ("Types not the same: " ^ "other and " ^ "other"));
+												{exp=(), ty=Types.INT})
+
+	fun checkPair ({exp=exp1, ty=ty1}, {exp=exp2, ty=ty2}, pos) = (sameTypes (ty1, ty2, pos))
 
 	fun getType ({exp=exp, ty=ty}): Types.ty = ty
 	(*										*
@@ -91,7 +104,6 @@ struct
 
 	fun transExp (venv, tenv) =
 		let
-			val x = print "looping\n"
 			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos})   	= checkIntPair (trexp left, trexp right, pos)
 			  | trexp (A.OpExp{left, oper=A.MinusOp, right, pos})  	= checkIntPair (trexp left, trexp right, pos)
 			  | trexp (A.OpExp{left, oper=A.TimesOp, right, pos})  	= checkIntPair (trexp left, trexp right, pos)
@@ -109,7 +121,6 @@ struct
 			  | trexp(A.SeqExp((exp, pos)::seq)) 					= (trexp exp; trseq seq)
 			  | trexp(A.LetExp{decs, body, pos}) =
 												  let
-												  	val x = print "Let expression\n"
 												  	val (venv, tenv) = (Symbol.beginScope venv, Symbol.beginScope tenv)
 												  	val {venv=new_venv, tenv=new_tenv} = transDecs(venv, tenv, decs)
 												  in
@@ -117,32 +128,29 @@ struct
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => {exp=(), ty=lookUpActualSymType ty} (* CHECK ALL PARAMETERS*)
+														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => (paramList (paramTys, args, pos); {exp=(), ty=lookUpActualSymType ty}) (* CHECK ALL PARAMETERS*)
 														| SOME(ENV.VarEntry{ty=ty}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(), ty=Types.INT})
 														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(), ty=Types.INT}))
 				| trexp(A.AssignExp{var, exp, pos}) = checkPair(trvar var, trexp exp, pos)
 				| trexp(A.WhileExp{test, body, pos}) =  let
-														val (venv, tenv) = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
-														val testTy = transExp(venv, tenv) test
-														val bodyTy = transExp(venv, tenv) test
+														val testTy = trexp test
+														val bodyTy = trexp body
 														in
 														(checkInt(testTy, pos); bodyTy)
 														end
 
 				| trexp(A.IfExp{test=test,then'=thenExp,else'=SOME(elseExp),pos=pos}) = let
-																						val (venv, tenv) = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
-																						val testTy = transExp(venv, tenv) test
-																						val thenTy = transExp(venv, tenv) test
-																						val elseTy = transExp(venv, tenv) test
+																						val testTy = trexp test
+																						val thenTy = trexp thenExp
+																						val elseTy = trexp elseExp
 																						in
 																						(checkInt(testTy, pos); checkPair (thenTy, elseTy, pos))
 																						end
 
 
 				| trexp(A.IfExp{test=test,then'=thenExp,else'=NONE,pos=pos}) =  let
-																				val (venv, tenv) = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
-																				val testTy = transExp(venv, tenv) test
-																				val thenTy = transExp(venv, tenv) test
+																				val testTy = trexp test
+																				val thenTy = trexp thenExp
 																				in
 																				(checkInt(testTy, pos); thenTy)
 																				end
@@ -151,18 +159,21 @@ struct
 																val sizeExp = trexp size
 																val initExp = trexp init
 																in
-																(*typ must be an ARRAY of ty * unique*)
-																(*size must be an int type*)
-																(*init must be ty in ARRAY of ty * unique*)
-																{exp=(), ty=Types.ARRAY(getType initExp, ref ())}
+																case typ of
+																     SOME(Types.ARRAY(aType, aRef)) =>
+																	 		(
+																	   		checkInt(sizeExp, pos);
+																			sameTypes(aType, getType initExp, pos);
+																  			{exp=(), ty=Types.ARRAY(aType, aRef)})
+																   | SOME(_) => ((ErrorMsg.error pos ("Tried to construct an array non array type. ")); {exp=(), ty=Types.INT})
+																   | NONE => ((ErrorMsg.error pos ("Array type not declared."));
+																   				{exp=(), ty=Types.ARRAY(Types.INT, ref ())})
 																end
 				| trexp(A.RecordExp{fields, typ, pos}) = 	let
-															val typ = lookUpSymbolTENV (tenv, typ, pos)
+																val typ = lookUpSymbolTENV (tenv, typ, pos)
+																val recRef = case typ of SOME(Types.RECORD (_, r)) => r | _ => ((ErrorMsg.error pos ("Array type not declared.")); ref ())
 															in
-															(*typ must be an ARRAY of ty * unique*)
-															(*size must be an int type*)
-															(*init must be ty in ARRAY of ty * unique*)
-															{exp=(), ty=Types.RECORD([],ref ())}
+															{exp=(), ty=Types.RECORD((map recList fields), recRef)}
 															end
 
 				| trexp(A.ForExp{var=symbol,escape=escape,
@@ -178,10 +189,9 @@ struct
 																	end
 
 				| trexp(A.BreakExp(pos)) = {exp=(), ty=Types.UNIT}
+				| trexp(l) = (print "other type of expression" ; {exp=(), ty=Types.UNIT})
 
-				| trexp(l) = (print "anything else\n"; {exp=(), ty=Types.STRING})
-
-			and trvar (A.SimpleVar(id, pos)) 			= (print "simple var\n";{exp=(), ty=lookUpSymbol (venv, id, pos)})
+			and trvar (A.SimpleVar(id, pos)) 			= {exp=(), ty=lookUpSymbol (venv, id, pos)}
 				| trvar (A.FieldVar(v, id, pos)) 	    = {exp=(), ty=Types.INT}
 				| trvar (A.SubscriptVar(var, exp, pos)) = {exp=(), ty=Types.INT}
 
@@ -189,38 +199,44 @@ struct
 			  | trseq ((exp, pos)::seq) = (trexp exp; trseq seq)
 			  | trseq (nil)  			= {exp=(), ty=Types.UNIT}
 
-			and checkIntPair (left, right, pos) =
-				(checkInt(left, pos);
-				checkInt(right, pos);
-				{exp=(), ty=Types.INT})
+			and paramList (t::typeList, a::argList, pos) = let
+														val {exp=aExp, ty=aTy} = trexp a
+													in
+														if (t = aTy)
+														then paramList (typeList, argList, pos)
+														else ((ErrorMsg.error pos ("Argument Type Incorrect: " ^ "other and " ^ "other")); false)
+													end
+			  | paramList ([], [], pos) = true
+			  | paramList ([], a::argList, pos) = ((ErrorMsg.error pos ("Too many arguments for function!")); false)
+			  | paramList (t::typeList, [], pos) = ((ErrorMsg.error pos ("Not enough arguments for function!")); false)
 
-			and checkPair ({exp=exp1, ty=ty1}, {exp=exp2, ty=ty2}, pos) = case (ty1 = ty2) of
-																			true  => ({exp=(), ty=Types.INT})
-																		  | false => ((ErrorMsg.error pos ("Incomparable Types: " ^ "other and " ^ "other")); {exp=(), ty=Types.INT})
+			and recList (field, exp, pos): (Symbol.symbol * Types.ty) = case lookUpSymbolTENV (tenv, field, pos) of
+																		SOME(ty) => (field, ty)
+																		| NONE => (ErrorMsg.error pos ("Record Arg do not match expected type"); (field, Types.UNIT))
+
 		in
 		trexp
 		end
 
-		and transDec (A.FunctionDec(lst), {venv, tenv})		= (print "found a function\n"; {venv=(insertList (lst, venv, insertFunc)), tenv=tenv})
-		  | transDec (A.TypeDec(lst), {venv, tenv}) 		= (print "found a type\n"; {venv=venv, tenv=( insertList (lst, tenv, insertType))})
+		and transDec (A.FunctionDec(lst), {venv, tenv})		= {venv=(insertList (lst, venv, insertFunc)), tenv=tenv}
+		  | transDec (A.TypeDec(lst), {venv, tenv}) 		= {venv=venv, tenv=( insertList (lst, tenv, insertType))}
 		  | transDec (A.VarDec({name=name,escape=escape,typ=NONE, init=init, pos=pos}),
 		  						{venv, tenv}) = let
-												val x = print ("inserting a new variable" ^ (Symbol.name name))
-												val x = print "\n"
 												val {exp, ty} = transExp(venv, tenv) init
 												in
 												{venv=Symbol.enter(venv, name, ENV.VarEntry{ty=ty}), tenv=tenv}
 												end
 		  | transDec (A.VarDec({name=name, escape=x, typ=SOME(sym, p), init=init, pos=pos}),
 		  						{venv, tenv}) = let
-												val typ = lookUpSymbolTENV (tenv, sym, pos)
+												val typ = case lookUpSymbolTENV (tenv, sym, pos) of SOME(ty) => ty | NONE => Types.INT
 												val {exp=exp,ty=expTy} = transExp (venv, tenv) init
 				  								val entry = ENV.VarEntry({ty=typ})
 				  							  	val venv = Symbol.enter (venv, name, entry)
 				  							  	in
 												(*check whether constraint == to init -- if init exp is nil must be record type 118*)
-												(compare (typ, expTy);
-				  							  	{venv=venv, tenv=tenv})
+												case expTy of
+													Types.NIL => (case typ of Types.RECORD(_, _) => {venv=venv, tenv=tenv} | _ => (ErrorMsg.error pos ("Nil can only be assigned to records."); {venv=venv, tenv=tenv}))
+													| _ => (compare (typ, expTy); {venv=venv, tenv=tenv})
 				  							  	end
 
 
