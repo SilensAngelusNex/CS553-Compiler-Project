@@ -31,7 +31,9 @@ struct
 	fun lookUpSymbolOpt (venv, SOME(sym, pos)): Types.ty = lookUpSymbol	(venv, sym, pos)
 	  | lookUpSymbolOpt (venv, NONE): Types.ty = (ErrorMsg.error 0 ("undefined variable"); Types.INT)
 
-	fun convertRecordField (tenv, {name, escape, typ, pos}): (Symbol.symbol * Types.ty) = (name, lookUpSymbol (tenv, typ, pos));
+	fun convertRecordField (tenv, {name, escape, typ, pos}): (Symbol.symbol * Types.ty) = case Symbol.look (tenv, name) of
+																							SOME(ty) => (name, ty)
+																						  | NONE => (name, Types.UNIT)
 
 	fun convertRecordFields (tenv, fields): (Symbol.symbol * Types.ty) list = map (fn (f) => convertRecordField (tenv, f)) fields;
 
@@ -88,8 +90,6 @@ struct
 															end)
 										| NONE		   => venv
 
-
-
 	(*									*
 	 * 	Private Translation Functions	*
 	 *  								*)
@@ -98,10 +98,21 @@ struct
  	  | transVar (venv, A.FieldVar(v, id, pos)) 		= {exp=(), ty=(lookUpSymbol (venv, id, pos))}
  	  | transVar (venv, A.SubscriptVar(var, exp, pos)) 	= {exp=(), ty=Types.INT}
 
- 	fun transTy (tenv, A.NameTy(symbol, pos)) 	= Types.NAME(symbol, ref NONE)
- 	  | transTy (tenv, A.ArrayTy(symbol, pos)) 	= Types.ARRAY((lookUpSymbol (tenv, symbol, pos)), ref ())
+ 	fun transTy (tenv, A.NameTy(symbol, pos)) 	= (case lookUpSymbolTENV (tenv, symbol, pos) of
+													SOME(ty) => ty
+													| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name symbol)); Types.UNIT))
+ 	  | transTy (tenv, A.ArrayTy(symbol, pos)) 	= (case lookUpSymbolTENV (tenv, symbol, pos) of
+	  												SOME(ty) => Types.ARRAY(ty, ref ())
+												  | NONE => Types.ARRAY(Types.UNIT, ref ()))
  	  | transTy (tenv, A.RecordTy(fields)) 		= Types.RECORD((convertRecordFields (tenv, fields)), ref ())
 
+	  (*recursive types*)
+  	fun processTypeHeaders ({name, ty, pos}, tenv) = Symbol.enter (tenv, name, Types.NAME(name, ref NONE))
+
+  	fun processTypeBodies ({name, ty, pos}, tenv) = case Symbol.look (tenv, name) of
+  												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
+  												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
+  												| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name name)); tenv)
 	fun transExp (venv, tenv) =
 		let
 			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos})   	= checkIntPair (trexp left, trexp right, pos)
@@ -136,7 +147,7 @@ struct
 														val testTy = trexp test
 														val bodyTy = trexp body
 														in
-														(checkInt(testTy, pos); bodyTy)
+														(print "while" ; checkInt(testTy, pos); bodyTy)
 														end
 
 				| trexp(A.IfExp{test=test,then'=thenExp,else'=SOME(elseExp),pos=pos}) = let
@@ -144,7 +155,7 @@ struct
 																						val thenTy = trexp thenExp
 																						val elseTy = trexp elseExp
 																						in
-																						(checkInt(testTy, pos); checkPair (thenTy, elseTy, pos))
+																						(print "if" ; checkInt(testTy, pos); checkPair (thenTy, elseTy, pos))
 																						end
 
 
@@ -152,7 +163,7 @@ struct
 																				val testTy = trexp test
 																				val thenTy = trexp thenExp
 																				in
-																				(checkInt(testTy, pos); thenTy)
+																				(print "if2" ; checkInt(testTy, pos); thenTy)
 																				end
 				| trexp(A.ArrayExp{typ, size, init, pos}) = 	let
 																val typ = lookUpSymbolTENV (tenv, typ, pos)
@@ -161,7 +172,7 @@ struct
 																in
 																case typ of
 																     SOME(Types.ARRAY(aType, aRef)) =>
-																	 		(
+																	 		(print "array" ;
 																	   		checkInt(sizeExp, pos);
 																			sameTypes(aType, getType initExp, pos);
 																  			{exp=(), ty=Types.ARRAY(aType, aRef)})
@@ -183,7 +194,7 @@ struct
 																	val hiTy = trexp hi
 																	val tenv = Symbol.enter (tenv, symbol, Types.INT)
 																	in
-																	(checkInt(loTy, pos);
+																	(print "for" ; checkInt(loTy, pos);
 																	 checkInt(hiTy, pos);
 																	 transExp (venv, tenv) body)
 																	end
@@ -218,8 +229,13 @@ struct
 		trexp
 		end
 
-		and transDec (A.FunctionDec(lst), {venv, tenv})		= {venv=(insertList (lst, venv, insertFunc)), tenv=tenv}
-		  | transDec (A.TypeDec(lst), {venv, tenv}) 		= {venv=venv, tenv=( insertList (lst, tenv, insertType))}
+		and transDec (A.FunctionDec(lst), {venv, tenv})		= {venv=venv, tenv=tenv}
+		  | transDec (A.TypeDec(lst), {venv, tenv}) = let
+		  												val tenv' = (foldl processTypeHeaders tenv lst)
+														val tenv'' = (foldl processTypeBodies tenv' lst)
+													  in
+													  	{venv=venv, tenv=tenv''}
+													  end
 		  | transDec (A.VarDec({name=name,escape=escape,typ=NONE, init=init, pos=pos}),
 		  						{venv, tenv}) = let
 												val {exp, ty} = transExp(venv, tenv) init
@@ -233,7 +249,6 @@ struct
 				  								val entry = ENV.VarEntry({ty=typ})
 				  							  	val venv = Symbol.enter (venv, name, entry)
 				  							  	in
-												(*check whether constraint == to init -- if init exp is nil must be record type 118*)
 												case expTy of
 													Types.NIL => (case typ of Types.RECORD(_, _) => {venv=venv, tenv=tenv} | _ => (ErrorMsg.error pos ("Nil can only be assigned to records."); {venv=venv, tenv=tenv}))
 													| _ => (compare (typ, expTy); {venv=venv, tenv=tenv})
@@ -242,6 +257,19 @@ struct
 
 		and transDecs (venv, tenv, decs) = (foldl transDec {venv=venv, tenv=tenv} decs)
 
+		(*and processFunctionHeaders ({name, params, result, body, pos}, (venv, tenv)) = (venv, tenv)
+		and processFunctionBodies ({name, params, result=SOME(rt, pos), body, pos}, (venv, tenv)) = let val SOME(result_ty) = lookUpSymbolTENV (tenv, rt, pos)
+																										fun transparam{name, typ, pos} = case lookUpSymbolTENV (tenv, typ, pos)
+																																			SOME t => {name=name, ty=t}
+																																		   | NONE => {name=name, ty=Types.UNIT}
+																										val params' = map transparam params
+																										val venv' = Symbol.enter (venv, name, ENV.FunEntry{formals=mape #ty parmas', result=result_ty})
+																										fun enterparam ({name, ty}, venv) = Symbol.enter (venv, name, ENV.VarEntry{access=(), ty=ty})
+																										val venv'' = fold enterparam params' venv'
+																										val res = transExp(venv'', tenv) body
+																									in
+																										(venv', tenv)
+																									end*)
 
 	(*								*
 	* 	API							*
