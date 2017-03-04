@@ -1,7 +1,7 @@
 structure Semant :> SemantSig =
 struct
 	structure A = Absyn
-
+	structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end)
 	type venv  = ENV.enventry Symbol.table
 	type tenv  = Types.ty Symbol.table
 	type expty = {exp: Translate.exp, ty: Types.ty}
@@ -37,11 +37,6 @@ struct
 
 	fun convertRecordFields (tenv, fields): (Symbol.symbol * Types.ty) list = map (fn (f) => convertRecordField (tenv, f)) fields;
 
-	fun convertFuncField (venv, {name, escape, typ, pos}): Types.ty = lookUpSymbol (venv, typ, pos)
-
-	fun convertFuncFields (venv, fields): Types.ty list = map (fn (field) => convertFuncField (venv, field)) fields;
-
-
 	fun checkInt ({exp=exp, ty=Types.INT}, pos ) = ()
 	  | checkInt (_, pos) = (ErrorMsg.error pos ("Expected INT Found: " ^ "other"))
 
@@ -61,35 +56,16 @@ struct
 	fun checkPair ({exp=exp1, ty=ty1}, {exp=exp2, ty=ty2}, pos) = (sameTypes (ty1, ty2, pos))
 
 	fun getType ({exp=exp, ty=ty}): Types.ty = ty
-	(*										*
-	* 	Insert Into Symbol Table Functions 	*
-	*  									*)
 
-	fun insertList (tylist, env, f) = foldl f env tylist
+	fun checkDuplicateFunctionField (m, name, pos) = case M.find (m, Symbol.name name) of
+													SOME(_) => (ErrorMsg.error pos ("Duplicate function field " ^ Symbol.name name))
+												  | NONE => ();
 
-	fun insertType ({name: A.symbol, ty: A.ty, pos: A.pos}, tenv): tenv = 	let
-																			val newType = Types.NAME(name, ref NONE)
-												 							val tenv = Symbol.enter (tenv, name, newType)
-																			in
-																		 	tenv
-																			end
-
-	fun insertFunc ({name: A.symbol,
-					params: A.field list,
-					result: (A.symbol * A.pos) option,
-					body: A.exp,
-					pos: A.pos},
-					venv) = case result of
-										SOME((sym, p)) => (let
-															val fields = convertFuncFields (venv, params)
-															val sym = lookUpSymbol (venv, sym, p)
-															val entry = ENV.FunEntry({formals=fields, result=sym})
-															val venv = Symbol.enter (venv, name, entry)
-															in
-															venv
-															end)
-										| NONE		   => venv
-
+	fun transparam ({name=name,typ=typ,pos=pos,escape=_}, tenv, (l, m)) = (	checkDuplicateFunctionField(m, name, pos);
+																	   	M.insert (m, Symbol.name name, true);
+																	   	case lookUpSymbolTENV (tenv, typ, pos) of
+																			SOME t => ({name=name, ty=t}::l, M.insert (m, Symbol.name name, true))
+																		   | NONE  => ({name=name, ty=Types.UNIT}::l, M.insert (m, Symbol.name name, true)));
 	(*									*
 	 * 	Private Translation Functions	*
 	 *  								*)
@@ -106,13 +82,14 @@ struct
 												  | NONE => Types.ARRAY(Types.UNIT, ref ()))
  	  | transTy (tenv, A.RecordTy(fields)) 		= Types.RECORD((convertRecordFields (tenv, fields)), ref ())
 
-	  (*recursive types*)
+	(*recursive types*)
   	fun processTypeHeaders ({name, ty, pos}, tenv) = Symbol.enter (tenv, name, Types.NAME(name, ref NONE))
 
   	fun processTypeBodies ({name, ty, pos}, tenv) = case Symbol.look (tenv, name) of
   												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
   												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
   												| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name name)); tenv)
+
 	fun transExp (venv, tenv) =
 		let
 			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos})   	= checkIntPair (trexp left, trexp right, pos)
@@ -229,9 +206,15 @@ struct
 		trexp
 		end
 
-		and transDec (A.FunctionDec(lst), {venv, tenv})		= {venv=venv, tenv=tenv}
+		and transDec (A.FunctionDec(lst), {venv, tenv})	= 	let
+														  		val (venv', tenv') = (foldl processFunctionHeaders (venv, tenv) lst)
+															  	val (venv'', tenv'') = (foldl processFunctionBodies (venv', tenv) lst)
+														  	in
+															  	{venv=venv'', tenv=tenv}
+															end
+
 		  | transDec (A.TypeDec(lst), {venv, tenv}) = let
-		  												val tenv' = (foldl processTypeHeaders tenv lst)
+														val tenv' = (foldl processTypeHeaders tenv lst)
 														val tenv'' = (foldl processTypeBodies tenv' lst)
 													  in
 													  	{venv=venv, tenv=tenv''}
@@ -257,21 +240,40 @@ struct
 
 		and transDecs (venv, tenv, decs) = (foldl transDec {venv=venv, tenv=tenv} decs)
 
-		(*and processFunctionHeaders ({name, params, result, body, pos}, (venv, tenv)) = (venv, tenv)
-		and processFunctionBodies ({name, params, result=SOME(rt, pos), body, pos}, (venv, tenv)) = let val SOME(result_ty) = lookUpSymbolTENV (tenv, rt, pos)
-																										fun transparam{name, typ, pos} = case lookUpSymbolTENV (tenv, typ, pos)
-																																			SOME t => {name=name, ty=t}
-																																		   | NONE => {name=name, ty=Types.UNIT}
-																										val params' = map transparam params
-																										val venv' = Symbol.enter (venv, name, ENV.FunEntry{formals=mape #ty parmas', result=result_ty})
-																										fun enterparam ({name, ty}, venv) = Symbol.enter (venv, name, ENV.VarEntry{access=(), ty=ty})
-																										val venv'' = fold enterparam params' venv'
-																										val res = transExp(venv'', tenv) body
-																									in
-																										(venv', tenv)
-																									end*)
+		and processFunctionHeaders ({name=name,params=params,result=SOME((sym, rpos)),body=body,pos=pos}, (venv, tenv)) = 	let
+																															val x = Int.toString pos
+																															val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
+																															val symTy = case lookUpSymbolTENV (tenv, sym, rpos) of
+																																			SOME(ty) => ty
+																																		  | NONE => Types.UNIT
+																															val fnDec = ENV.FunEntry({formals=map #ty params', result=symTy})
+																															val venv' = Symbol.enter (venv, name, fnDec)
+																														in
+																															(venv', tenv)
+																														end
+		| processFunctionHeaders ({name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv)) = 	let
+																											val x = Int.toString pos
+																											val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
+																											val symTy = Types.NAME (name, ref NONE)
+																											val fnDec = ENV.FunEntry({formals=map #ty params', result=symTy})
+																											val venv' = Symbol.enter (venv, name, fnDec)
+																										in
+																											(venv', tenv)
+																										end
 
-	(*								*
+		and processFunctionBodies ({name, params, result=result, body, pos}, (venv, tenv)) = case Symbol.look(venv, name) of
+																									NONE => (venv, tenv)
+																							   	  | SOME(ENV.VarEntry {ty})						=> (venv, tenv)
+																								  | SOME(ENV.FunEntry {formals=f,result=ty})	=> case ty of
+																								  													Types.NAME(sym, r) => let
+																																										val {exp=exp, ty=bodyTy} = transExp (venv, tenv) body
+																																									in
+																																										(r := SOME(bodyTy); (venv, tenv))
+																																									end
+
+																																					| _ => (venv, tenv)
+
+(*								*
 	* 	API							*
 	*  								*)
 
