@@ -170,7 +170,7 @@ arrCreate : lvalue LBRACK exp RBRACK OF exp (case lvalue of A.SimpleVar(s, p) =>
                                                                     A.NilExp))
 
 
-recCreate : ID LBRACE ID EQ exp fields  (A.RecordExp({fields = (fields (Symbol.symbol(ID), exp, IDleft)), typ = Symbol.symbol(ID), pos = IDleft}))
+recCreate : ID LBRACE ID EQ exp fields  (A.RecordExp({fields = (fields (Symbol.symbol(ID2), exp, IDleft)), typ = Symbol.symbol(ID1), pos = IDleft}))
           | ID LBRACE RBRACE            (A.RecordExp({fields = [], typ = Symbol.symbol(ID), pos = IDleft}))
 
 fields : COMMA ID EQ exp fields         (fn e => e::(fields (Symbol.symbol(ID), exp, IDleft)))

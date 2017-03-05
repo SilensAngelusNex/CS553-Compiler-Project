@@ -1155,13 +1155,12 @@ end
 |  ( 48, ( ( _, ( MlyValue.fields fields1, _, fields1right)) :: ( _, (
  MlyValue.exp exp1, _, _)) :: _ :: ( _, ( MlyValue.ID ID2, _, _)) :: _
  :: ( _, ( MlyValue.ID ID1, (IDleft as ID1left), _)) :: rest671)) =>
- let val  result = MlyValue.recCreate (fn _ => let val  (ID as ID1) = 
-ID1 ()
+ let val  result = MlyValue.recCreate (fn _ => let val  ID1 = ID1 ()
  val  ID2 = ID2 ()
  val  (exp as exp1) = exp1 ()
  val  (fields as fields1) = fields1 ()
  in (
-A.RecordExp({fields = (fields (Symbol.symbol(ID), exp, IDleft)), typ = Symbol.symbol(ID), pos = IDleft})
+A.RecordExp({fields = (fields (Symbol.symbol(ID2), exp, IDleft)), typ = Symbol.symbol(ID1), pos = IDleft})
 )
 end)
  in ( LrTable.NT 22, ( result, ID1left, fields1right), rest671)

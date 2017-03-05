@@ -1,0 +1,8 @@
+/* Should be good */
+let
+    type a = int
+    type b = a
+    var c: a := 1
+ in
+    ()
+ end

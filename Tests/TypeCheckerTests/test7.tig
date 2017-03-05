@@ -1,0 +1,13 @@
+let
+    type list = {first: int, rest: list}
+    function readlist() : list =
+       let
+           var i := 0
+        in
+            if 0
+            then list{first=i,rest=readlist()}
+            else list {first= 1, rest= nil}
+       end
+in
+    0
+end

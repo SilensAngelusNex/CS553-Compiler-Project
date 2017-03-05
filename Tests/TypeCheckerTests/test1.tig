@@ -1,3 +1,4 @@
+/* Should find unexpected type */
 let var a: int := 5
     var b: int := 2
     var c := "s"

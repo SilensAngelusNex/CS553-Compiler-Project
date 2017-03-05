@@ -6,5 +6,6 @@ type blue = string
 type fish = {one: red, two: blue}
 var z := 4
 in
+fish {one: 3, two: "blue"}
 x+y+z
 end

@@ -120,7 +120,7 @@ digit=[0-9];
                                                 continue()
                                                );
 
-<INITIAL>([-]?[1-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
+<INITIAL>([1-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
 									               SOME i => (Tokens.INT(i, yypos, yypos + String.size yytext))
                                                    | NONE   => (ErrorMsg.error yypos ("Unexpected non-integer " ^ yytext);
                                                 continue())

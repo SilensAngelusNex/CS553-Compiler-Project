@@ -1,0 +1,6 @@
+/* Should find unexpected type */
+let
+    type list = {first: int, rest: list}
+ in
+    list {first=1, rest=nil}
+ end
