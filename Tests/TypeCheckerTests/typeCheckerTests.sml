@@ -1,3 +1,3 @@
 exception BadParseResult;
 
-(*CM.make "Type Checker/sources.cm";*)
+CM.make "Type Checker/sources.cm";
