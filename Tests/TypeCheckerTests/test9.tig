@@ -1,0 +1,8 @@
+/* Circular types */
+let
+    type a = b
+    type b = c
+    type c = array of a
+in
+    0
+end

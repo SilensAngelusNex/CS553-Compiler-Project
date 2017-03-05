@@ -1,0 +1,7 @@
+/* Duplicate function and type fields */
+let
+    type list = {first: int, first: list}
+    function readlist(i: int, i: string) = i + i
+in
+    0
+end

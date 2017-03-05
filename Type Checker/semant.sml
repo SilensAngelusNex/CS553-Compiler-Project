@@ -2,6 +2,7 @@ structure Semant :> SemantSig =
 struct
 	structure A = Absyn
 	structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end)
+	structure S = SplaySetFn(struct type ord_key = string val compare = String.compare end)
 	type venv  = ENV.enventry Symbol.table
 	type tenv  = Types.ty Symbol.table
 	type expty = {exp: Translate.exp, ty: Types.ty}
@@ -48,11 +49,16 @@ struct
 	fun lookUpSymbolOpt (venv, SOME(sym, pos)): Types.ty = lookUpSymbol	(venv, sym, pos)
 	  | lookUpSymbolOpt (venv, NONE): Types.ty = (ErrorMsg.error 0 ("undefined variable"); Types.UNDEFINED)
 
-	fun convertRecordField (tenv, {name, escape, typ, pos}): (Symbol.symbol * Types.ty) = case Symbol.look (tenv, typ) of
-																							SOME(ty) => (name, ty)
-																						  | NONE => (ErrorMsg.error pos ("Type " ^ (Symbol.name typ) ^ "not defined."); (name, Types.UNIT))
+	fun checkDuplicateFields (m, name, pos, str) = case M.find (m, Symbol.name name) of
+												  		SOME(_) => (ErrorMsg.error pos (str ^ " " ^ Symbol.name name))
+												  		| NONE => ();
 
-	fun convertRecordFields (tenv, fields): (Symbol.symbol * Types.ty) list = map (fn (f) => convertRecordField (tenv, f)) fields;
+	fun convertRecordField (tenv, {name, escape, typ, pos}, (acc, m)) = (checkDuplicateFields(m, name, pos, "Duplicate Record field:");
+																		case Symbol.look (tenv, typ) of
+																			SOME t => ((name, t)::acc, M.insert (m, Symbol.name name, true))
+																		   | NONE  => (ErrorMsg.error pos ("Type " ^ (Symbol.name typ) ^ "not defined."); ((name, Types.UNIT)::acc, M.insert (m, Symbol.name name, true))))
+
+	fun convertRecordFields (tenv, fields): (Symbol.symbol * Types.ty) list = let val (acc, m) = foldl (fn (f, acc) => convertRecordField(tenv, f, acc)) ([], M.empty) fields in acc end
 
 	fun checkInt ({exp=exp, ty=Types.INT}, pos ) = ()
 	  | checkInt ({exp=exp, ty=ty}, pos) = (ErrorMsg.error pos ("Expected INT Found: " ^ (typeToString ty)))
@@ -81,12 +87,7 @@ struct
 																	true => {exp= (), ty= ty1}
 																	| false => ((ErrorMsg.error pos ("Types not the same: " ^ (typeToString ty1) ^ " and " ^ (typeToString ty2) ^ "\n")); {exp= (), ty= ty1})
 
-	fun checkDuplicateFunctionField (m, name, pos) = case M.find (m, Symbol.name name) of
-													SOME(_) => (ErrorMsg.error pos ("Duplicate function field " ^ Symbol.name name))
-												  | NONE => ();
-
-	fun transparam ({name=name,typ=typ,pos=pos,escape=_}, tenv, (l, m)) = (	checkDuplicateFunctionField(m, name, pos);
-																	   	M.insert (m, Symbol.name name, true);
+	fun transparam ({name=name,typ=typ,pos=pos,escape=_}, tenv, (l, m)) = (	checkDuplicateFields(m, name, pos, "Duplicate Function field:");
 																	   	case lookUpSymbolTENV (tenv, typ, pos) of
 																			SOME t => ({name=name, ty=t}::l, M.insert (m, Symbol.name name, true))
 																		   | NONE  => ({name=name, ty=Types.UNIT}::l, M.insert (m, Symbol.name name, true)));
@@ -95,21 +96,47 @@ struct
 	 *  								*)
 
 
- 	fun transTy (tenv, A.NameTy(symbol, pos)) 	= (case lookUpSymbolTENV (tenv, symbol, pos) of
-													SOME(ty) => ty
-													| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name symbol)); Types.UNIT))
- 	  | transTy (tenv, A.ArrayTy(symbol, pos)) 	= (case lookUpSymbolTENV (tenv, symbol, pos) of
+ 	fun transTy (tenv, A.NameTy(symbol, pos)) 	= (case Symbol.look (tenv, symbol) of
+													  SOME(ty) => ty
+													| NONE => (ErrorMsg.error pos ("Unrecognized Type: " ^ (Symbol.name symbol)); Types.UNIT))
+ 	  | transTy (tenv, A.ArrayTy(symbol, pos)) 	= (case Symbol.look (tenv, symbol ) of
 	  												SOME(ty) => Types.ARRAY(ty, ref ())
-												  | NONE => Types.ARRAY(Types.UNIT, ref ()))
+												  | NONE => (ErrorMsg.error pos ("Unrecognized Type: " ^ (Symbol.name symbol)); Types.ARRAY(Types.UNIT, ref ())))
  	  | transTy (tenv, A.RecordTy(fields)) 		= Types.RECORD((convertRecordFields (tenv, fields)), ref ())
 
 	(*recursive types*)
   	fun processTypeHeaders ({name, ty, pos}, tenv) = Symbol.enter (tenv, name, Types.NAME(name, ref NONE))
 
   	fun processTypeBodies ({name, ty, pos}, tenv) = case Symbol.look (tenv, name) of
-  												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
-  												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
-  												| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name name)); tenv)
+	  												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
+	  												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
+	  												| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name name)); tenv)
+
+	fun getInnerType (tenv, ty, pos) = case ty of
+										  SOME(Types.NAME(sym, r)) => (case !r of
+										  								SOME(typ) => SOME(typ)
+																	  | NONE => (ErrorMsg.error pos ("None type error in type: " ^ (Symbol.name sym)); NONE))
+										| SOME(Types.ARRAY(typ, _)) => SOME(typ)
+										| SOME(_) => NONE
+										| NONE => (ErrorMsg.error pos ("None type error"); NONE)
+
+	fun circularTy (s, SOME(Types.NAME(name, r)), tenv) = (if S.member (s, (Symbol.name name))
+															then true
+															else circularTy ((S.add (s, name)), getInnerType (tenv, Symbol.look (tenv, name), 0), tenv))
+	| circularTy (s, SOME(Types.ARRAY(ty, u)), tenv) = 	circularTy (s, getInnerType (tenv, SOME(ty), 0), tenv)
+	| circularTy (s, _, tenv) = false
+
+	fun processRecursiveDefs tenv {name, ty, pos} =  let
+														 	val s = S.add (S.empty, name)
+															val nameTy = Symbol.look (tenv, name)
+															val inner = getInnerType (tenv, nameTy, pos)
+															val circular = circularTy (s, inner, tenv)
+														 in
+														 	if circular
+															then (ErrorMsg.error pos ("Circular type: " ^ (Symbol.name name)); ())
+															else ()
+														 end
+
 
 	fun transExp (venv, tenv) =
 		let
@@ -263,6 +290,7 @@ struct
 		  | transDec (A.TypeDec(lst), {venv, tenv}) = let
 														val tenv' = (foldl processTypeHeaders tenv lst)
 														val tenv'' = (foldl processTypeBodies tenv' lst)
+														val _ = (map (fn (t) => processRecursiveDefs(tenv') t) lst)
 													  in
 													  	{venv=venv, tenv=tenv''}
 													  end
