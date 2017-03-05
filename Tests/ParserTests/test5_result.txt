@@ -1,0 +1,5 @@
+AssignExp(
+ SimpleVar(x),
+ OpExp(PlusOp,
+  IntExp(5),
+  IntExp(4)))

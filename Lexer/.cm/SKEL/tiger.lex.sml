@@ -1,2 +1,0 @@
-Skeleton 5
-d2f7ä¢Int"d"Char"Cä¢String"ä¢TextIO"ä¢Tokens"ä¢Vector"ä¢ErrorMsg"Nad"Mlex"h3aä¢yyInput"jh3aä¢TIO"gp1ÿad"TSIO"gp2ÿd"StreamIO"ad"TPIO"gp1d"TextPrimIO"è0aä¢UserDeclarations"h1aä¢M"jÿ‚gp1e"SplayMapFn"bbd2egp1ÿ‚f5Cÿ‚0d"IO"ÿd"List"ÿCÿ$ÿ‚ÿ-ÿ6ÿNf0f1ÿ

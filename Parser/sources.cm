@@ -1,14 +1,14 @@
 Group is
 
 absyn.sml
-../Lexer/errormsg.sml
-table.sig
-table.sml
-symbol.sml
+errormsg.sml
 parse.sml
 prabsyn.sml
-tiger.lex
+symbol.sml
+table.sig
+table.sml
 tiger.grm
+tiger.lex.sml
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm

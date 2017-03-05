@@ -1,0 +1,8 @@
+/* Should be have  */
+let
+    type a = {x: int}
+    type b = a
+    var c: b := b{x=1}
+ in
+    ()
+ end

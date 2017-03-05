@@ -1,0 +1,6 @@
+/* Mutually Recursive Functions ---> Should pass */
+let
+  function one(i:int, i: string) = "fail!"
+in
+  1
+end

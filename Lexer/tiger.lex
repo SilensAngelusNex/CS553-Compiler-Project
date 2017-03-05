@@ -12,28 +12,6 @@ fun err(p1,p2) = ErrorMsg.error p1
 
 structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end);
 
-(*				  *
- * Keyword Tokens *
- *   			  *)
-
-val constructorMap = foldl (fn ((k, v), m) => M.insert (m, k, v)) M.empty [ ("type", Tokens.TYPE),
-																			("var", Tokens.VAR),
-																			("function", Tokens.FUNCTION),
-																			("break", Tokens.BREAK),
-																			("of", Tokens.OF),
-																			("end", Tokens.END),
-																			("in", Tokens.IN),
-																			("nil", Tokens.NIL),
-																			("let", Tokens.LET),
-																			("do", Tokens.DO),
-																			("to", Tokens.TO),
-																			("for", Tokens.FOR),
-																			("while", Tokens.WHILE),
-																			("else", Tokens.ELSE),
-																			("then", Tokens.THEN),
-																			("if", Tokens.IF),
-																			("array", Tokens.ARRAY)];
-
 val controlCharMap = foldl (fn ((k, v), m) => M.insert (m, k, v)) M.empty [ ("\\^@", "\^@"),
 																			("\\0" , "\^@"),
 																			("\\^A", "\^A"),
@@ -78,10 +56,6 @@ val controlCharMap = foldl (fn ((k, v), m) => M.insert (m, k, v)) M.empty [ ("\\
                                                                             ("\\\\", "\\"),
                                                                             ("\\\"", "\"")];
 
-fun keywordIdToken (s, pos) = case M.find (constructorMap, s) of
-								 SOME f => f (pos, pos + String.size s)
-							   | NONE => Tokens.ID(s, pos, pos + String.size s);
-
 fun appendAsciiInt v = if v >= 0 andalso v <= 255
                        then
                             let val asciiChar = chr v
@@ -104,8 +78,12 @@ fun eof() =
     end;
 
 %%
+
+%header (functor TigerLexFun(structure Tokens : Tiger_TOKENS));
+
 %s COMMENT STRING MULTILINE;
 digit=[0-9];
+
 %%
 
 <INITIAL>\n									=> (lineNum := !lineNum + 1;
@@ -117,13 +95,32 @@ digit=[0-9];
 
 <INITIAL>\t									=> (continue());
 
-<INITIAL>(_main)|([a-zA-Z][a-zA-Z0-9_]*) 	=> (keywordIdToken (yytext, yypos));
+
+<INITIAL>type => ( Tokens.TYPE(yypos, yypos + String.size yytext));
+<INITIAL>var => ( Tokens.VAR(yypos, yypos + String.size yytext));
+<INITIAL>function => ( Tokens.FUNCTION(yypos, yypos + String.size yytext));
+<INITIAL>break => ( Tokens.BREAK(yypos, yypos + String.size yytext));
+<INITIAL>of => ( Tokens.OF(yypos, yypos + String.size yytext));
+<INITIAL>end => ( Tokens.END(yypos, yypos + String.size yytext));
+<INITIAL>in => ( Tokens.IN(yypos, yypos + String.size yytext));
+<INITIAL>nil => ( Tokens.NIL(yypos, yypos + String.size yytext));
+<INITIAL>let => ( Tokens.LET(yypos, yypos + String.size yytext));
+<INITIAL>do => ( Tokens.DO(yypos, yypos + String.size yytext));
+<INITIAL>to => ( Tokens.TO(yypos, yypos + String.size yytext));
+<INITIAL>for => ( Tokens.FOR(yypos, yypos + String.size yytext));
+<INITIAL>while => ( Tokens.WHILE(yypos, yypos + String.size yytext));
+<INITIAL>else => ( Tokens.ELSE(yypos, yypos + String.size yytext));
+<INITIAL>then => ( Tokens.THEN(yypos, yypos + String.size yytext));
+<INITIAL>if => ( Tokens.IF(yypos, yypos + String.size yytext));
+<INITIAL>array => ( Tokens.ARRAY(yypos, yypos + String.size yytext));
+
+<INITIAL>(_main)|([a-zA-Z][a-zA-Z0-9_]*) 	=> ( Tokens.ID(yytext, yypos, yypos + String.size yytext) );
 
 <INITIAL>\"                                 => (YYBEGIN STRING; str:= "";
                                                 continue()
                                                );
 
-<INITIAL>([-]?[1-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
+<INITIAL>([1-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
 									               SOME i => (Tokens.INT(i, yypos, yypos + String.size yytext))
                                                    | NONE   => (ErrorMsg.error yypos ("Unexpected non-integer " ^ yytext);
                                                 continue())

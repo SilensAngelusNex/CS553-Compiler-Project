@@ -1,0 +1,6 @@
+OpExp(PlusOp,
+ IntExp(4),
+ IfExp(
+  IntExp(0),
+  IntExp(2),
+  IntExp(6)))
