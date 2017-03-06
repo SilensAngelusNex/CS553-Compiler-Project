@@ -40,7 +40,7 @@ struct
 	fun lookUpSymbol (venv, symbol, pos): Types.ty = case Symbol.look(venv, symbol) of
 													   		SOME(ENV.VarEntry {ty})						=> (lookUpActualSymType (ty, pos))
 														  | SOME(ENV.FunEntry {formals=f,result=ty})	=> (lookUpActualSymType (ty, pos))
-													   	  | NONE										=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT)
+													   	  | NONE										=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.UNDEFINED)
 
 	fun lookUpSymbolTENV (tenv, symbol, pos): Types.ty option = (case Symbol.look(tenv, symbol) of
 												   		  	 		SOME(ty)	=> SOME(lookUpActualSymType (ty, pos))
@@ -121,9 +121,10 @@ struct
 										| NONE => (ErrorMsg.error pos ("None type error"); NONE)
 
 	fun circularTy (s, SOME(Types.NAME(name, r)), tenv) = (if S.member (s, (Symbol.name name))
-															then true
+															then ( r := SOME(Types.UNDEFINED); true)
 															else circularTy ((S.add (s, name)), getInnerType (tenv, Symbol.look (tenv, name), 0), tenv))
 	| circularTy (s, SOME(Types.ARRAY(ty, u)), tenv) = 	circularTy (s, getInnerType (tenv, SOME(ty), 0), tenv)
+	| circularTy (s, SOME(Types.UNDEFINED), tenv)    = 	((); true)
 	| circularTy (s, _, tenv) = false
 
 	fun processRecursiveDefs tenv {name, ty, pos} =  let
