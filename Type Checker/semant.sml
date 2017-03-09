@@ -6,6 +6,7 @@ struct
 	type venv  = ENV.enventry Symbol.table
 	type tenv  = Types.ty Symbol.table
 	type expty = {exp: Translate.exp, ty: Types.ty}
+	val loops = ref 0
 
     (*								*
 	 * 	Private Helper Functions	*
@@ -173,8 +174,10 @@ struct
 				| trexp(A.WhileExp{test, body, pos}) =  let
 														val testTy = trexp test
 														val bodyTy = trexp body
+														val result = (loops := !loops + 1; checkInt(testTy, pos); bodyTy)
 														in
-														(checkInt(testTy, pos); bodyTy)
+														(loops := !loops - 1;
+														result)
 														end
 
 				| trexp(A.IfExp{test=test,then'=thenExp,else'=SOME(elseExp),pos=pos}) = let
@@ -221,13 +224,18 @@ struct
 																	val loTy = trexp lo
 																	val hiTy = trexp hi
 																	val venv'' = Symbol.enter (venv, symbol, ENV.VarEntry{ty=Types.INT})
+																	val result = (loops:= !loops + 1;
+																					checkInt(loTy, pos);
+																					checkInt(hiTy, pos);
+																					transExp (venv'', tenv) body)
 																	in
-																	(checkInt(loTy, pos);
-																	 checkInt(hiTy, pos);
-																	 transExp (venv'', tenv) body)
+																		(loops := !loops - 1;
+																		result)
 																	end
 
-				| trexp(A.BreakExp(pos)) = {exp=(), ty=Types.UNIT}
+				| trexp(A.BreakExp(pos)) = 	if !loops > 0
+				 							then {exp=(), ty=Types.UNIT}
+											else ((ErrorMsg.error pos ("Break called outside of a loop.")); {exp=(), ty=Types.UNDEFINED})
 
 			and trvar (A.SimpleVar(id, pos)) 			= {exp=(), ty=(lookUpSymbol (venv, id, pos))}
 				| trvar (A.FieldVar(var, id, pos)) 	    = let

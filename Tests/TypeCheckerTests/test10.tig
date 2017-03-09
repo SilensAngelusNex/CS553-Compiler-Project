@@ -1,0 +1,13 @@
+/* Circular types */
+let
+	var x := 0
+in
+	(
+    for r := 0 to 4
+	do 	if x = 3
+		then break
+		else while x<3
+				do (x + 2; break);
+	break
+	)
+end
