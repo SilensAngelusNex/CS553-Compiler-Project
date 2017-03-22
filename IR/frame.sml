@@ -1,0 +1,3 @@
+structure Frame =
+struct
+end
