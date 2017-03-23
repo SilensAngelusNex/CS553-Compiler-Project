@@ -1,3 +1,0 @@
-structure Frame =
-struct
-end

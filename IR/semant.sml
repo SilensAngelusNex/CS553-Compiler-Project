@@ -37,9 +37,9 @@ struct
 
 
 	fun lookUpSymbol (venv, symbol, pos): Types.ty = case Symbol.look(venv, symbol) of
-													   		SOME(ENV.VarEntry {ty})						=> (lookUpActualSymType (ty, pos))
-														  | SOME(ENV.FunEntry {formals=f,result=ty})	=> (lookUpActualSymType (ty, pos))
-													   	  | NONE										=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT)
+													   		SOME(ENV.VarEntry {access=_, ty=_})							=> (lookUpActualSymType (ty, pos))
+														  | SOME(ENV.FunEntry {level=_, label=_, formals=_, result=ty})	=> (lookUpActualSymType (ty, pos))
+													   	  | NONE														=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT)
 
 	fun lookUpSymbolTENV (tenv, symbol, pos): Types.ty option = (case Symbol.look(tenv, symbol) of
 												   		  	 		SOME(ty)	=> SOME(lookUpActualSymType (ty, pos))
@@ -85,11 +85,11 @@ struct
 													SOME(_) => (ErrorMsg.error pos ("Duplicate function field " ^ Symbol.name name))
 												  | NONE => ();
 
-	fun transparam ({name=name,typ=typ,pos=pos,escape=_}, tenv, (l, m)) = (	checkDuplicateFunctionField(m, name, pos);
+	fun transparam ({name=name,typ=typ,pos=pos,escape=esc}, tenv, (l, m)) = (	checkDuplicateFunctionField(m, name, pos);
 																	   	M.insert (m, Symbol.name name, true);
 																	   	case lookUpSymbolTENV (tenv, typ, pos) of
-																			SOME t => ({name=name, ty=t}::l, M.insert (m, Symbol.name name, true))
-																		   | NONE  => ({name=name, ty=Types.UNIT}::l, M.insert (m, Symbol.name name, true)));
+																			SOME t => ({name=name, ty=t, escape=esc}::l, M.insert (m, Symbol.name name, true))
+																		   | NONE  => ({name=name, ty=Types.UNIT, escape=esc}::l, M.insert (m, Symbol.name name, true)));
 	(*									*
 	 * 	Private Translation Functions	*
 	 *  								*)
@@ -111,7 +111,7 @@ struct
   												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
   												| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name name)); tenv)
 
-	fun transExp (venv, tenv) =
+	fun transExp (level, venv, tenv) =
 		let
 			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos})   	= checkIntPair (trexp left, trexp right, pos)
 			  | trexp (A.OpExp{left, oper=A.MinusOp, right, pos})  	= checkIntPair (trexp left, trexp right, pos)
@@ -131,16 +131,17 @@ struct
 			  | trexp(A.LetExp{decs, body, pos}) =
 												  let
 												  	val (venv, tenv) = (Symbol.beginScope venv, Symbol.beginScope tenv)
-												  	val {venv=new_venv, tenv=new_tenv} = transDecs(venv, tenv, decs)
-													val {exp=e, ty=t} = transExp(new_venv, new_tenv) body
+													val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=[]}
+												  	val {venv=new_venv, tenv=new_tenv} = transDecs(nextLevel, venv, tenv, decs)
+													val {exp=e, ty=t} = transExp(nextLevel, new_venv, new_tenv) body
 												  in
 												  	{exp=e, ty=t}
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => (paramList (paramTys, args, pos); {exp=(), ty=lookUpActualSymType (ty, pos)}) (* CHECK ALL PARAMETERS*)
-														| SOME(ENV.VarEntry{ty=ty}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(), ty=Types.INT})
-														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(), ty=Types.INT}))
+														 SOME(ENV.FunEntry{level=_, label=_, formals=paramTys, result=ty}) => (paramList (paramTys, args, pos); {exp=(), ty=lookUpActualSymType (ty, pos)}) (* CHECK ALL PARAMETERS*)
+														| SOME(ENV.VarEntry{access=_, ty=_}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(), ty=Types.UNDEFINED})
+														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(), ty=Types.UNDEFINED}))
 				| trexp(A.AssignExp{var, exp, pos}) = checkPair(trvar var, trexp exp, pos)
 				| trexp(A.WhileExp{test, body, pos}) =  let
 														val testTy = trexp test
@@ -187,16 +188,16 @@ struct
 															{exp=(), ty=Types.RECORD(smyTypes, recRef)})
 															end
 
-				| trexp(A.ForExp{var=symbol,escape=escape,
+				| trexp(A.ForExp{var=symbol,escape=esc,
 								lo=lo,hi=hi,body=body,pos=pos}) = 	let
 																	val (venv', tenv') = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
 																	val loTy = trexp lo
 																	val hiTy = trexp hi
-																	val venv'' = Symbol.enter (venv, symbol, ENV.VarEntry{ty=Types.INT})
+																	val venv'' = Symbol.enter (venv, symbol, ENV.VarEntry{access=Translate.allocLocal level !esc, ty=Types.INT})
 																	in
 																	(checkInt(loTy, pos);
 																	 checkInt(hiTy, pos);
-																	 transExp (venv'', tenv) body)
+																	 transExp (nextLevel, venv'', tenv) body)
 																	end
 
 				| trexp(A.BreakExp(pos)) = {exp=(), ty=Types.UNIT}
@@ -253,30 +254,32 @@ struct
 		trexp
 		end
 
-		and transDec (A.FunctionDec(lst), {venv, tenv})	= 	let
-														  		val (venv', _, params) = (foldr processFunctionHeaders (venv, tenv, []) lst)
+		and transDec (level, A.FunctionDec(lst), {venv, tenv})	= 	let
+														  		val (venv', _, params) = (foldr (fn (e,a) => processFunctionHeaders(level, e, a)) (venv, tenv, []) lst)
 															  	val (_, _) = (foldl processFunctionBodies (venv', tenv) (ListPair.zip (lst, params)))
 														  	in
 															  	{venv=venv', tenv=tenv}
 															end
 
-		  | transDec (A.TypeDec(lst), {venv, tenv}) = let
+		  | transDec (level, A.TypeDec(lst), {venv, tenv}) = let
 														val tenv' = (foldl processTypeHeaders tenv lst)
 														val tenv'' = (foldl processTypeBodies tenv' lst)
 													  in
 													  	{venv=venv, tenv=tenv''}
 													  end
-		  | transDec (A.VarDec({name=name,escape=escape,typ=NONE, init=init, pos=pos}),
+		  | transDec (level, A.VarDec({name=name,escape=esc,typ=NONE, init=init, pos=pos}),
 		  						{venv, tenv}) = let
-												val {exp, ty} = transExp(venv, tenv) init
+												val {exp, ty} = transExp(level, venv, tenv) init
+												val a = Translate.allocLocal level !esc
 												in
-												{venv=Symbol.enter(venv, name, ENV.VarEntry{ty=ty}), tenv=tenv}
+												{venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}
 												end
-		  | transDec (A.VarDec({name=name, escape=x, typ=SOME(sym, p), init=init, pos=pos}),
+		  | transDec (level, A.VarDec({name=name, escape=esc, typ=SOME(sym, p), init=init, pos=pos}),
 		  						{venv, tenv}) = let
 												val typ = case lookUpSymbolTENV (tenv, sym, pos) of SOME(ty) => ty | NONE => (ErrorMsg.error pos ("undefined variable " ^ Symbol.name sym); Types.UNDEFINED)
-												val {exp=exp,ty=expTy} = transExp (venv, tenv) init
-				  								val entry = ENV.VarEntry({ty=typ})
+												val {exp=exp,ty=expTy} = transExp (level, venv, tenv) init
+												val a = Translate.allocLocal level !esc
+				  								val entry = ENV.VarEntry({access=a, ty=typ})
 				  							  	val venv = Symbol.enter (venv, name, entry)
 				  							  	in
 												case expTy of
@@ -285,23 +288,26 @@ struct
 				  							  	end
 
 
-		and transDecs (venv, tenv, decs) = (foldl transDec {venv=venv, tenv=tenv} decs)
+		and transDecs (level, venv, tenv, decs) = (foldl (fn (e,a) => transDec(level, e, a)) {venv=venv, tenv=tenv} decs)
 
-		and processFunctionHeaders ({name=name,params=params,result=SOME((sym, rpos)),body=body,pos=pos}, (venv, tenv, paramList)) = 	let
+		and processFunctionHeaders (level, {name=name,params=params,result=SOME((sym, rpos)),body=body,pos=pos}, (venv, tenv, paramList)) = 	let
 																																	val x = Int.toString pos
 																																	val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
 																																	val symTy = case lookUpSymbolTENV (tenv, sym, rpos) of
 																																					SOME(ty) => ty
 																																				  | NONE => (ErrorMsg.error pos ("Unrecognised function result type") ;Types.UNDEFINED)
-																																	val fnDec = ENV.FunEntry({formals=map #ty params', result=symTy})
+																																	val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=map (fn a => true) params'}
+																																	val fnDec = ENV.FunEntry({level=nextLevel, label=_, formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
+
 																																	(venv', tenv, params'::paramList)
 																																end
-		| processFunctionHeaders ({name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
+		| processFunctionHeaders (level, {name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
 																													val x = Int.toString pos
 																													val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
-																													val fnDec = ENV.FunEntry({formals=map #ty params', result=Types.UNIT})
+																													val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=map (fn a => true) params'}
+																													val fnDec = ENV.FunEntry({level=nextLevel, label=_, formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 																												in
 																													(venv', tenv, params'::paramList)
@@ -309,24 +315,23 @@ struct
 
 		and processFunctionBodies (({name, params, result=result, body, pos}, paramList), (venv, tenv)) = case Symbol.look(venv, name) of
 																											NONE => (ErrorMsg.error pos("Function body name doesnt exist: " ^ (Symbol.name name)); (venv, tenv))
-																									   	  | SOME(ENV.VarEntry {ty})						=> (venv, tenv)
-																										  | SOME(ENV.FunEntry {formals=f,result=ty})	=>  let
-																										  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
-																																								val venv'' = foldl (fn ({name=s, ty=ty}, t) => Symbol.enter (t, s, ENV.VarEntry{ty=ty})) venv' paramList
-																										  														val {exp=exp,ty=ty1} = transExp (venv'', tenv') body
-																																							in
-																																								case isSubtype(ty, ty1, pos) of
-																																									true => (venv, tenv)
-																																								  | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
-																																							end
+																									   	  | SOME(ENV.VarEntry (_))						=> (ErrorMsg.error pos("Given name is a variable name: " ^ (Symbol.name name)); (venv, tenv)
+																										  | SOME(ENV.FunEntry {level=level, label=_, formals=f,result=ty})	=>  let
+																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
+																																											val venv'' = foldl (fn ({name=s, ty=ty, escape=esc}, t) => Symbol.enter (t, s, ENV.VarEntry{access=Translate.allocLocal level !esc, ty=ty})) venv' paramList
+																													  														val {exp=exp,ty=ty1} = transExp (level, venv'', tenv') body
+																																										in
+																																											case isSubtype(ty, ty1, pos) of
+																																												true => (venv, tenv)
+																																											  | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
+																																										end
 
-	fun transVar (venv, tenv, A.SimpleVar(id, pos)) 	  		= {exp=(), ty=(lookUpSymbol (venv, id, pos))}
-	  | transVar (venv, tenv, A.FieldVar(var, id, pos)) 		= {exp=(), ty=(lookUpSymbol (venv, id, pos))}
-	  | transVar (venv, tenv, A.SubscriptVar(var, exp, pos))	= {exp=(), ty=Types.UNDEFINED}
+	fun transVar (level, venv, tenv, A.SimpleVar(id, pos)) 	  		= {exp=(), ty=(lookUpSymbol (venv, id, pos))}
+	  | transVar (level, venv, tenv, A.FieldVar(var, id, pos)) 		= {exp=(), ty=(lookUpSymbol (venv, id, pos))}
+	  | transVar (level, venv, tenv, A.SubscriptVar(var, exp, pos))	= {exp=(), ty=Types.UNDEFINED}
 (*
 	* 	API							*
 	*  								*)
 
-	fun transProg exp = let val x = transExp (ENV.base_venv, ENV.base_tenv) exp in () end
-
+	fun transProg exp = (FindEscape.findEscape exp; transExp (Translate.outermost, ENV.base_venv, ENV.base_tenv) exp; ())
 end
