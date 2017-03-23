@@ -37,7 +37,7 @@ struct
 
 
 	fun lookUpSymbol (venv, symbol, pos): Types.ty = case Symbol.look(venv, symbol) of
-													   		SOME(ENV.VarEntry {access=_, ty=_})							=> (lookUpActualSymType (ty, pos))
+													   		SOME(ENV.VarEntry {access=_, ty=ty})						=> (lookUpActualSymType (ty, pos))
 														  | SOME(ENV.FunEntry {level=_, label=_, formals=_, result=ty})	=> (lookUpActualSymType (ty, pos))
 													   	  | NONE														=> (ErrorMsg.error pos ("undefined variable " ^ Symbol.name symbol); Types.INT)
 
@@ -132,7 +132,7 @@ struct
 												  let
 												  	val (venv, tenv) = (Symbol.beginScope venv, Symbol.beginScope tenv)
 												  	val {venv=new_venv, tenv=new_tenv} = transDecs(level, venv, tenv, decs)
-													val {exp=e, ty=t} = transExp(nextLevel, new_venv, new_tenv) body
+													val {exp=e, ty=t} = transExp(level, new_venv, new_tenv) body
 												  in
 												  	{exp=e, ty=t}
 												  end
@@ -192,11 +192,11 @@ struct
 																	val (venv', tenv') = (Symbol.beginScope (venv), Symbol.beginScope (tenv))
 																	val loTy = trexp lo
 																	val hiTy = trexp hi
-																	val venv'' = Symbol.enter (venv, symbol, ENV.VarEntry{access=Translate.allocLocal level !esc, ty=Types.INT})
+																	val venv'' = Symbol.enter (venv, symbol, ENV.VarEntry{access=Translate.allocLocal (level) (!esc), ty=Types.INT})
 																	in
 																	(checkInt(loTy, pos);
 																	 checkInt(hiTy, pos);
-																	 transExp (nextLevel, venv'', tenv) body)
+																	 transExp (level, venv'', tenv) body)
 																	end
 
 				| trexp(A.BreakExp(pos)) = {exp=(), ty=Types.UNIT}
@@ -269,7 +269,7 @@ struct
 		  | transDec (level, A.VarDec({name=name,escape=esc,typ=NONE, init=init, pos=pos}),
 		  						{venv, tenv}) = let
 												val {exp, ty} = transExp(level, venv, tenv) init
-												val a = Translate.allocLocal level !esc
+												val a = Translate.allocLocal (level) (!esc)
 												in
 												{venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}
 												end
@@ -277,7 +277,7 @@ struct
 		  						{venv, tenv}) = let
 												val typ = case lookUpSymbolTENV (tenv, sym, pos) of SOME(ty) => ty | NONE => (ErrorMsg.error pos ("undefined variable " ^ Symbol.name sym); Types.UNDEFINED)
 												val {exp=exp,ty=expTy} = transExp (level, venv, tenv) init
-												val a = Translate.allocLocal level !esc
+												val a = Translate.allocLocal (level) (!esc)
 				  								val entry = ENV.VarEntry({access=a, ty=typ})
 				  							  	val venv = Symbol.enter (venv, name, entry)
 				  							  	in
@@ -295,8 +295,8 @@ struct
 																																	val symTy = case lookUpSymbolTENV (tenv, sym, rpos) of
 																																					SOME(ty) => ty
 																																				  | NONE => (ErrorMsg.error pos ("Unrecognised function result type") ;Types.UNDEFINED)
-																																	val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=map (fn a => true) params'}
-																																	val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newLabel, formals=map #ty params', result=symTy})
+																																	val nextLevel = Translate.newLevel {parent=level, name=Temp.newlabel(), formals=map (fn a => true) params'}
+																																	val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
 
@@ -305,8 +305,8 @@ struct
 		| processFunctionHeaders (level, {name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
 																													val x = Int.toString pos
 																													val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
-																													val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=map (fn a => true) params'}
-																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newLabel, formals=map #ty params', result=Types.UNIT})
+																													val nextLevel = Translate.newLevel {parent=level, name=Temp.newlabel(), formals=map (fn a => true) params'}
+																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 																												in
 																													(venv', tenv, params'::paramList)
@@ -317,7 +317,7 @@ struct
 																									   	  | SOME(ENV.VarEntry (_))						=> (ErrorMsg.error pos("Given name is a variable name: " ^ (Symbol.name name)); (venv, tenv))
 																										  | SOME(ENV.FunEntry {level=level, label=_, formals=f,result=ty})	=>  let
 																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
-																																											val venv'' = foldl (fn ({name=s, ty=ty, escape=esc}, t) => Symbol.enter (t, s, ENV.VarEntry{access=Translate.allocLocal level !esc, ty=ty})) venv' paramList
+																																											val venv'' = foldl (fn ({name=s, ty=ty, escape=esc}, t) => Symbol.enter (t, s, ENV.VarEntry{access=Translate.allocLocal (level) (!esc), ty=ty})) venv' paramList
 																													  														val {exp=exp,ty=ty1} = transExp (level, venv'', tenv') body
 																																										in
 																																											case isSubtype(ty, ty1, pos) of

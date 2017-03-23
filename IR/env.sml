@@ -18,19 +18,21 @@ struct
 	val empty: ty Symbol.table = Symbol.empty
 	val base_tenv: ty Symbol.table = (foldl (fn ((sym, ty), acc) => Symbol.enter(acc, sym, ty)) empty tenvs)
 
-	val trans = Translate.EMPTY
+	val trans = Translate.outermost
 
 	val venvs = [
-				 (Symbol.symbol ("print"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false]}, label=Temp.newLabel, formals=[Types.STRING], result=Types.UNIT})),
-				 (Symbol.symbol ("flush"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[]}, label=Temp.newLabel, formals=[], result=Types.UNIT})),
-				 (Symbol.symbol ("getchar"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[]}, label=Temp.newLabel, formals=[], result=Types.STRING})),
-				 (Symbol.symbol ("ord"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false]}, label=Temp.newLabel, formals=[Types.STRING], result=Types.INT})),
-				 (Symbol.symbol ("chr"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false]}, label=Temp.newLabel, formals=[Types.INT], result=Types.STRING})),
-				 (Symbol.symbol ("size"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false]}, label=Temp.newLabel, formals=[Types.STRING], result=Types.INT})),
-				 (Symbol.symbol ("substring"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false, false, false]}, label=Temp.newLabel, formals=[Types.STRING, Types.INT, Types.INT], result=Types.STRING})),
-				 (Symbol.symbol ("concat"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false, false]}, label=Temp.newLabel, formals=[Types.STRING,Types.STRING], result=Types.STRING})),
-				 (Symbol.symbol ("not"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false]}, label=Temp.newLabel, formals=[Types.INT], result=Types.INT})),
-				 (Symbol.symbol ("exit"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newLabel, formals=[false]}, label=Temp.newLabel, formals=[Types.INT], result=Types.INT}))
+				 (Symbol.symbol ("print"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]},
+				 									 label=Temp.newlabel(), formals=[Types.STRING], result=Types.UNIT
+														})),
+				 (Symbol.symbol ("flush"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[]}, label=Temp.newlabel(), formals=[], result=Types.UNIT})),
+				 (Symbol.symbol ("getchar"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[]}, label=Temp.newlabel(), formals=[], result=Types.STRING})),
+				 (Symbol.symbol ("ord"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.STRING], result=Types.INT})),
+				 (Symbol.symbol ("chr"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.STRING})),
+				 (Symbol.symbol ("size"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.STRING], result=Types.INT})),
+				 (Symbol.symbol ("substring"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false, false, false]}, label=Temp.newlabel(), formals=[Types.STRING, Types.INT, Types.INT], result=Types.STRING})),
+				 (Symbol.symbol ("concat"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false, false]}, label=Temp.newlabel(), formals=[Types.STRING,Types.STRING], result=Types.STRING})),
+				 (Symbol.symbol ("not"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT})),
+				 (Symbol.symbol ("exit"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT}))
 				 ]
 
 	val empty: enventry Symbol.table = Symbol.empty

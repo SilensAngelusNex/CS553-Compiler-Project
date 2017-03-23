@@ -11,6 +11,8 @@ $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm
 
+table.sig
+table.sml
 symbol_table.sig
 symbol_table.sml
 semant.sig
@@ -22,8 +24,9 @@ translate.sig
 translate.sml
 main.sml
 
-(*tree.sml*)
+tree.sml
 temp.sig
 temp.sml
 frame.sig
 MIPSFrame.sml
+escape.sml

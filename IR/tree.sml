@@ -55,24 +55,24 @@ datatype stm = SEQ of stm * stm
               | ULT | ULE | UGT | UGE
 
 	fun notRel EQ = NE
-			 | NE = EQ
-			 | LT = GE
-			 | GT = LE
-			 | LE = GT
-			 | GE = LT
-	         | ULT = UGE
-			 | ULE = UGT
-			 | UGT = ULE
-			 | UGE = ULT
+    | notRel NE = EQ
+    | notRel LT = GE
+    | notRel GT = LE
+    | notRel LE = GT
+    | notRel GE = LT
+    | notRel ULT = UGE
+    | notRel ULE = UGT
+    | notRel UGT = ULE
+    | notRel UGE = ULT
 
 	fun commute EQ = NE
-			  | NE = EQ
-			  | LT = GE
-			  | GT = LE
-			  | LE = GT
-			  | GE = LT
-	          | ULT = UGE
-			  | ULE = UGT
-			  | UGT = ULE
-			  | UGE = ULT
+	  | commute NE = EQ
+	  | commute LT = GE
+	  | commute GT = LE
+	  | commute LE = GT
+	  | commute GE = LT
+      | commute ULT = UGE
+	  | commute ULE = UGT
+	  | commute UGT = ULE
+	  | commute UGE = ULT
 end
