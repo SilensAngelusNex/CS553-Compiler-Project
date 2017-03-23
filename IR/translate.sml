@@ -15,14 +15,14 @@ struct
 	fun outermost = currLevel
 
 	fun newLevel {parent: parent, name: name, formals: formals} =  let
-																		val n = Frame.newFrame {name: name, formals: true::formals}
+																		val n = Frame.newFrame {name=name, formals=true::formals}
 																   in
 																   		currLevel := L(n);
 																		n
 																   end
-	fun formals L(frame) = case Frame.formals frame of
+	fun formals L(frame) = (case Frame.formals frame of
 							a::l => map (fn a => (L(frame), a)) l
-						   | _  => []
+						   | _  => [])
 	  | formals EMPTY = []
 
 	fun allocLocal L(frame) bool = (!currLevel, Frame.allocLocal frame bool)

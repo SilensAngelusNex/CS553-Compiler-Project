@@ -4,9 +4,9 @@ struct
 	datatype access = InFrame of int
 					| InReg of Temp.temp
 
-	fun allocLocals f (i, b::l) = case i < 4 of
+	fun allocLocals f (i, b::l) = (case i < 4 of
 									true	=> (putInReg f		; allocLocals f (i + 1, l))
-								  | false 	=> (allocLocal f b	; allocLocals f (i + 1, l))
+								  | false 	=> (allocLocal f b	; allocLocals f (i + 1, l)))
 
 	  | allocLocals f (i, [])   = f
 

@@ -106,3 +106,49 @@ fun unCx(Ex, e) =
 
 
 #### Basic Blocks
+
+
+
+dataype intr =
+    OPER of {
+        assem: string
+        dst: temp list,
+        src: temp list,
+        jump: label list option}
+    | LABEL of
+    | Move of {
+            assem: string,
+            dst: tmp,
+            src: temp
+            }
+
+
+# Liveness
+
+loop from the last block adding to liveIn and LiveOut
+
+LiveIn[B] = uses[B] (Union LiveOut[B] - Defs[B])
+LiveOut[B] = Union Live-In[Successors (out edges)]
+
+Fixed Point of a function: f(x) = x
+- Least fixed point: Fewest things in set
+- Greatest fixed point: Greatest things in set
+
+For a generic block:
+    - Defs =
+    - Uses =
+    - In edges -->
+    - Out edges --> Union the  
+
+
+Graph:
+- Find the sink (if exists)
+- Sould be bi-directional
+
+
+while !changed:
+    then
+        let val() = changed := false
+        val := do innerloop
+        val := do outerloop
+    else

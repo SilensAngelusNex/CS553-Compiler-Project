@@ -131,8 +131,7 @@ struct
 			  | trexp(A.LetExp{decs, body, pos}) =
 												  let
 												  	val (venv, tenv) = (Symbol.beginScope venv, Symbol.beginScope tenv)
-													val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=[]}
-												  	val {venv=new_venv, tenv=new_tenv} = transDecs(nextLevel, venv, tenv, decs)
+												  	val {venv=new_venv, tenv=new_tenv} = transDecs(level, venv, tenv, decs)
 													val {exp=e, ty=t} = transExp(nextLevel, new_venv, new_tenv) body
 												  in
 												  	{exp=e, ty=t}
@@ -297,7 +296,7 @@ struct
 																																					SOME(ty) => ty
 																																				  | NONE => (ErrorMsg.error pos ("Unrecognised function result type") ;Types.UNDEFINED)
 																																	val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=map (fn a => true) params'}
-																																	val fnDec = ENV.FunEntry({level=nextLevel, label=_, formals=map #ty params', result=symTy})
+																																	val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newLabel, formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
 
@@ -307,7 +306,7 @@ struct
 																													val x = Int.toString pos
 																													val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
 																													val nextLevel = Translate.newLevel {level=level, name=Temp.newLabel (), formals=map (fn a => true) params'}
-																													val fnDec = ENV.FunEntry({level=nextLevel, label=_, formals=map #ty params', result=Types.UNIT})
+																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newLabel, formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 																												in
 																													(venv', tenv, params'::paramList)
@@ -315,7 +314,7 @@ struct
 
 		and processFunctionBodies (({name, params, result=result, body, pos}, paramList), (venv, tenv)) = case Symbol.look(venv, name) of
 																											NONE => (ErrorMsg.error pos("Function body name doesnt exist: " ^ (Symbol.name name)); (venv, tenv))
-																									   	  | SOME(ENV.VarEntry (_))						=> (ErrorMsg.error pos("Given name is a variable name: " ^ (Symbol.name name)); (venv, tenv)
+																									   	  | SOME(ENV.VarEntry (_))						=> (ErrorMsg.error pos("Given name is a variable name: " ^ (Symbol.name name)); (venv, tenv))
 																										  | SOME(ENV.FunEntry {level=level, label=_, formals=f,result=ty})	=>  let
 																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
 																																											val venv'' = foldl (fn ({name=s, ty=ty, escape=esc}, t) => Symbol.enter (t, s, ENV.VarEntry{access=Translate.allocLocal level !esc, ty=ty})) venv' paramList

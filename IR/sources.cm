@@ -18,10 +18,12 @@ semant.sml
 env.sig
 env.sml
 
+translate.sig
 translate.sml
 main.sml
 
-tree.sml
-frame.sml
+(*tree.sml*)
 temp.sig
 temp.sml
+frame.sig
+MIPSFrame.sml
