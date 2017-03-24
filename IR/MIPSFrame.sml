@@ -6,11 +6,17 @@ struct
 
 	type frame = Temp.label * access list ref * int ref
 
-	val FP = Temp.newtemp
+	datatype frag = PROC of {body: Tree.stm, frame: frame}
+				  | STRING of Temp.label * string
+
+	val FP = Temp.newtemp ()
 
 	val wordSize = 4
 
-	fun exp access tree: Tree.exp = tree
+	fun externalCall (s, args) = T.CALL(T.NAME(Temp.namedLabel s), args)
+
+	fun exp InFrame(k) exp: Tree.exp = Tree.MEM(Tree.BINOP(Tree.PLUS, exp, CONST(k))
+	  | exp InReg(t) _: Tree.exp = Tree.TEMP(t)
 
 	fun formals (_, a, _): access list = !a
 
@@ -43,4 +49,6 @@ struct
 											  in
 												  result
 											  end
+
+	fun procEntryExit1 (frame, body) = body
 end
