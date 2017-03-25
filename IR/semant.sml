@@ -103,10 +103,6 @@ struct
 																	| (false, false) => ((ErrorMsg.error pos ("Types not compatible: " ^ (typeToString ty1) ^ " and " ^ (typeToString ty2) ^ "\n")); Types.UNDEFINED)
 	fun getType ({exp=exp, ty=ty}): Types.ty = ty
 
-	fun sameTypes ({exp=exp1, ty=ty1}, {exp=exp2, ty=ty2}, pos) = case ty1 = ty2 of
-																	true => {exp= (), ty= ty1}
-																	| false => ((ErrorMsg.error pos ("Types not the same: " ^ (typeToString ty1) ^ " and " ^ (typeToString ty2) ^ "\n")); {exp= (), ty= ty1})
-
 	fun checkDuplicateFunctionField (m, name, pos) = case M.find (m, Symbol.name name) of
 													SOME(_) => (ErrorMsg.error pos ("Duplicate function field " ^ Symbol.name name))
 												  | NONE => ();
@@ -181,7 +177,13 @@ struct
 			  | trexp(A.NilExp) 									= {exp=(Translate.transNil ()), ty=Types.NIL}
 			  | trexp(A.IntExp(i)) 									= {exp=(Translate.transInt i), ty=Types.INT}
 			  | trexp(A.StringExp(s, pos)) 							= {exp=(Translate.transString s), ty=Types.STRING}
-			  | trexp(A.SeqExp(seq)) 								= (let val l = trseq seq in {exp=(Translate.transSeq (map #exp l)),ty=List.last(l)} end)
+			  | trexp(A.SeqExp(seq)) 								= 	let
+				  															val l = trseq seq
+																			val exp = Translate.transSeq (map #exp l)
+																			val ty = #ty (List.last (l))
+																		in
+																			{exp=exp, ty=ty}
+																		end
 			  | trexp(A.LetExp{decs, body, pos}) =
 												  let
 												  	val (venv, tenv) = (Symbol.beginScope venv, Symbol.beginScope tenv)
@@ -346,7 +348,7 @@ struct
 												val a = Translate.allocLocal (level) (!esc)
 												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp)
 												in
-												({venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}, result::l)
+												({venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}, l@[result])
 												end
 		  | transDec (level, A.VarDec({name=name, escape=esc, typ=SOME(sym, p), init=init, pos=pos}),
 		  						({venv, tenv}, l)) = let
@@ -399,6 +401,7 @@ struct
 
 																																											val _ = Translate.procEntryExit {level=level, body=result}
 																																										in
+																																											Translate.leaveLevel ();
 																																											case isSubtype(ty, ty1, pos) of
 																																												true => (venv, tenv)
 																																											  | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
@@ -408,5 +411,8 @@ struct
 	* 	API							*
 	*  								*)
 
-	fun transProg exp = (FindEscape.findEscape exp; transExp (Translate.outermost, ENV.base_venv, ENV.base_tenv) exp; Translate.getResult ())
+	fun transProg exp = (
+		FindEscape.findEscape exp;
+		Printtree.printtree (TextIO.openOut "results.txt" , Translate.treeStm (#exp (transExp (Translate.outermost, ENV.base_venv, ENV.base_tenv) exp)));
+		Translate.getResult ())
 end

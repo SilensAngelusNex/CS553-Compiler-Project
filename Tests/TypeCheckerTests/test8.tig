@@ -1,0 +1,6 @@
+let
+  var x: int := 1
+  function one(i:int):int = i + x
+in
+  x
+end

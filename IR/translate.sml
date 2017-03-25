@@ -14,7 +14,7 @@ struct
 
 	type access = level * F.access
 
-	val currLevel = ref EMPTY
+	val currLevel = ref (L(F.newFrame {name=Temp.newlabel (), formals=[true]}, EMPTY, ref ()))
 
 	val outermost = !currLevel
 
@@ -22,14 +22,29 @@ struct
 
 	fun getResult () = !fragList
 
+	fun getDepth (L(_, p, _)) = (getDepth p) ^ "*"
+	  | getDepth EMPTY = "Depth: "
+
 	fun newLevel {parent=parent, name=name, formals=formals} = let
 																	val n = F.newFrame {name=name, formals=true::formals}
 																	val u = ref ()
 																	val result = L(n, parent, ref ())
 															   in
 															   		currLevel := result;
+																	print ("Enter" ^ (getDepth (!currLevel)) ^ "\n");
 																	result
 															   end
+
+    fun allocTemp () = case !currLevel of L(f, _, _) => F.allocTemp f
+   						  | EMPTY => (newLevel {parent=EMPTY, name=Temp.newlabel (), formals=[true]}; allocTemp ())
+
+	fun leaveLevel () = (currLevel := (case !currLevel of
+									L(_, EMPTY, _) => L(F.newFrame {name=Temp.newlabel (), formals=[true]}, EMPTY, ref ())
+									| L(_, p, _) => p
+									| EMPTY => L(F.newFrame {name=Temp.newlabel (), formals=[true]}, EMPTY, ref ()));
+						print  ("Leave" ^ (getDepth (!currLevel)) ^ "\n");
+						!currLevel)
+
 
 	fun formals (L(frame, a, u)): access list = (case F.formals frame of
 													c::l => (map (fn b => (L(frame, a, u), b)) l)
@@ -37,24 +52,24 @@ struct
 
 	  | formals EMPTY: access list = []
 
-	fun allocLocal (L(frame, _, u)) bool = (!currLevel, F.allocLocal frame bool)
+	fun allocLocal (L(frame, _, u)) bool = (print "level alloc\n"; (!currLevel, F.allocLocal frame bool))
 	  | allocLocal EMPTY bool = (!currLevel, F.allocLocal (F.newFrame {name= Temp.newlabel (), formals= []}) bool)
 
 	fun staticLink (L(f1, p1, u1), L(f2, p2, u2), link) = (case u1 = u2 of
-															true => link
-															| false => staticLink (L(f1, p1, u1), p2, T.MEM(link)))
-	  | staticLink (EMPTY, L(f2, p2, u2), link) = staticLink (EMPTY, p2, T.MEM(link))
+															true => (print "found\n"; link)
+															| false => (print "escaping...\n"; staticLink (L(f1, p1, u1), p2, T.MEM(link))))
+	  | staticLink (EMPTY, L(f2, p2, u2), link) = (print "L1 empty.\n"; staticLink (EMPTY, p2, T.MEM(link)))
 	  | staticLink (L(f1, p1, u1), EMPTY, link) = (ErrorMsg.error 0 ("Static link not found."); link)
-	  | staticLink (EMPTY, EMPTY, link) = link
+	  | staticLink (EMPTY, EMPTY, link) = (print "double empty.\n"; link)
 
-	fun transSimpleVar (SOME(l1, a), l2): exp = Ex(F.exp a (staticLink (l1, l2, T.TEMP(F.FP))))
+	fun transSimpleVar (SOME(l1, a), l2): exp = ((F.printAccess a); Ex(F.exp a (staticLink (l1, l2, T.TEMP(F.FP)))))
 	  | transSimpleVar (NONE, l2): exp = (ErrorMsg.error 0 ("Var access not found."); Ex(T.CONST(0)))
 
 
 	fun unEx (Ex(e)) = e
 	  | unEx (Nx(g)) = T.ESEQ(g, T.CONST 0)
 	  | unEx (Cx(f)) = let
-					  		val r = Temp.newtemp() (*register*)
+					  		val r = allocTemp () (*register*)
 					        val l1 = Temp.newlabel() (*label*)
 					        val l2 = Temp.newlabel() (*label*)
 					        val b = f (l1, l2)
@@ -89,7 +104,7 @@ struct
 	fun unCx(Ex(T.CONST (0))) = (fn (l1, l2) => T.JUMP(T.NAME(l2), [l2]))
 	  | unCx(Ex(T.CONST (_))) = (fn (l1, l2) => T.JUMP(T.NAME(l1), [l1]))
 	  | unCx(Ex(e)) = let
-	  						val t1 = T.TEMP(Temp.newtemp())
+	  						val t1 = T.TEMP(allocTemp ())
 	  					in
 							(fn (l1, l2) => T.SEQ(T.MOVE(t1, e),  T.CJUMP(T.NE, t1, T.CONST(0), l1, l2)))
 						end
@@ -108,8 +123,8 @@ struct
   		  							)
 
   	fun transArrayVar (exp, index): exp = 	let
-  												val id = Temp.newtemp()
-  												val loc = Temp.newtemp()
+  												val id = allocTemp ()
+  												val loc = allocTemp ()
   												val pass = Temp.newlabel()
   												val exit = Temp.newlabel()
   												val access = Temp.newlabel()
@@ -154,7 +169,7 @@ struct
 	        val t = Temp.newlabel()
 	        val f = Temp.newlabel()
 	        val e = Temp.newlabel()
-	        val r = Temp.newtemp()
+	        val r = allocTemp ()
 	    in
 			Ex(
 				T.ESEQ(
@@ -191,7 +206,7 @@ struct
 		        val i2 = unEx e2
 		        val t = Temp.newlabel()
 		        val e = Temp.newlabel()
-		        val r = Temp.newtemp()
+		        val r = allocTemp ()
 		    in
 				Ex(
 		        T.ESEQ(
@@ -243,8 +258,8 @@ struct
 									val i1 = unNx body
 									val i2 = unEx hi
 									val i3 = unEx lo
-									val h = Temp.newtemp()
-									val l = Temp.newtemp()
+									val h = allocTemp ()
+									val l = allocTemp ()
 									val cond = Temp.newlabel()
 									val body = Temp.newlabel()
 								 in
@@ -313,4 +328,5 @@ struct
 	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())
 	  | procEntryExit {level=EMPTY, body=body} = ()
 
+	fun treeStm a = unNx a
 end

@@ -3,7 +3,8 @@ struct
 	fun main filename =
 	 	let
 			val tree = Parse.parse filename
+			val IR = Semant.transProg tree
 		in
-		Semant.transProg tree
+		()
 		end
 end

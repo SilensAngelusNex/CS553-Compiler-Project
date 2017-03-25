@@ -1,0 +1,9 @@
+EXP(
+	ESEQ(
+		MOVE(
+			TEMP t752,
+			CONST 1),
+		CALL(
+			NAME L659,
+				TEMP t716,
+				TEMP t752)))

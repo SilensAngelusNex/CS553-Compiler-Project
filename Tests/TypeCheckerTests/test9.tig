@@ -1,0 +1,11 @@
+let
+	var x: int := 1
+	function one(i:int):int = let
+									var a: int := i
+									function two(j:int):int = j + x + i
+								in
+									two (a)
+								end
+in
+	one (x)
+end

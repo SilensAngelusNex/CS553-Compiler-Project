@@ -35,6 +35,8 @@ struct
 				 (Symbol.symbol ("exit"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT}))
 				 ]
 
+	val x = Translate.leaveLevel ()
+
 	val empty: enventry Symbol.table = Symbol.empty
 	val base_venv: enventry Symbol.table = (foldl (fn ((sym, env), acc) => Symbol.enter(acc, sym, env)) empty venvs)
 

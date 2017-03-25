@@ -1,14 +1,14 @@
-structure Printtree : 
+structure Printtree :
      sig val printtree : TextIO.outstream * Tree.stm -> unit end =
 struct
 
   structure T = Tree
 fun printtree (outstream, s0) =
  let fun say s =  TextIO.output(outstream,s)
-  fun sayln s= (say s; say "\n") 
+  fun sayln s= (say s; say "\n")
 
   fun indent 0 = ()
-    | indent i = (say " "; indent(i-1))
+    | indent i = (say "\t"; indent(i-1))
 
   fun stm(T.SEQ(a,b),d) =
           (indent d; sayln "SEQ("; stm(a,d+1); sayln ","; stm(b,d+1); say ")")
@@ -17,7 +17,7 @@ fun printtree (outstream, s0) =
     | stm(T.CJUMP(r,a,b,t,f),d) = (indent d; say "CJUMP(";
 				relop r; sayln ",";
 				exp(a,d+1); sayln ","; exp(b,d+1); sayln ",";
-				indent(d+1); say(Symbol.name t); 
+				indent(d+1); say(Symbol.name t);
 				say ","; say (Symbol.name f); say ")")
     | stm(T.MOVE(a,b),d) = (indent d; sayln "MOVE("; exp(a,d+1); sayln ",";
 			    exp(b,d+1); say ")")
@@ -61,4 +61,3 @@ fun printtree (outstream, s0) =
 end
 
 end
-

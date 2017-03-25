@@ -5,6 +5,7 @@ sig
 	type access
 	val outermost : level
 	val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level
+	val leaveLevel : unit -> level
 	val formals : level -> access list
 	val allocLocal: level -> bool -> access
 	val transSimpleVar : access option * level -> exp
@@ -31,4 +32,6 @@ sig
 	val transArrayVar : exp * exp -> exp
 	val transRecordVar : exp * int -> exp
 	val beginLoop : unit -> Temp.label
+
+	val treeStm : exp -> Tree.stm
 end
