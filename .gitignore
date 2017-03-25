@@ -2,4 +2,5 @@
 Lexer/.cm
 Parser/.cm
 Type\ Checker/.cm
+Instruction Selection/.cm
 IR/.cm

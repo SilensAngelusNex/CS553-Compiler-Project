@@ -1,0 +1,30 @@
+EXP(
+	ESEQ(
+		MOVE(
+			TEMP t189,
+			CALL(
+				NAME L6,
+					TEMP t100)),
+		ESEQ(
+			MOVE(
+				TEMP t252,
+				CALL(
+					NAME L157,
+						TEMP t100)),
+			ESEQ(
+				MOVE(
+					TEMP t253,
+					ESEQ(
+						MOVE(
+							TEMP t189,
+							CALL(
+								NAME L6,
+									TEMP t100)),
+						CALL(
+							NAME L157,
+								TEMP t100))),
+				CALL(
+					NAME L155,
+						TEMP t100,
+						TEMP t252,
+						TEMP t253)))))
