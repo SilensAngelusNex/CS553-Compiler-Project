@@ -2,52 +2,29 @@ EXP(
 	ESEQ(
 		MOVE(
 			TEMP t124,
-			CONST 8),
+			CALL(
+				NAME L6,
+					TEMP t100)),
 		ESEQ(
 			MOVE(
-				TEMP t125,
+				TEMP t187,
 				CALL(
-					NAME initArray,
-						BINOP(MUL,
-							TEMP t124,
-							CONST 4),
-						CONST 0)),
+					NAME L63,
+						TEMP t100)),
 			ESEQ(
 				MOVE(
-					TEMP t126,
-					CALL(
-						NAME initArray,
-							BINOP(MUL,
-								TEMP t124,
-								CONST 4),
-							CONST 0)),
-				ESEQ(
-					MOVE(
-						TEMP t127,
-						CALL(
-							NAME initArray,
-								BINOP(MUL,
-									BINOP(MINUS,
-										BINOP(PLUS,
-											TEMP t124,
-											TEMP t124),
-										CONST 1),
-									CONST 4),
-								CONST 0)),
+					TEMP t188,
 					ESEQ(
 						MOVE(
-							TEMP t128,
+							TEMP t124,
 							CALL(
-								NAME initArray,
-									BINOP(MUL,
-										BINOP(MINUS,
-											BINOP(PLUS,
-												TEMP t124,
-												TEMP t124),
-											CONST 1),
-										CONST 4),
-									CONST 0)),
+								NAME L6,
+									TEMP t100)),
 						CALL(
-							NAME L22,
-								TEMP t100,
-								CONST 0)))))))
+							NAME L63,
+								TEMP t100))),
+				CALL(
+					NAME L61,
+						TEMP t100,
+						TEMP t187,
+						TEMP t188)))))

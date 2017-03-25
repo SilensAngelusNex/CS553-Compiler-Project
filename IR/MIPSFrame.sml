@@ -14,9 +14,6 @@ struct
 
 	val wordSize = 4
 
-	fun printAccess (InFrame(i)) = (print "Frame: "; print (Int.toString i); print "\n")
-	  | printAccess	(InReg(t)) = (print "Temp: "; print (Int.toString t); print "\n")
-
 	fun externalCall (s, args) = Tree.CALL(Tree.NAME(Temp.namedlabel s), args)
 
 	fun exp (InFrame(k)) exp = Tree.MEM(Tree.BINOP(Tree.PLUS, exp, Tree.CONST(k)))
@@ -35,13 +32,12 @@ struct
 	fun allocLocal (name, alist, size) true  = let
 												  val result = InFrame(!size * 4)
 											  in
-											  	  print "frame alloc loc\n";
 											      alist := !alist@[result];
 												  size := !size + 1;
 												  result
 											  end
 
-	  | allocLocal f false = (print "frame alloc temp\n"; InReg(allocTemp f))
+	  | allocLocal f false = InReg(allocTemp f)
 
 	fun allocLocals f (i, b::l) = (case i < 4 of
 									true	=> (allocTemp f		; allocLocals f (i + 1, l))

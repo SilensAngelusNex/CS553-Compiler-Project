@@ -14,6 +14,4 @@ sig
 	val externalCall : string * Tree.exp list -> Tree.exp
 	val RV : Temp.temp
 	val procEntryExit1 : (frame * Tree.stm) -> Tree.stm
-
-	val printAccess : access -> unit
 end
