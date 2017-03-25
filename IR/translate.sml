@@ -1,74 +1,89 @@
 structure Translate: TRANSLATE =
 struct
 
-	structure M = MIPSFrame
-
+	structure F = MIPSFrame
 	structure T = Tree
+	structure A = Absyn
 
 	datatype exp = Ex of Tree.exp
 				 | Nx of Tree.stm
 				 | Cx of Temp.label * Temp.label -> Tree.stm
 
-	datatype level = L of M.frame * level * unit ref
+	datatype level = L of F.frame * level * unit ref
 					| EMPTY
 
-	type access = level * M.access
+	type access = level * F.access
 
 	val currLevel = ref EMPTY
 
 	val outermost = !currLevel
 
+	val fragList: F.frag list ref = ref []
+
+	fun getResult () = !fragList
+
 	fun newLevel {parent=parent, name=name, formals=formals} = let
-																	val n = M.newFrame {name=name, formals=true::formals}
-																	val u = unit ref
-																	val result = L(n, parent, unit ref)
+																	val n = F.newFrame {name=name, formals=true::formals}
+																	val u = ref ()
+																	val result = L(n, parent, ref ())
 															   in
 															   		currLevel := result;
 																	result
 															   end
 
-	fun formals (L(frame, _, u)): access list = (case M.formals frame of
-													a::l => (map (fn b => (L(frame, _, u), b)) l)
+	fun formals (L(frame, a, u)): access list = (case F.formals frame of
+													c::l => (map (fn b => (L(frame, a, u), b)) l)
 												   | []  => [])
 
 	  | formals EMPTY: access list = []
 
-	fun allocLocal (L(frame, _, u)) bool = (!currLevel, M.allocLocal frame bool)
-	  | allocLocal EMPTY bool = (!currLevel, M.allocLocal (M.newFrame {name= Temp.newlabel (), formals= []}) bool)
+	fun allocLocal (L(frame, _, u)) bool = (!currLevel, F.allocLocal frame bool)
+	  | allocLocal EMPTY bool = (!currLevel, F.allocLocal (F.newFrame {name= Temp.newlabel (), formals= []}) bool)
 
-	fun staticLink (L(f1, p1, u1), L(f2, p2, u2)) link = case u1 = u2 of
-												true => link
-												| false => staticLink (L(f1, p1, u1), p2) T.MEM(link)
+	fun staticLink (L(f1, p1, u1), L(f2, p2, u2), link) = (case u1 = u2 of
+															true => link
+															| false => staticLink (L(f1, p1, u1), p2, T.MEM(link)))
+	  | staticLink (EMPTY, L(f2, p2, u2), link) = staticLink (EMPTY, p2, T.MEM(link))
+	  | staticLink (L(f1, p1, u1), EMPTY, link) = (ErrorMsg.error 0 ("Static link not found."); link)
+	  | staticLink (EMPTY, EMPTY, link) = link
 
-	fun simpleVar (SOME(l1, a), l2): exp = M.exp a (staticLink (l1, l2) M.FP)
-	  | simpleVar (NONE, l2): exp = (ErrorMsg.error 0 ("Var access not found."); T.CONST(0))
+	fun transSimpleVar (SOME(l1, a), l2): exp = Ex(F.exp a (staticLink (l1, l2, T.TEMP(F.FP))))
+	  | transSimpleVar (NONE, l2): exp = (ErrorMsg.error 0 ("Var access not found."); Ex(T.CONST(0)))
 
-	fun unEx(Ex, e) = e
-	  | unEx(Nx, g) = ESEQ(s, CONST 0)
-	  | unEx(Cx, f) =
-	    let val r = Temp.newtemp() (*register*)
-	        val l1 = Temp.newlabel() (*label*)
-	        val l2 = Temp.newlabel() (*label*)
-	        val b = f (l1, l2)
+
+	fun unEx (Ex(e)) = e
+	  | unEx (Nx(g)) = T.ESEQ(g, T.CONST 0)
+	  | unEx (Cx(f)) = let
+					  		val r = Temp.newtemp() (*register*)
+					        val l1 = Temp.newlabel() (*label*)
+					        val l2 = Temp.newlabel() (*label*)
+					        val b = f (l1, l2)
+					    in
+					        T.ESEQ(
+					            T.SEQ(
+					                T.MOVE(T.TEMP r, T.CONST 0),
+									T.SEQ(
+					                	b,
+										T.SEQ(
+					                    	T.LABEL l1,
+											T.SEQ(
+					                    		T.MOVE(T.TEMP r, T.CONST 1),
+					                    		T.LABEL l2
+											)
+										)
+									)
+					            ),
+					            T.TEMP r
+					        )
+					    end
+
+	fun unNx(Ex(e)) = T.EXP(e)
+	  | unNx(Nx(g)) = g
+	  | unNx(Cx(f)) =
+	    let
+			val l1 = Temp.newlabel()
 	    in
-	        ESEQ(
-	            seq([
-	                    MOVE(TEMP R, CONST 0),
-	                    b,
-	                    LABEL l1,
-	                    MOVE(TEMP R, CONST 1),
-	                    LABEL l2
-	                  ]),
-	             TEMP r
-	             )
-	    end
-
-	fun unNx(Ex, e) = EXP(e)
-	  | unNx(Nx, g) = g
-	  | unNx(Cx, f) =
-	    let l1 = newLabel()
-	    in
-	        SEQ(f(l1,l1, Label l1))
+	        T.SEQ(f(l1,l1), T.LABEL l1)
 	    end
 
 	fun unCx(Ex(T.CONST (0))) = (fn (l1, l2) => T.JUMP(T.NAME(l2), [l2]))
@@ -76,10 +91,59 @@ struct
 	  | unCx(Ex(e)) = let
 	  						val t1 = T.TEMP(Temp.newtemp())
 	  					in
-							(fn (l1, l2) => T.SEQ(T.MOVE(t1, e),  T.CJUMP(NEQ, t1, T.CONST(0), l1, l2)))
+							(fn (l1, l2) => T.SEQ(T.MOVE(t1, e),  T.CJUMP(T.NE, t1, T.CONST(0), l1, l2)))
 						end
 	  | unCx(Nx(g)) = (ErrorMsg.error 0 ("UnCx an Nx? Stop that."); (fn (l1, l2) => T.SEQ(g,  T.JUMP(T.NAME(l1), [l1]))))
 	  | unCx(Cx(f)) = f
+
+	fun transRecordVar (exp, index) = Ex(
+  		  								T.MEM(
+  											T.BINOP(
+  												T.PLUS,
+  												T.BINOP(
+  													T.MUL, T.CONST(index), T.CONST(F.wordSize)),
+  												unEx(exp)
+  											)
+  										)
+  		  							)
+
+  	fun transArrayVar (exp, index): exp = 	let
+  												val id = Temp.newtemp()
+  												val loc = Temp.newtemp()
+  												val pass = Temp.newlabel()
+  												val exit = Temp.newlabel()
+  												val access = Temp.newlabel()
+  											in
+  												Ex(
+  													T.ESEQ(
+  														T.SEQ(
+  															T.SEQ(
+  																T.SEQ(
+  																	T.MOVE(T.TEMP(id), unEx(index)),
+  																	T.MOVE(T.TEMP(loc), unEx(exp))
+  																),
+  																T.SEQ(
+  																	T.CJUMP(T.GE, T.TEMP(id), T.CONST(0), pass, exit),
+  																	T.SEQ(
+  																		T.LABEL(pass),
+  																		T.CJUMP(T.LT, T.TEMP(id), T.MEM(T.BINOP(T.MINUS, T.TEMP(loc), T.CONST(F.wordSize))), access, exit)
+  																	)
+  																)
+  															),
+  															T.SEQ(
+  																T.LABEL(exit),
+  																unNx(Ex(F.externalCall("exit", [T.CONST(1)])))
+  															)
+  														),
+  														T.ESEQ(
+  															T.LABEL(access),
+  															T.MEM(T.BINOP(T.PLUS, T.BINOP(T.MUL, T.TEMP(id), T.CONST(F.wordSize)), T.TEMP(loc)))
+  														)
+  													)
+  												)
+  											end
+
+
 
 
 	fun transIf(e1, e2, SOME(e3)) =
@@ -92,29 +156,31 @@ struct
 	        val e = Temp.newlabel()
 	        val r = Temp.newtemp()
 	    in
-	        T.ESEQ(
-				T.SEQ (
-					i1 (t, f),
+			Ex(
+				T.ESEQ(
 					T.SEQ (
+						i1 (t, f),
 						T.SEQ (
-							T.LABEL t,
 							T.SEQ (
-								T.MOVE(TEMP r, i2),
-								T.JUMP(NAME e, [e])
+								T.LABEL t,
+								T.SEQ (
+									T.MOVE(T.TEMP r, i2),
+									T.JUMP(T.NAME e, [e])
+								)
+							),
+							T.SEQ (
+								T.LABEL f,
+								T.SEQ (
+									T.MOVE(T.TEMP r, i3),
+									T.JUMP(T.NAME e, [e])
+								)
 							)
 						)
-						T.SEQ (
-							T.LABEL f,
-							T.SEQ (
-								T.MOVE(TEMP r, i3),
-								T.JUMP(NAME e, [e])
-							)
-						)
+					),
+					T.ESEQ (
+						T.LABEL e,
+						T.TEMP(r)
 					)
-				),
-				T.ESEQ (
-					T.LABEL e,
-					T.TEMP(r)
 				)
 			)
 	    end
@@ -127,14 +193,15 @@ struct
 		        val e = Temp.newlabel()
 		        val r = Temp.newtemp()
 		    in
+				Ex(
 		        T.ESEQ(
 					T.SEQ (
 						i1 (t, e),
 						T.SEQ (
 							T.LABEL t,
 							T.SEQ (
-								T.MOVE(TEMP r, i2),
-								T.JUMP(NAME e, [e])
+								T.MOVE(T.TEMP r, i2),
+								T.JUMP(T.NAME e, [e])
 							)
 						)
 					),
@@ -143,34 +210,36 @@ struct
 						T.TEMP(r)
 					)
 				)
+				)
 		    end
 
-	fun transWhile(e1, e2) = let
+	fun transWhile(e1, e2, ed) = let
 								val i1 = unCx e1
 								val i2 = unNx e2
 								val cond = Temp.newlabel()
 								val body = Temp.newlabel()
-								val ed = Temp.newlabel()
 							 in
-							 	T.SEQ (
-									T.SEQ (
+							 	Nx(
+							 		T.SEQ (
 										T.SEQ (
-											T.LABEL cond,
-											i1 (body, ed)
-										),
-										T.SEQ (
-											T.LABEL body,
 											T.SEQ (
-												i2,
-												T.JUMP(NAME cond, [cond])
+												T.LABEL cond,
+												i1 (body, ed)
+											),
+											T.SEQ (
+												T.LABEL body,
+												T.SEQ (
+													i2,
+													T.JUMP(T.NAME cond, [cond])
+												)
 											)
 										),
-									),
-									T.LABEL ed
+										T.LABEL (ed)
+									)
 								)
 							 end
 
-	 fun transFor(hi, lo, body) = let
+	 fun transFor(hi, lo, body, ed) = let
 									val i1 = unNx body
 									val i2 = unEx hi
 									val i3 = unEx lo
@@ -178,8 +247,8 @@ struct
 									val l = Temp.newtemp()
 									val cond = Temp.newlabel()
 									val body = Temp.newlabel()
-									val ed = Temp.newlabel()
 								 in
+								 	Nx(
 									 T.SEQ (
 										 T.SEQ (
 											 T.MOVE (T.TEMP h, i2),
@@ -189,7 +258,7 @@ struct
 											T.SEQ (
 												T.SEQ (
 													T.LABEL cond,
-													i1 (body, ed)
+													T.CJUMP(T.LT, T.TEMP l, T.TEMP h, body, ed)
 											 	),
 												T.SEQ (
 													T.LABEL body,
@@ -197,7 +266,7 @@ struct
 														T.MOVE(T.TEMP l, T.BINOP(T.PLUS, T.TEMP l, T.CONST 1)),
 														T.SEQ (
 															i1,
-															T.JUMP(NAME cond, [cond])
+															T.JUMP(T.NAME cond, [cond])
 														)
 													)
 											 	)
@@ -205,43 +274,43 @@ struct
 										 	T.LABEL ed
 										 )
 								 	 )
+									 )
 								end
-	fun transNil () = CONST 0
-	fun transInt i = CONST i
+	fun beginLoop () = Temp.newlabel()
+	fun transNil () = Ex(T.CONST 0)
+	fun transInt i = Ex(T.CONST i)
 	fun transString s = let
 							val lab = Temp.newlabel ()
-							(* put Frame.String(lab, s) onto frag list*)
+							(* put F.String(lab, s) onto frag list*)
 						in
-							Tree.Name(lab)
+							fragList := !fragList@[F.STRING(lab, s)];
+							Ex(T.NAME(lab))
 						end
-	fun transCall (l, args) = T.CALL (T.NAME l, (Temp M.FP)::args)
-	fun transOP (A.PlusOp, e1, e2) 	 = T.BINOP(T.PLUS, e1, e2)
-	  | transOP (A.MinusOp, e1, e2)	 = T.BINOP(T.MINUS, e1, e2)
-	  | transOP (A.TimesOp, e1, e2)	 = T.BINOP(T.TIMES, e1, e2)
-	  | transOP (A.DivideOp, e1, e2) = T.BINOP(T.DIVIDE, e1, e2)
-	  | transOP (A.EqOp, e1, e2) 	 = transIf(T.BINOP(T.MINUS, e1, e2), T.CONST 0, T.CONST 1)
-	  | transOP (A.NeqOp, e1, e2) 	 = transIf(T.BINOP(T.MINUS, e1, e2), T.CONST 1, T.CONST 0)
-	  | transOP (A.LtOp, e1, e2) 	 = transIf(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, e1, e2), T.CONST(M.wordsize * 8 - 1)), T.CONST 1, T.CONST 0)
-	  | transOP (A.LeOp, e1, e2) 	 = transIf(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, e2, e1), T.CONST(M.wordsize * 8 - 1)), T.CONST 0, T.CONST 1)
-	  | transOP (A.GtOp, e1, e2) 	 = transIf(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, e1, e2), T.CONST(M.wordsize * 8 - 1)), T.CONST 0, T.CONST 1)
-	  | transOP (A.GeOp, e1, e2) 	 = transIf(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, e2, e1), T.CONST(M.wordsize * 8 - 1)), T.CONST 1, T.CONST 0)
+	fun transCall (l, args) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map unEx args)))
+	fun transOP (A.PlusOp, e1, e2) 	 = Ex(T.BINOP(T.PLUS, unEx(e1), unEx(e2)))
+	  | transOP (A.MinusOp, e1, e2)	 = Ex(T.BINOP(T.MINUS, unEx(e1), unEx(e2)))
+	  | transOP (A.TimesOp, e1, e2)	 = Ex(T.BINOP(T.MUL, unEx(e1), unEx(e2)))
+	  | transOP (A.DivideOp, e1, e2) = Ex(T.BINOP(T.DIV, unEx(e1), unEx(e2)))
+	  | transOP (A.EqOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1), unEx(e2))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)))
+	  | transOP (A.NeqOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1), unEx(e2))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)))
+	  | transOP (A.LtOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1), unEx(e2)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)))
+	  | transOP (A.LeOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2), unEx(e1)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)))
+	  | transOP (A.GtOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1), unEx(e2)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)))
+	  | transOP (A.GeOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2), unEx(e1)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)))
 
-	fun transeSeq a::l = T.ESEQ(a, transeSeq(l))
-				| a::nil = a
-	fun transLet (d::decs, body) = T.ESEQ(d, transLet(decs, body))
-	  | transLet ([], body) = body
-	  | transLet (d::nil, body) = T.ESEQ(d, body)
-	fun transRec (lst) = T.CALL(T.NAME(Temp.namedLabel("initRecord")), [lst])
-	fun transArray (s, i) = T.CALL(T.NAME(Temp.namedLabel("initArray")), [T.BINOP(T.MUL, s, T.CONST(M.wordsize)), i])
-	fun transAssign (var, exp) = T.MOVE (var , exp)
-	fun transBreak = 
-    (*
-	fun transFuncDec of fundec list
-    fun transVarDec of {name: symbol,
-		    	escape: bool ref,
-		    	typ: (symbol * pos) option,
-		    	init: exp,
-		    	pos: pos}
-    fun transTypeDec of {name: symbol, ty: ty, pos: pos} list
-	*)
+	fun transSeq (a::[]) = Ex(unEx(a))
+	  | transSeq (a::l) = Ex(T.ESEQ(unNx(a), unEx(transSeq(l))))
+	  | transSeq ([]) = Ex(T.CONST(0))
+	fun transLet (d::decs, body) = Ex(T.ESEQ(unNx(d), unEx(transLet(decs, body))))
+	  | transLet ([], body) = Ex(unEx(body))
+	fun transRec (lst) = Ex(T.CALL(T.NAME(Temp.namedlabel("initRecord")), (map unEx lst)))
+	fun transArray (size, init) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size), T.CONST(F.wordSize)), unEx(init)]))
+	fun transAssign (var, exp) = Nx(T.MOVE (unEx(var) , unEx(exp)))
+	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
+	fun transBody (exp) = transAssign (Ex(T.TEMP F.RV), exp)
+
+
+	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())
+	  | procEntryExit {level=EMPTY, body=body} = ()
+
 end

@@ -1,4 +1,4 @@
 signature SemantSig =
 sig
-	val transProg: Absyn.exp -> Translate.frag list
+	val transProg: Absyn.exp -> Translate.F.frag list
 end

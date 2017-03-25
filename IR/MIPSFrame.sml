@@ -10,13 +10,14 @@ struct
 				  | STRING of Temp.label * string
 
 	val FP = Temp.newtemp ()
+	val RV = Temp.newtemp ()
 
 	val wordSize = 4
 
-	fun externalCall (s, args) = T.CALL(T.NAME(Temp.namedLabel s), args)
+	fun externalCall (s, args) = Tree.CALL(Tree.NAME(Temp.namedlabel s), args)
 
-	fun exp InFrame(k) exp: Tree.exp = Tree.MEM(Tree.BINOP(Tree.PLUS, exp, CONST(k))
-	  | exp InReg(t) _: Tree.exp = Tree.TEMP(t)
+	fun exp (InFrame(k)) exp = Tree.MEM(Tree.BINOP(Tree.PLUS, exp, Tree.CONST(k)))
+	  | exp (InReg(t)) _ = Tree.TEMP(t)
 
 	fun formals (_, a, _): access list = !a
 
