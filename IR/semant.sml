@@ -360,7 +360,9 @@ struct
 												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp)
 				  							  	in
 												case expTy of
-													Types.NIL => (case typ of Types.RECORD(_, _) => ({venv=venv, tenv=tenv}, result::l) | _ => (ErrorMsg.error pos ("Nil can only be assigned to records."); ({venv=venv, tenv=tenv}, result::l)))
+													Types.NIL => (case typ of
+																	Types.RECORD(_, _) 	=> ({venv=venv, tenv=tenv}, result::l)
+																	| _ 				=> (ErrorMsg.error pos ("Nil can only be assigned to records."); ({venv=venv, tenv=tenv}, result::l)))
 													| _ => (isSubtype (typ, expTy, pos); ({venv=venv, tenv=tenv}, result::l))
 				  							  	end
 
@@ -377,7 +379,7 @@ struct
 																																	val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
-
+																																	Translate.leaveLevel ();
 																																	(venv', tenv, params'::paramList)
 																																end
 		| processFunctionHeaders (level, {name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
@@ -387,6 +389,7 @@ struct
 																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 																												in
+																													Translate.leaveLevel ();
 																													(venv', tenv, params'::paramList)
 																												end
 
@@ -401,7 +404,6 @@ struct
 
 																																											val _ = Translate.procEntryExit {level=level, body=result}
 																																										in
-																																											Translate.leaveLevel ();
 																																											case isSubtype(ty, ty1, pos) of
 																																												true => (venv, tenv)
 																																											  | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))

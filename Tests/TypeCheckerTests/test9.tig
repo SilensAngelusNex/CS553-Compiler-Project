@@ -1,10 +1,11 @@
 let
 	var x: int := 1
-	function one(i:int):int = let
+	var b: int := "string"
+	function one(i: int): int = let
 									var a: int := i
-									function two(j:int):int = j + x + i
+									function two(j: int): int = j + x + i
 								in
-									two (a)
+									two (x)
 								end
 in
 	one (x)

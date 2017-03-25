@@ -52,7 +52,7 @@ struct
 
 	  | formals EMPTY: access list = []
 
-	fun allocLocal (L(frame, _, u)) bool = (print "level alloc\n"; (!currLevel, F.allocLocal frame bool))
+	fun allocLocal (L(frame, p, u)) bool = (print "level alloc\n"; (L(frame, p, u), F.allocLocal frame bool))
 	  | allocLocal EMPTY bool = (!currLevel, F.allocLocal (F.newFrame {name= Temp.newlabel (), formals= []}) bool)
 
 	fun staticLink (L(f1, p1, u1), L(f2, p2, u2), link) = (case u1 = u2 of
@@ -318,7 +318,7 @@ struct
 	  | transSeq ([]) = Ex(T.CONST(0))
 	fun transLet (d::decs, body) = Ex(T.ESEQ(unNx(d), unEx(transLet(decs, body))))
 	  | transLet ([], body) = Ex(unEx(body))
-	fun transRec (lst) = Ex(T.CALL(T.NAME(Temp.namedlabel("initRecord")), (map unEx lst)))
+	fun transRec (lst) = Ex(T.CALL(T.NAME(Temp.namedlabel("allocRecord")), (map unEx lst)))
 	fun transArray (size, init) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size), T.CONST(F.wordSize)), unEx(init)]))
 	fun transAssign (var, exp) = Nx(T.MOVE (unEx(var) , unEx(exp)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))

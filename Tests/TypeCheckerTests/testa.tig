@@ -1,0 +1,8 @@
+let
+    type list = {first: int, rest: list}
+    function a() : list = list{first=2,rest=nil}
+    function b() : list = list{first=2,rest=nil}
+    var list1 := list{first=1,rest=nil}
+in
+    ()
+end
