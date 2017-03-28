@@ -138,7 +138,7 @@ struct
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => (paramList (paramTys, args, pos); {exp=(), ty=lookUpActualSymType (ty, pos)}) (* CHECK ALL PARAMETERS*)
+														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => (paramList (paramTys, (List.rev args), pos); {exp=(), ty=lookUpActualSymType (ty, pos)}) (* CHECK ALL PARAMETERS*)
 														| SOME(ENV.VarEntry{ty=ty}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(), ty=Types.INT})
 														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(), ty=Types.INT}))
 				| trexp(A.AssignExp{var, exp, pos}) = checkPair(trvar var, trexp exp, pos)

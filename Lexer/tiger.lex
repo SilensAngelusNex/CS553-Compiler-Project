@@ -138,7 +138,7 @@ digit=[0-9];
 <INITIAL>\>                                  => (Tokens.GT(yypos, yypos+1));
 <INITIAL>\<=                                 => (Tokens.LE(yypos, yypos+2));
 <INITIAL>\<                                  => (Tokens.LT(yypos, yypos+1));
-<INITIAL>!=                                  => (Tokens.NEQ(yypos, yypos+2));
+<INITIAL>\<\>                                  => (Tokens.NEQ(yypos, yypos+2));
 <INITIAL>=                                   => (Tokens.EQ(yypos, yypos+1));
 <INITIAL>\/                                  => (Tokens.DIVIDE(yypos, yypos+1));
 <INITIAL>\*                                  => (Tokens.TIMES(yypos, yypos+1));
