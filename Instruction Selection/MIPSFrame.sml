@@ -6,11 +6,33 @@ struct
 
 	type frame = Temp.label * access list ref * int ref
 
+	type register = Temp.temp * string
+
 	datatype frag = PROC of {body: Tree.stm, frame: frame}
 				  | STRING of Temp.label * string
 
-	val FP = Temp.newtemp ()
-	val RV = Temp.newtemp ()
+	fun regTemps l = (map (fn (name) => (Temp.newtemp (), name)) l)
+	fun getTemps l = (map (fn (temp, name) => temp) l)
+
+	val specialregs = regTemps ["$zero", "$at", "$v0", "$v1", "$gp", "$sp", "$fp", "$ra"]
+	val argregs = regTemps ["$a0", "$a1", "$a2", "$a3"]
+	val callersaves = regTemps ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9"]
+	val calleesaves = regTemps ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7"]
+
+
+
+	val tempMap = foldl (fn ((temp, name), table) => Temp.Table.enter (table, temp, (temp, name)))
+					(Temp.Table.empty)
+					(specialregs@argregs@callersaves@calleesaves)
+
+	val R0 = case List.nth (specialregs, 0) of (temp, name) => temp
+	val V0 = case List.nth (specialregs, 2) of (temp, name) => temp
+	val V1 = case List.nth (specialregs, 3) of (temp, name) => temp
+	val SP = case List.nth (specialregs, 4) of (temp, name) => temp
+	val FP = case List.nth (specialregs, 5) of (temp, name) => temp
+	val RV = case List.nth (specialregs, 6) of (temp, name) => temp
+	val RA = case List.nth (specialregs, 7) of (temp, name) => temp
+
 
 	val wordSize = 4
 
@@ -53,4 +75,20 @@ struct
 											  end
 
 	fun procEntryExit1 (frame, body) = body
+
+	fun procEntryExit2 (frame, body) = body @ [Assem.OPER { assem="",
+														src=[R0, RA, SP]@(getTemps calleesaves),
+														dst=[],
+														jump=SOME([])}]
+
+	fun procEntryExit3 (name, body) =
+			{
+				prolog="PROCEDURE " ^ Symbol.name name ^ "\n",
+				body=body,
+				epilog="END " ^ Symbol.name name ^ "\n"
+			}
+
+	fun tempName t: string = case Temp.Table.look (tempMap, t) of
+							SOME(temp, name) => name
+						  | NONE => Temp.makestring t
 end
