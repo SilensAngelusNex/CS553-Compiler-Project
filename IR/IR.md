@@ -160,3 +160,44 @@ while !changed:
 
 
     env: should function labels be the same as their frame labels????
+
+
+
+interference Graph
+
+- Build a node for all variables in block
+- connect nodes by an edge if they cannot use the same register
+    - if they are both live at the same time
+
+
+Interference edges : solid -->
+Move edges : dotted         -->
+-
+
+
+move edge between d/c if not interference edge
+
+
+h -> g,j
+f -> j
+e -> f, j
+m -> b, e
+b -> c, m
+c -> d, m
+
+
+
+1. Build the Graph
+2. Simplify It
+    - Whose degree (# edges going out) < # of colors
+    - Build Stack by ripping nodes out of the graph
+    - Potential Spill -> when every node in the graph has degree at least size of # of colors
+    - Never simplify on something with move edge
+        - Coalesce if you can't simplify anymore
+            - To coalesce or not?
+                -
+        - Freeze --> just wipe out the move edge
+3. Assign Colors
+    - pop the stack
+    - Color the whole graph? Yay
+    - Can't color? Actually spill ( got back to step 1)

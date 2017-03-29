@@ -23,7 +23,7 @@ env.sml
 
 translate.sig
 translate.sml
-main.sml
+Main.sml
 
 tree.sml
 temp.sig
@@ -31,3 +31,8 @@ temp.sml
 frame.sig
 MIPSFrame.sml
 escape.sml
+
+codegen.sig
+codegen.sml
+assem.sml
+canon.sml

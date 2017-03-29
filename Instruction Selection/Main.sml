@@ -1,36 +1,42 @@
 structure Main = struct
 
-   structure Tr = Translate
-   structure F = Frame
-   structure R = RegAlloc
+    structure Tr = Translate
+    structure F = MIPSFrame
+    (*structure R = RegAlloc*)
+    structure C = Canon
+    structure G = MIPSGen
 
- fun getsome (SOME x) = x
+    fun getsome (SOME x) = x
 
-   fun emitproc out (F.PROC{body,frame}) =
-     let val _ = print ("emit " ^ Frame.name frame ^ "\n")
-(*         val _ = Printtree.printtree(out,body); *)
-	 val stms = Canon.linearize body
-(*         val _ = app (fn s => Printtree.printtree(out,s)) stms; *)
-         val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
-	 val instrs =   List.concat(map (Mips.codegen frame) stms')
-         val format0 = Assem.format(Temp.makestring)
-      in  app (fn i => TextIO.output(out,format0 i)) instrs;
-     end
-     end
-    | emitproc out (F.STRING(lab,s)) = TextIO.output(out,F.string(lab,s))
-
-   fun withOpenFile fname f =
-       let val out = TextIO.openOut fname
-        in (f out before TextIO.closeOut out)
-	    handle e => (TextIO.closeOut out; raise e)
-       end
-
-   fun compile filename =
-       let val absyn = Parse.parse filename
-           val frags = (FindEscape.prog absyn; Semant.transProg absyn)
+    fun emitproc out (F.STRING(lab,s)) = TextIO.output(out, s ^ "\n")
+      | emitproc out (F.PROC{body,frame}) =
+        let
+            val _ = print ("emit " ^ "F.name frame" ^ "\n")
+            (*         val _ = Printtree.printtree(out,body); *)
+            val stms = C.linearize body
+            (*         val _ = app (fn s => Printtree.printtree(out,s)) stms; *)
+            val stms' = C.traceSchedule(C.basicBlocks stms)
+            val instrs =   List.concat(map (G.codegen frame) stms')
+            val format0 = Assem.format(Temp.makestring)
+            val x = print ("instrus length: " ^ (Int.toString (List.length (instrs))) ^"\n")
         in
-            withOpenFile (filename ^ ".s")
-	     (fn out => (app (emitproc out) frags))
-       end
+            app (fn i => TextIO.output(out,format0 i)) instrs
+        end
+
+    fun withOpenFile fname f =
+        let
+            val out = TextIO.openOut fname
+        in (f out before TextIO.closeOut out)
+            handle e => (TextIO.closeOut out; raise e)
+        end
+
+    fun compile filename =
+        let
+            val absyn = Parse.parse filename
+            val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
+            val x = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
+        in
+            withOpenFile (filename ^ ".s") (fn out => (app (emitproc out) frags))
+        end
 
 end

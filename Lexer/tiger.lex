@@ -120,7 +120,7 @@ digit=[0-9];
                                                 continue()
                                                );
 
-<INITIAL>([1-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
+<INITIAL>([0-9][0-9]*|0) 	 	            => (case Int.fromString yytext of
 									               SOME i => (Tokens.INT(i, yypos, yypos + String.size yytext))
                                                    | NONE   => (ErrorMsg.error yypos ("Unexpected non-integer " ^ yytext);
                                                 continue())
@@ -138,7 +138,7 @@ digit=[0-9];
 <INITIAL>\>                                  => (Tokens.GT(yypos, yypos+1));
 <INITIAL>\<=                                 => (Tokens.LE(yypos, yypos+2));
 <INITIAL>\<                                  => (Tokens.LT(yypos, yypos+1));
-<INITIAL>\<\>                                  => (Tokens.NEQ(yypos, yypos+2));
+<INITIAL>\<\>                                => (Tokens.NEQ(yypos, yypos+2));
 <INITIAL>=                                   => (Tokens.EQ(yypos, yypos+1));
 <INITIAL>\/                                  => (Tokens.DIVIDE(yypos, yypos+1));
 <INITIAL>\*                                  => (Tokens.TIMES(yypos, yypos+1));

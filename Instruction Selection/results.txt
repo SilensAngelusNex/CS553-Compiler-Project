@@ -1,30 +1,106 @@
 EXP(
 	ESEQ(
 		MOVE(
-			TEMP t189,
+			TEMP t152,
 			CALL(
-				NAME L6,
-					TEMP t100)),
+				NAME allocRecord,
+					NAME L21,
+					CALL(
+						NAME initArray,
+							BINOP(MUL,
+								CONST 3,
+								CONST 4),
+							CONST 1900))),
 		ESEQ(
 			MOVE(
-				TEMP t252,
-				CALL(
-					NAME L157,
-						TEMP t100)),
+				ESEQ(
+					SEQ(
+						SEQ(
+							SEQ(
+								MOVE(
+									TEMP t153,
+									CONST 0),
+								MOVE(
+									TEMP t154,
+									MEM(
+										BINOP(PLUS,
+											BINOP(MUL,
+												CONST 1,
+												CONST 4),
+											TEMP t152)))),
+							SEQ(
+								CJUMP(GE,
+									TEMP t153,
+									CONST 0,
+									L22,L23),
+								SEQ(
+									LABEL L22,
+									CJUMP(LT,
+										TEMP t153,
+										MEM(
+											BINOP(MINUS,
+												TEMP t154,
+												CONST 4)),
+										L24,L23)))),
+						SEQ(
+							LABEL L23,
+							EXP(
+								CALL(
+									NAME exit,
+										CONST 1)))),
+					ESEQ(
+						LABEL L24,
+						MEM(
+							BINOP(PLUS,
+								BINOP(MUL,
+									TEMP t153,
+									CONST 4),
+								TEMP t154)))),
+				CONST 2323),
 			ESEQ(
 				MOVE(
-					TEMP t253,
 					ESEQ(
-						MOVE(
-							TEMP t189,
-							CALL(
-								NAME L6,
-									TEMP t100)),
-						CALL(
-							NAME L157,
-								TEMP t100))),
-				CALL(
-					NAME L155,
-						TEMP t100,
-						TEMP t252,
-						TEMP t253)))))
+						SEQ(
+							SEQ(
+								SEQ(
+									MOVE(
+										TEMP t155,
+										CONST 2),
+									MOVE(
+										TEMP t156,
+										MEM(
+											BINOP(PLUS,
+												BINOP(MUL,
+													CONST 1,
+													CONST 4),
+												TEMP t152)))),
+								SEQ(
+									CJUMP(GE,
+										TEMP t155,
+										CONST 0,
+										L25,L26),
+									SEQ(
+										LABEL L25,
+										CJUMP(LT,
+											TEMP t155,
+											MEM(
+												BINOP(MINUS,
+													TEMP t156,
+													CONST 4)),
+											L27,L26)))),
+							SEQ(
+								LABEL L26,
+								EXP(
+									CALL(
+										NAME exit,
+											CONST 1)))),
+						ESEQ(
+							LABEL L27,
+							MEM(
+								BINOP(PLUS,
+									BINOP(MUL,
+										TEMP t155,
+										CONST 4),
+									TEMP t156)))),
+					CONST 2323),
+				CONST 0))))

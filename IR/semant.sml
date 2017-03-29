@@ -231,8 +231,9 @@ struct
 																				val thenExp = trexp thenExp
 																				val check = (checkInt(test, pos); compatibleTypes(#ty thenTy, Types.UNIT, pos))
 																				in
-																				{exp=Translate.transIf (#exp test, #exp thenExp, NONE, level), ty=(#ty thenExp)}
+                                          {exp=Translate.transIf (#exp test, #exp thenExp, NONE, level), ty=(#ty thenExp)}
 																				end
+                                        
 				| trexp(A.ArrayExp{typ, size, init, pos}) = 	let
 																val typ = lookUpSymbolTENV (tenv, typ, pos)
 																val sizeExp = trexp size
@@ -285,7 +286,9 @@ struct
 																						in
 																						case index of
 																						  SOME(t, i) 	=> {exp=(Translate.transRecordVar (exp, i, level)), ty=t}
+
 																						| NONE 			=> ((ErrorMsg.error pos ("Accessing a non-existent field")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
+
 																						end
 															  | _ =>  ((ErrorMsg.error pos ("Accessing a field of a non-record")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 														  end
