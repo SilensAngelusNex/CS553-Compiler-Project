@@ -9,6 +9,8 @@ struct
     (*								*
 	 * 	Private Helper Functions	*
 	 *  							*)
+	 val uniq = ref 0
+	 fun unique () = (uniq := !uniq + 1; !uniq)
 
 	 fun typeToString (Types.RECORD (n, _)) = "RECORD"
 		 | typeToString (Types.NIL) = "Nil"
@@ -99,12 +101,16 @@ struct
 													SOME(ty) => ty
 													| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name symbol)); Types.UNIT))
  	  | transTy (tenv, A.ArrayTy(symbol, pos)) 	= (case lookUpSymbolTENV (tenv, symbol, pos) of
-	  												SOME(ty) => Types.ARRAY(ty, ref ())
-												  | NONE => Types.ARRAY(Types.UNIT, ref ()))
- 	  | transTy (tenv, A.RecordTy(fields)) 		= Types.RECORD((convertRecordFields (tenv, fields)), ref ())
+	  												SOME(ty) => Types.ARRAY(ty, unique ())
+												  | NONE => Types.ARRAY(Types.UNIT, unique ()))
+ 	  | transTy (tenv, A.RecordTy(fields)) 		= Types.RECORD((convertRecordFields (tenv, fields)), unique ())
 
 	(*recursive types*)
   	fun processTypeHeaders ({name, ty, pos}, tenv) = Symbol.enter (tenv, name, Types.NAME(name, ref NONE))
+
+	fun checkDuplicationNames ((name, pos), m) = case M.find (m, Symbol.name name) of
+														SOME(_) => (ErrorMsg.error pos ("Duplicate recursive type declarations for symbol: " ^ (Symbol.name name)); m)
+														| NONE => M.insert (m, Symbol.name name, true)
 
   	fun processTypeBodies ({name, ty, pos}, tenv) = case Symbol.look (tenv, name) of
   												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
@@ -138,7 +144,7 @@ struct
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => (paramList (paramTys, (List.rev args), pos); {exp=(), ty=lookUpActualSymType (ty, pos)}) (* CHECK ALL PARAMETERS*)
+														 SOME(ENV.FunEntry{formals=paramTys, result=ty}) => (paramList (paramTys, args, pos); {exp=(), ty=lookUpActualSymType (ty, pos)}) (* CHECK ALL PARAMETERS*)
 														| SOME(ENV.VarEntry{ty=ty}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(), ty=Types.INT})
 														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(), ty=Types.INT}))
 				| trexp(A.AssignExp{var, exp, pos}) = checkPair(trvar var, trexp exp, pos)
@@ -146,7 +152,7 @@ struct
 														val testTy = trexp test
 														val bodyTy = trexp body
 														in
-														(checkInt(testTy, pos); bodyTy)
+														(checkInt(testTy, pos); compatibleTypes(#ty bodyTy, Types.UNIT, pos); bodyTy)
 														end
 
 				| trexp(A.IfExp{test=test,then'=thenExp,else'=SOME(elseExp),pos=pos}) = let
@@ -162,7 +168,7 @@ struct
 																				val testTy = trexp test
 																				val thenTy = trexp thenExp
 																				in
-																				(checkInt(testTy, pos); thenTy)
+																				(checkInt(testTy, pos); compatibleTypes(#ty thenTy, Types.UNIT, pos); thenTy)
 																				end
 				| trexp(A.ArrayExp{typ, size, init, pos}) = 	let
 																val typ = lookUpSymbolTENV (tenv, typ, pos)
@@ -176,12 +182,12 @@ struct
 																  			{exp=(), ty=Types.ARRAY(aType, aRef)})
 																   | SOME(_) => ((ErrorMsg.error pos ("Tried to construct an array non array type. ")); {exp=(), ty=Types.INT})
 																   | NONE => ((ErrorMsg.error pos ("Array type not declared."));
-																   				{exp=(), ty=Types.ARRAY(Types.INT, ref ())})
+																   				{exp=(), ty=Types.ARRAY(Types.INT, unique ())})
 																end
 				| trexp(A.RecordExp{fields, typ, pos}) = 	let
 																val (smyTypes, recRef) = case lookUpSymbolTENV (tenv, typ, pos) of
 																	SOME(Types.RECORD (lst, r)) => (lst, r)
-																	| _ => ((ErrorMsg.error pos ("Record type not declared.")); ([], ref ()))
+																	| _ => ((ErrorMsg.error pos ("Record type not declared.")); ([], unique ()))
 															in
 															(map (recList smyTypes) fields;
 															{exp=(), ty=Types.RECORD(smyTypes, recRef)})
@@ -208,7 +214,7 @@ struct
 														  	case ty of
 																Types.RECORD(typs,r) => (case List.find (fn (s, t) => s = id) typs of
 																							  SOME(s, t) => {exp=(), ty=t}
-																							| NONE 		 => ((ErrorMsg.error pos ("Accessing a non-existent field you cunt")); {exp=(), ty=Types.UNDEFINED}))
+																							| NONE 		 => ((ErrorMsg.error pos ("Accessing a non-existent field")); {exp=(), ty=Types.UNDEFINED}))
 
 															  | _ =>  ((ErrorMsg.error pos ("Accessing a field of a non-record")); {exp=(), ty=Types.UNDEFINED})
 														  end
@@ -216,9 +222,10 @@ struct
 															val x = checkInt ((trexp exp), pos)
 															val {exp=exp,ty=ty} = trvar var
 														  in
-														  	case ty of
+														  	case lookUpActualSymType ty of
 																Types.ARRAY(ty1,r) => {exp=(), ty=ty1}
-															  | _ =>  ((ErrorMsg.error pos ("Subscript of non-array")); {exp=(), ty=Types.UNDEFINED})
+															  | Types.NAME(ty, r) =>
+															  | a =>  ((ErrorMsg.error pos ("Subscript of non-array: " ^ (typeToString a))); {exp=(), ty=Types.UNDEFINED})
 														  end
 
 			and trseq ((exp, pos)::nil) = trexp exp
@@ -244,10 +251,10 @@ struct
 									in
 									case isSubtype(ty1, ty2, pos) of
 										true  => ()
-									  | false => (ErrorMsg.error pos ("Record Arg do not match expected type"); ())
+									  | false => (ErrorMsg.error pos ("Value for field " ^ field ^ " does not match expected type"); ())
 									end
 						  | false => recList lst (field, exp, pos))
-			  | recList [] (field, exp, pos) = (ErrorMsg.error pos ("Record field not found"); ())
+			  | recList [] (field, exp, pos) = (ErrorMsg.error pos ("Record field not found:\t" ^ field); ())
 
 		in
 		trexp
@@ -257,20 +264,25 @@ struct
 														  		val (venv', _, params) = (foldr processFunctionHeaders (venv, tenv, []) lst)
 															  	val (_, _) = (foldl processFunctionBodies (venv', tenv) (ListPair.zip (lst, params)))
 														  	in
-															  	{venv=venv', tenv=tenv}
+															  	(foldl checkDuplicationNames M.empty (map (fn a => (#name a, #pos a)) lst); {venv=venv', tenv=tenv})
 															end
 
 		  | transDec (A.TypeDec(lst), {venv, tenv}) = let
 														val tenv' = (foldl processTypeHeaders tenv lst)
 														val tenv'' = (foldl processTypeBodies tenv' lst)
 													  in
-													  	{venv=venv, tenv=tenv''}
+													  	(foldl checkDuplicationNames M.empty (map (fn a => (#name a, #pos a)) lst); {venv=venv, tenv=tenv''})
 													  end
 		  | transDec (A.VarDec({name=name,escape=escape,typ=NONE, init=init, pos=pos}),
 		  						{venv, tenv}) = let
 												val {exp, ty} = transExp(venv, tenv) init
 												in
-												{venv=Symbol.enter(venv, name, ENV.VarEntry{ty=ty}), tenv=tenv}
+												( case ty of
+													Types.NIL => (ErrorMsg.error pos ("Illegal variable initialization. Cannot be nil."); {venv=Symbol.enter(venv, name, ENV.VarEntry{ty=ty}), tenv=tenv})
+												  | _ => {venv=Symbol.enter(venv, name, ENV.VarEntry{ty=ty}), tenv=tenv})
+
+
+
 												end
 		  | transDec (A.VarDec({name=name, escape=x, typ=SOME(sym, p), init=init, pos=pos}),
 		  						{venv, tenv}) = let
@@ -281,7 +293,10 @@ struct
 				  							  	in
 												case expTy of
 													Types.NIL => (case typ of Types.RECORD(_, _) => {venv=venv, tenv=tenv} | _ => (ErrorMsg.error pos ("Nil can only be assigned to records."); {venv=venv, tenv=tenv}))
-													| _ => (isSubtype (typ, expTy, pos); {venv=venv, tenv=tenv})
+													| _ => (
+														case isSubtype (typ, expTy, pos) of
+															false => (ErrorMsg.error pos ("Illegal variable initialization. Expected " ^ Symbol.name sym ^ "."); {venv=venv, tenv=tenv})
+															| true => {venv=venv, tenv=tenv})
 				  							  	end
 
 
@@ -289,10 +304,10 @@ struct
 
 		and processFunctionHeaders ({name=name,params=params,result=SOME((sym, rpos)),body=body,pos=pos}, (venv, tenv, paramList)) = 	let
 																																	val x = Int.toString pos
-																																	val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
+																																	val (params', m) = foldr (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
 																																	val symTy = case lookUpSymbolTENV (tenv, sym, rpos) of
 																																					SOME(ty) => ty
-																																				  | NONE => (ErrorMsg.error pos ("Unrecognised function result type") ;Types.UNDEFINED)
+																																				  | NONE => (ErrorMsg.error pos ("Unrecognized function result type") ;Types.UNDEFINED)
 																																	val fnDec = ENV.FunEntry({formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
@@ -300,7 +315,7 @@ struct
 																																end
 		| processFunctionHeaders ({name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
 																													val x = Int.toString pos
-																													val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
+																													val (params', m) = foldr (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
 																													val fnDec = ENV.FunEntry({formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 																												in
@@ -315,9 +330,11 @@ struct
 																																								val venv'' = foldl (fn ({name=s, ty=ty}, t) => Symbol.enter (t, s, ENV.VarEntry{ty=ty})) venv' paramList
 																										  														val {exp=exp,ty=ty1} = transExp (venv'', tenv') body
 																																							in
-																																								case isSubtype(ty, ty1, pos) of
-																																									true => (venv, tenv)
-																																								  | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
+																																								case ty of
+																																									Types.UNIT => ( case ty1 of
+																																													Types.UNIT => (venv, tenv)
+																																													| a => (ErrorMsg.error pos ("Warning: Procedure " ^ (Symbol.symbol name) ^ " not returning Unit. Found: " ^ (typeToString ty1)); (venv, tenv)))
+																																								  | _ => case isSubtype(ty, ty1, pos) of true => (venv, tenv) | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
 																																							end
 
 	fun transVar (venv, tenv, A.SimpleVar(id, pos)) 	  		= {exp=(), ty=(lookUpSymbol (venv, id, pos))}

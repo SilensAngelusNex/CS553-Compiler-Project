@@ -128,6 +128,10 @@ struct
 	(*recursive types*)
   	fun processTypeHeaders ({name, ty, pos}, tenv) = Symbol.enter (tenv, name, Types.NAME(name, ref NONE))
 
+	fun checkDuplicationNames ((name, pos), m) = case M.find (m, Symbol.name name) of
+														SOME(_) => (ErrorMsg.error pos ("Duplicate recursive type declarations for symbol: " ^ (Symbol.name name)); m)
+														| NONE => M.insert (m, Symbol.name name, true)
+
 	fun processTypeBodies ({name, ty, pos}, tenv) = case Symbol.look (tenv, name) of
 		  												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
 		  												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
@@ -194,7 +198,7 @@ struct
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{level=_, label=l, formals=paramTys, result=ty}) => {exp=(Translate.transCall (l, (map #exp (paramList (paramTys, args, pos))))), ty=lookUpActualSymType (ty, pos)}
+														SOME(ENV.FunEntry{level=_, label=l, formals=paramTys, result=ty}) => {exp=(Translate.transCall (l, (map #exp (paramList (paramTys, args, pos))))), ty=lookUpActualSymType (ty, pos)}
 														| SOME(ENV.VarEntry{access=_, ty=_}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(Translate.transNil ()), ty=Types.UNDEFINED}))
 				| trexp(A.AssignExp{var, exp, pos}) = let
@@ -210,6 +214,8 @@ struct
 														val body = trexp body
 														in
 														(loops := (case !loops of LOOP(l, last) => last | NOLOOP => NOLOOP);
+														checkInt(test, pos);
+														compatibleTypes(#ty body, Types.UNIT, pos);
 														{exp=(Translate.transWhile (#exp test, #exp body, loopLabel)), ty=Types.UNIT})
 														end
 
@@ -226,7 +232,9 @@ struct
 																				val test = trexp test
 																				val thenExp = trexp thenExp
 																				in
-																				(checkInt(test, pos); {exp=Translate.transIf (#exp test, #exp thenExp, NONE), ty=(#ty thenExp)})
+																				(checkInt(test, pos);
+																				compatibleTypes(#ty thenExp, Types.UNIT, pos);
+																				{exp=Translate.transIf (#exp test, #exp thenExp, NONE), ty=(#ty thenExp)})
 																				end
 				| trexp(A.ArrayExp{typ, size, init, pos}) = 	let
 																val typ = lookUpSymbolTENV (tenv, typ, pos)
@@ -285,13 +293,13 @@ struct
 															  | _ =>  ((ErrorMsg.error pos ("Accessing a field of a non-record")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 														  end
 				| trvar (A.SubscriptVar(var, exp, pos)) = let
-															val index = trexp exp
-															val check = checkInt (index, pos)
-															val {exp=exp,ty=ty} = trvar var
+																val index = trexp exp
+																val check = checkInt (index, pos)
+														  		val {exp=exp,ty=ty} = trvar var
 														  in
-														  	case ty of
-																Types.ARRAY(ty1,r) => {exp=(Translate.transArrayVar (exp, (#exp index))), ty=ty1}
-															  | _ =>  ((ErrorMsg.error pos ("Subscript of non-array")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
+															  case lookUpActualSymType (ty, pos) of
+																  Types.ARRAY(ty1,r) => {exp=(Translate.transArrayVar (exp, (#exp index))), ty=ty1}
+																| a =>  ((ErrorMsg.error pos ("Subscript of non-array: " ^ (typeToString a))); {exp=(Translate.transArrayVar (exp, (#exp index))), ty=Types.UNDEFINED})
 														  end
 
 			and trseq ((exp, pos)::nil) = (trexp exp)::nil
@@ -319,10 +327,10 @@ struct
 									in
 									case isSubtype(ty1, ty2, pos) of
 										true  => (#exp expTy)
-									  | false => (ErrorMsg.error pos ("Record Arg do not match expected type"); (Translate.transNil ()))
+									 | false => (ErrorMsg.error pos ("Value for field " ^ field ^ " does not match expected type"); (Translate.transNil ()))
 									end
 						  | false => recList lst (field, exp, pos))
-			  | recList [] (field, exp, pos) = (ErrorMsg.error pos ("Record field not found"); (Translate.transNil ()))
+			  | recList [] (field, exp, pos) = (ErrorMsg.error pos ("Record field not found:\t" ^ field); (Translate.transNil ()))
 
 		in
 		trexp
@@ -332,7 +340,7 @@ struct
 														  		val (venv', _, params) = (foldr (fn (e,a) => processFunctionHeaders(level, e, a)) (venv, tenv, []) lst)
 															  	val (_, _) = (foldl processFunctionBodies (venv', tenv) (ListPair.zip (lst, params)))
 														  	in
-															  	({venv=venv', tenv=tenv}, l)
+															  	(foldl checkDuplicationNames M.empty (map (fn a => (#name a, #pos a)) lst); ({venv=venv', tenv=tenv}, l))
 															end
 
 		  | transDec (level, A.TypeDec(lst), ({venv, tenv}, l)) = let
@@ -340,7 +348,7 @@ struct
 														val tenv'' = (foldl processTypeBodies tenv' lst)
 														val _ = (map (fn (t) => processRecursiveDefs(tenv') t) lst)
 													  in
-													  	({venv=venv, tenv=tenv''}, l)
+													  	(foldl checkDuplicationNames M.empty (map (fn a => (#name a, #pos a)) lst); ({venv=venv, tenv=tenv''}, l))
 													  end
 		  | transDec (level, A.VarDec({name=name,escape=esc,typ=NONE, init=init, pos=pos}),
 		  						({venv, tenv}, l)) = let
@@ -348,7 +356,9 @@ struct
 												val a = Translate.allocLocal (level) (!esc)
 												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp)
 												in
-												({venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}, l@[result])
+												( case ty of
+													Types.NIL => (ErrorMsg.error pos ("Illegal variable initialization. Cannot be nil."); ({venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}, l@[result]))
+												  | _ => ({venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}, l@[result]))
 												end
 		  | transDec (level, A.VarDec({name=name, escape=esc, typ=SOME(sym, p), init=init, pos=pos}),
 		  						({venv, tenv}, l)) = let
@@ -363,14 +373,16 @@ struct
 													Types.NIL => (case typ of
 																	Types.RECORD(_, _) 	=> ({venv=venv, tenv=tenv}, result::l)
 																	| _ 				=> (ErrorMsg.error pos ("Nil can only be assigned to records."); ({venv=venv, tenv=tenv}, result::l)))
-													| _ => (isSubtype (typ, expTy, pos); ({venv=venv, tenv=tenv}, result::l))
+												| _ => (
+													case isSubtype (typ, expTy, pos) of
+														false => (ErrorMsg.error pos ("Illegal variable initialization. Expected " ^ Symbol.name sym ^ "."); ({venv=venv, tenv=tenv}, result::l))
+														| true => ({venv=venv, tenv=tenv}, result::l))
 				  							  	end
 
 
 		and transDecs (level, venv, tenv, decs) = (foldl (fn (e, a) => transDec(level, e, a)) ({venv=venv, tenv=tenv}, []) decs)
 
 		and processFunctionHeaders (level, {name=name,params=params,result=SOME((sym, rpos)),body=body,pos=pos}, (venv, tenv, paramList)) = 	let
-																																	val x = Int.toString pos
 																																	val (params', m) = foldl (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
 																																	val symTy = case lookUpSymbolTENV (tenv, sym, rpos) of
 																																					SOME(ty) => ty
@@ -404,9 +416,11 @@ struct
 
 																																											val _ = Translate.procEntryExit {level=level, body=result}
 																																										in
-																																											case isSubtype(ty, ty1, pos) of
-																																												true => (venv, tenv)
-																																											  | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
+																																											case ty of
+																																												Types.UNIT => ( case ty1 of
+																																																Types.UNIT => (venv, tenv)
+																																																| a => (ErrorMsg.error pos ("Warning: Procedure " ^ (Symbol.symbol name) ^ " not returning Unit. Found: " ^ (typeToString ty1)); (venv, tenv)))
+																																											  | _ => case isSubtype(ty, ty1, pos) of true => (venv, tenv) | false => (ErrorMsg.error pos ("Incompatible return type in function " ^ (Symbol.symbol name) ^ ". Expected: " ^ (typeToString ty) ^ " Found: " ^ (typeToString ty1)) ; (venv, tenv))
 																																										end
 
    (*
