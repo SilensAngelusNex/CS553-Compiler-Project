@@ -5,7 +5,7 @@ sig
 	type access
 	val outermost : level
 	val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level
-	val leaveLevel : unit -> level
+	val leaveLevel : level -> level
 	val formals : level -> access list
 	val allocLocal: level -> bool -> access
 	val transSimpleVar : access option * level -> exp
@@ -14,23 +14,23 @@ sig
 	val getResult : unit -> F.frag list
 	val fragList : F.frag list ref
 
-	val transOP : Absyn.oper * exp * exp -> exp
-	val transSeq : exp list -> exp
-	val transLet : exp list * exp -> exp
-	val transRec : exp list -> exp
-	val transArray : exp * exp -> exp
-	val transAssign : exp * exp -> exp
+	val transOP : Absyn.oper * exp * exp * level -> exp
+	val transSeq : exp list * level -> exp
+	val transLet : exp list * exp * level -> exp
+	val transRec : exp list * level -> exp
+	val transArray : exp * exp * level -> exp
+	val transAssign : exp * exp * level -> exp
 	val transBreak : Temp.label -> exp
-	val transBody :  exp -> exp
+	val transBody :  exp * level -> exp
 	val transNil : unit -> exp
 	val transInt : int -> exp
 	val transString : string -> exp
-	val transCall : Temp.label * exp list -> exp
-	val transFor : exp * exp * exp * Temp.label -> exp
-	val transWhile : exp * exp * Temp.label -> exp
-	val transIf : exp * exp * exp option -> exp
-	val transArrayVar : exp * exp -> exp
-	val transRecordVar : exp * int -> exp
+	val transCall : Temp.label * exp list * level -> exp
+	val transFor : exp * exp * exp * Temp.label * level -> exp
+	val transWhile : exp * exp * Temp.label * level -> exp
+	val transIf : exp * exp * exp option * level -> exp
+	val transArrayVar : exp * exp * level -> exp
+	val transRecordVar : exp * int * level -> exp
 	val beginLoop : unit -> Temp.label
 
 	val treeStm : exp -> Tree.stm
