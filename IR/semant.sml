@@ -87,14 +87,14 @@ struct
 	fun checkInt ({exp=exp, ty=Types.INT}, pos ) = ()
 	  | checkInt ({exp=exp, ty=ty}, pos) = (ErrorMsg.error pos ("Expected INT Found: " ^ (typeToString ty)))
 
-	fun intBinOp (left, right, oper, pos) =
+	fun intBinOp (left, right, oper, pos, level) =
 		(checkInt(left, pos);
 		checkInt(right, pos);
-		{exp=(Translate.transOP (oper, #exp left, #exp right)), ty=Types.INT})
+		{exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT})
 
-	fun binOp (left, right, oper, pos) =
+	fun binOp (left, right, oper, pos, level) =
 		(checkPair(left, right, pos);
-		{exp=(Translate.transOP (oper, #exp left, #exp right)), ty=Types.INT})
+		{exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT})
 
 	fun getSuper ({exp=exp1, ty=ty1}, {exp=exp2, ty=ty2}, pos) = 	case ((isSubtype(ty1, ty2, pos)), (isSubtype(ty2, ty1, pos))) of
 																	  (true, true) => ty1
@@ -163,23 +163,23 @@ struct
 
 	fun transExp (level, venv, tenv) =
 		let
-			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos})   	= intBinOp (trexp left, trexp right, A.PlusOp, pos)
-			  | trexp (A.OpExp{left, oper=A.MinusOp, right, pos})  	= intBinOp (trexp left, trexp right, A.MinusOp, pos)
-			  | trexp (A.OpExp{left, oper=A.TimesOp, right, pos})  	= intBinOp (trexp left, trexp right, A.TimesOp, pos)
-			  | trexp (A.OpExp{left, oper=A.DivideOp, right, pos}) 	= intBinOp (trexp left, trexp right, A.DivideOp, pos)
-			  | trexp (A.OpExp{left, oper=A.EqOp, right, pos}) 	   	= binOp (trexp left, trexp right, A.EqOp, pos)
-			  | trexp (A.OpExp{left, oper=A.NeqOp, right, pos})  	= binOp (trexp left, trexp right, A.NeqOp, pos)
-			  | trexp (A.OpExp{left, oper=A.LtOp, right, pos})  	= binOp (trexp left, trexp right, A.LtOp, pos)
-			  | trexp (A.OpExp{left, oper=A.LeOp, right, pos}) 		= binOp (trexp left, trexp right, A.LeOp, pos)
-			  | trexp (A.OpExp{left, oper=A.GtOp, right, pos}) 		= binOp (trexp left, trexp right, A.GtOp, pos)
-			  | trexp (A.OpExp{left, oper=A.GeOp, right, pos}) 		= binOp (trexp left, trexp right, A.GeOp, pos)
+			fun trexp (A.OpExp{left, oper=A.PlusOp, right, pos})   	= intBinOp (trexp left, trexp right, A.PlusOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.MinusOp, right, pos})  	= intBinOp (trexp left, trexp right, A.MinusOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.TimesOp, right, pos})  	= intBinOp (trexp left, trexp right, A.TimesOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.DivideOp, right, pos}) 	= intBinOp (trexp left, trexp right, A.DivideOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.EqOp, right, pos}) 	   	= binOp (trexp left, trexp right, A.EqOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.NeqOp, right, pos})  	= binOp (trexp left, trexp right, A.NeqOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.LtOp, right, pos})  	= binOp (trexp left, trexp right, A.LtOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.LeOp, right, pos}) 		= binOp (trexp left, trexp right, A.LeOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.GtOp, right, pos}) 		= binOp (trexp left, trexp right, A.GtOp, pos, level)
+			  | trexp (A.OpExp{left, oper=A.GeOp, right, pos}) 		= binOp (trexp left, trexp right, A.GeOp, pos, level)
 			  | trexp(A.VarExp(var)) 								= trvar(var)
 			  | trexp(A.NilExp) 									= {exp=(Translate.transNil ()), ty=Types.NIL}
 			  | trexp(A.IntExp(i)) 									= {exp=(Translate.transInt i), ty=Types.INT}
 			  | trexp(A.StringExp(s, pos)) 							= {exp=(Translate.transString s), ty=Types.STRING}
 			  | trexp(A.SeqExp(seq)) 								= 	let
 				  															val l = trseq seq
-																			val exp = Translate.transSeq (map #exp l)
+																			val exp = Translate.transSeq ((map #exp l), level)
 																			val ty = #ty (List.last (l))
 																		in
 																			{exp=exp, ty=ty}
@@ -190,18 +190,18 @@ struct
 												  	val ({venv=new_venv, tenv=new_tenv}, decList) = transDecs(level, venv, tenv, decs)
 													val {exp=body, ty=t} = transExp(level, new_venv, new_tenv) body
 												  in
-												  	{exp=Translate.transLet (decList, body), ty=t}
+												  	{exp=Translate.transLet (decList, body, level), ty=t}
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{level=_, label=l, formals=paramTys, result=ty}) => {exp=(Translate.transCall (l, (map #exp (paramList (paramTys, args, pos))))), ty=lookUpActualSymType (ty, pos)}
+														 SOME(ENV.FunEntry{level=_, label=l, formals=paramTys, result=ty}) => {exp=(Translate.transCall (l, (map #exp (paramList (paramTys, args, pos))), level)), ty=lookUpActualSymType (ty, pos)}
 														| SOME(ENV.VarEntry{access=_, ty=_}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(Translate.transNil ()), ty=Types.UNDEFINED}))
 				| trexp(A.AssignExp{var, exp, pos}) = let
 														val expTy = trexp exp
 														val var = trvar var
 														in
-														{exp=(Translate.transAssign (#exp var, #exp expTy)), ty=checkPair(var, expTy, pos)}
+														{exp=(Translate.transAssign (#exp var, #exp expTy, level)), ty=checkPair(var, expTy, pos)}
 														end
 				| trexp(A.WhileExp{test, body, pos}) =  let
 														val test = trexp test
@@ -210,7 +210,7 @@ struct
 														val body = trexp body
 														in
 														(loops := (case !loops of LOOP(l, last) => last | NOLOOP => NOLOOP);
-														{exp=(Translate.transWhile (#exp test, #exp body, loopLabel)), ty=Types.UNIT})
+														{exp=(Translate.transWhile (#exp test, #exp body, loopLabel, level)), ty=Types.UNIT})
 														end
 
 				| trexp(A.IfExp{test=test,then'=thenExp,else'=SOME(elseExp),pos=pos}) = let
@@ -218,7 +218,7 @@ struct
 																							val thenExp = trexp thenExp
 																							val elseExp = trexp elseExp
 																						in
-																							(checkInt(test, pos); {exp=Translate.transIf (#exp test, #exp thenExp, SOME(#exp elseExp)), ty=getSuper (thenExp, elseExp, pos)})
+																							(checkInt(test, pos); {exp=Translate.transIf (#exp test, #exp thenExp, SOME(#exp elseExp), level), ty=getSuper (thenExp, elseExp, pos)})
 																						end
 
 
@@ -226,7 +226,7 @@ struct
 																				val test = trexp test
 																				val thenExp = trexp thenExp
 																				in
-																				(checkInt(test, pos); {exp=Translate.transIf (#exp test, #exp thenExp, NONE), ty=(#ty thenExp)})
+																				(checkInt(test, pos); {exp=Translate.transIf (#exp test, #exp thenExp, NONE, level), ty=(#ty thenExp)})
 																				end
 				| trexp(A.ArrayExp{typ, size, init, pos}) = 	let
 																val typ = lookUpSymbolTENV (tenv, typ, pos)
@@ -237,17 +237,17 @@ struct
 																     SOME(Types.ARRAY(aType, aRef)) =>
 																	 		(checkInt(sizeExp, pos);
 																			compatibleTypes (aType, getType initExp, pos);
-																  			{exp=(Translate.transArray (#exp sizeExp, #exp initExp)), ty=Types.ARRAY(aType, aRef)})
+																  			{exp=(Translate.transArray (#exp sizeExp, #exp initExp, level)), ty=Types.ARRAY(aType, aRef)})
 																   | SOME(_) => ((ErrorMsg.error pos ("Tried to construct an array non array type. ")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 																   | NONE => ((ErrorMsg.error pos ("Array type not declared."));
-																   				{exp=(Translate.transArray (#exp sizeExp, Translate.transNil())), ty=Types.ARRAY(Types.UNDEFINED, ref ())})
+																   				{exp=(Translate.transArray (#exp sizeExp, Translate.transNil(), level)), ty=Types.ARRAY(Types.UNDEFINED, ref ())})
 																end
 				| trexp(A.RecordExp{fields, typ, pos}) = 	let
 																val (smyTypes, recRef) = case lookUpSymbolTENV (tenv, typ, pos) of
 																	SOME(Types.RECORD (lst, r)) => (lst, r)
 																	| _ => ((ErrorMsg.error pos ("Record type not declared.")); ([], ref ()))
 															in
-															{exp=(Translate.transRec (map (recList smyTypes) fields)), ty=Types.RECORD(smyTypes, recRef)}
+															{exp=(Translate.transRec ((map (recList smyTypes) fields), level)), ty=Types.RECORD(smyTypes, recRef)}
 															end
 
 				| trexp(A.ForExp{var=symbol,escape=esc,
@@ -263,7 +263,7 @@ struct
 																					transExp (level, venv'', tenv) body)
 																	in
 																	(loops := (case !loops of LOOP(l, last) => last | NOLOOP => NOLOOP);
-																	{exp=Translate.transFor (#exp hi, #exp lo, #exp body, loopLabel), ty=Types.UNIT})
+																	{exp=Translate.transFor (#exp hi, #exp lo, #exp body, loopLabel, level), ty=Types.UNIT})
 																	end
 
 				| trexp(A.BreakExp(pos)) = 	case !loops of
@@ -279,7 +279,7 @@ struct
 																							val index = find id typs
 																						in
 																						case index of
-																						  SOME(t, i) 	=> {exp=(Translate.transRecordVar (exp, i)), ty=t}
+																						  SOME(t, i) 	=> {exp=(Translate.transRecordVar (exp, i, level)), ty=t}
 																						| NONE 			=> ((ErrorMsg.error pos ("Accessing a non-existent field you cunt")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 																						end
 															  | _ =>  ((ErrorMsg.error pos ("Accessing a field of a non-record")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
@@ -290,7 +290,7 @@ struct
 															val {exp=exp,ty=ty} = trvar var
 														  in
 														  	case ty of
-																Types.ARRAY(ty1,r) => {exp=(Translate.transArrayVar (exp, (#exp index))), ty=ty1}
+																Types.ARRAY(ty1,r) => {exp=(Translate.transArrayVar (exp, (#exp index), level)), ty=ty1}
 															  | _ =>  ((ErrorMsg.error pos ("Subscript of non-array")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 														  end
 
@@ -346,7 +346,7 @@ struct
 		  						({venv, tenv}, l)) = let
 												val {exp, ty} = transExp(level, venv, tenv) init
 												val a = Translate.allocLocal (level) (!esc)
-												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp)
+												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp, level)
 												in
 												({venv=Symbol.enter(venv, name, ENV.VarEntry{access=a, ty=ty}), tenv=tenv}, l@[result])
 												end
@@ -357,7 +357,7 @@ struct
 												val a = Translate.allocLocal (level) (!esc)
 				  								val entry = ENV.VarEntry({access=a, ty=typ})
 				  							  	val venv = Symbol.enter (venv, name, entry)
-												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp)
+												val result = Translate.transAssign (Translate.transSimpleVar(SOME(a), level), exp, level)
 				  							  	in
 												case expTy of
 													Types.NIL => (case typ of
@@ -379,7 +379,6 @@ struct
 																																	val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
-																																	Translate.leaveLevel ();
 																																	(venv', tenv, params'::paramList)
 																																end
 		| processFunctionHeaders (level, {name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
@@ -389,7 +388,6 @@ struct
 																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 																												in
-																													Translate.leaveLevel ();
 																													(venv', tenv, params'::paramList)
 																												end
 
@@ -400,7 +398,7 @@ struct
 																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
 																																											val venv'' = foldl (fn ({name=s, ty=ty, escape=esc}, t) => Symbol.enter (t, s, ENV.VarEntry{access=Translate.allocLocal (level) (!esc), ty=ty})) venv' paramList
 																													  														val {exp=exp,ty=ty1} = transExp (level, venv'', tenv') body
-																																											val result = Translate.transBody exp
+																																											val result = Translate.transBody (exp, level)
 
 																																											val _ = Translate.procEntryExit {level=level, body=result}
 																																										in
