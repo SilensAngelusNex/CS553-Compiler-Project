@@ -15,12 +15,20 @@ struct
 	 * 	Private Helper Functions	*
 	 *  							*)
 
+	 (* Retrieves actual type from Type.NAME  *)
+	 fun lookUpActualSymType (Types.NAME(sym, tyOpt), pos): Types.ty = (case !tyOpt of
+	 																	SOME(ty) => ty
+	 																  | NONE	 => (ErrorMsg.error pos ("Undefined variable " ^ Symbol.name sym); Types.UNDEFINED))
+	 	| lookUpActualSymType (ty, pos): Types.ty = ty;
+
 	 fun typeToString (Types.RECORD (n, _)) = "RECORD"
 		 | typeToString (Types.NIL) = "Nil"
 		 | typeToString (Types.INT) = "Int"
 		 | typeToString (Types.STRING) = "String"
 		 | typeToString (Types.ARRAY (t, _)) = "Array of type: " ^ (typeToString t)
-		 | typeToString (Types.NAME (n, _)) = "Name: " ^ Symbol.name n
+		 | typeToString (Types.NAME (n, r)) = (case !r of
+		 										SOME(x) => "Name: " ^ (Symbol.name n) ^ " but actually " ^ (typeToString x)
+											  | NONE => "Name: " ^ (Symbol.name n) ^ " without a type")
 		 | typeToString (Types.UNIT)  = "UNIT"
 		 | typeToString (Types.UNDEFINED)  = "Undefined"
 
@@ -28,7 +36,8 @@ struct
 	 	| isSubtype (Types.RECORD(_,_), Types.NIL, pos) = true
 		| isSubtype (Types.RECORD(_,r), Types.RECORD(_,r2), pos) = r = r2
 		| isSubtype (Types.ARRAY(_,r), Types.ARRAY(_,r2), pos) = r = r2
-		| isSubtype (Types.NAME(s,_), Types.NAME(s2,_), pos) = s = s2
+		| isSubtype (x, Types.NAME(s,ty), pos) = isSubtype(x, (lookUpActualSymType (Types.NAME(s,ty), pos)), pos)
+		| isSubtype (Types.NAME(s,ty), x, pos) = isSubtype((lookUpActualSymType (Types.NAME(s,ty), pos)), x, pos)
 		| isSubtype (_, Types.UNDEFINED, pos) = true
 		| isSubtype (a, b, pos) = if a = b then true else false
 
@@ -40,13 +49,6 @@ struct
 	fun find e l = findHelp e (l, 0)
 
 	(* Converts fields to (Symbol.symbol * ty) list *)
-
-	(* Retrieves actual type from Type.NAME  *)
-	fun lookUpActualSymType (Types.NAME(sym, tyOpt), pos): Types.ty = (case !tyOpt of
-												  						SOME(ty) => ty
-												  		  			  | NONE	 => (ErrorMsg.error pos ("undefined variable " ^ Symbol.name sym); Types.UNDEFINED))
-	 	| lookUpActualSymType (ty, pos): Types.ty = ty;
-
 
 	fun lookUpSymbol (venv, symbol, pos): Types.ty = case Symbol.look(venv, symbol) of
 													   		SOME(ENV.VarEntry {access=_, ty=ty})						=> (lookUpActualSymType (ty, pos))
@@ -133,7 +135,11 @@ struct
 														| NONE => M.insert (m, Symbol.name name, true)
 
 	fun processTypeBodies ({name, ty, pos}, tenv) = case Symbol.look (tenv, name) of
-		  												  SOME(Types.NAME(name, r)) => (r := SOME(transTy (tenv, ty)); tenv)
+		  												  SOME(Types.NAME(name, r)) => let
+														  									val actualty = transTy (tenv, ty)
+														  								in
+																							(r := SOME(actualty); tenv)
+																						end
 		  												| SOME(_) => (ErrorMsg.error pos ("Unexpected Type for symbol: " ^ (Symbol.name name)); tenv)
 		  												| NONE => (ErrorMsg.error pos ("Unrecognized symbol: " ^ (Symbol.name name)); tenv)
 
@@ -181,6 +187,7 @@ struct
 			  | trexp(A.NilExp) 									= {exp=(Translate.transNil ()), ty=Types.NIL}
 			  | trexp(A.IntExp(i)) 									= {exp=(Translate.transInt i), ty=Types.INT}
 			  | trexp(A.StringExp(s, pos)) 							= {exp=(Translate.transString s), ty=Types.STRING}
+			  | trexp(A.SeqExp([]))									= {exp=(Translate.transNil ()), ty=Types.UNIT}
 			  | trexp(A.SeqExp(seq)) 								= 	let
 				  															val l = trseq seq
 																			val exp = Translate.transSeq ((map #exp l), level)
@@ -204,8 +211,9 @@ struct
 				| trexp(A.AssignExp{var, exp, pos}) = let
 														val expTy = trexp exp
 														val var = trvar var
+														val _ = checkPair(var, expTy, pos)
 														in
-														{exp=(Translate.transAssign (#exp var, #exp expTy, level)), ty=checkPair(var, expTy, pos)}
+														{exp=(Translate.transAssign (#exp var, #exp expTy, level)), ty=Types.UNIT}
 														end
 				| trexp(A.WhileExp{test, body, pos}) =  let
 														val test = trexp test
@@ -236,17 +244,18 @@ struct
 
 				| trexp(A.ArrayExp{typ, size, init, pos}) = 	let
 																val typ = lookUpSymbolTENV (tenv, typ, pos)
+																val typ = case typ of SOME(x) => x | NONE => Types.UNDEFINED
 																val sizeExp = trexp size
 																val initExp = trexp init
 																in
-																case typ of
-																     SOME(Types.ARRAY(aType, aRef)) =>
+																case lookUpActualSymType (typ, pos) of
+																     Types.ARRAY(aType, aRef) =>
 																	 		(checkInt(sizeExp, pos);
 																			compatibleTypes (aType, getType initExp, pos);
 																  			{exp=(Translate.transArray (#exp sizeExp, #exp initExp, level)), ty=Types.ARRAY(aType, aRef)})
-																   | SOME(_) => ((ErrorMsg.error pos ("Tried to construct an array non array type. ")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
-																   | NONE => ((ErrorMsg.error pos ("Array type not declared."));
-																   				{exp=(Translate.transArray (#exp sizeExp, Translate.transNil(), level)), ty=Types.ARRAY(Types.UNDEFINED, ref ())})
+
+																   | _ => ((ErrorMsg.error pos ("Tried to construct an array non array type. ")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
+
 																end
 				| trexp(A.RecordExp{fields, typ, pos}) = 	let
 																val (smyTypes, recRef) = case lookUpSymbolTENV (tenv, typ, pos) of
@@ -280,7 +289,7 @@ struct
 				| trvar (A.FieldVar(var, id, pos)) 	    = let
 															val {exp=exp,ty=ty} = trvar var
 														  in
-														  	case ty of
+														  	case lookUpActualSymType (ty, pos) of
 																Types.RECORD(typs,r) => let
 																							val index = find id typs
 																						in

@@ -104,7 +104,7 @@ exp : exp PLUS exp                  (A.OpExp({left = exp1, oper = A.PlusOp, pos 
     | whileExp                      (whileExp)
     | seqExp                        (seqExp)
     | LPAREN exp RPAREN             (exp)
-    | LPAREN RPAREN                 (A.NilExp)
+    | LPAREN RPAREN                 (A.SeqExp([]))
     | callExp                       (callExp)
     | assignExp                     (assignExp)
     | recCreate                     (recCreate)

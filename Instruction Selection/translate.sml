@@ -22,19 +22,12 @@ struct
 
 	fun newLevel {parent=parent, name=name, formals=formals} = let
 																	val n = F.newFrame {name=name, formals=true::formals}
-																	val u = ref ()
-																	val result = L(n, parent, ref ())
 															   in
-															   		currLevel := result;
-																	result
+															   		L(n, parent, ref ())
 															   end
 
-    fun allocTemp level = case level of L(f, _, _) => F.allocTemp f
-   						  | EMPTY => 	let
-						  					val level = newLevel {parent=EMPTY, name=Temp.newlabel (), formals=[true]}
-									 	in
-											{level=level, temp=(allocTemp level)}
-										end
+    fun allocTemp level = case level of L(f, _, _) 	=> {level=level, temp=F.allocTemp f}
+   						  			  | EMPTY 		=> 	allocTemp (newLevel {parent=outermost, name=Temp.newlabel (), formals=[true]})
 
 	fun leaveLevel level = case level of
 							  L(_, EMPTY, _) => outermost
@@ -49,7 +42,13 @@ struct
 	  | formals EMPTY: access list = []
 
 	fun allocLocal (L(frame, p, u)) bool = (L(frame, p, u), F.allocLocal frame bool)
-	  | allocLocal EMPTY bool = (!currLevel, F.allocLocal (F.newFrame {name= Temp.newlabel (), formals= []}) bool)
+	  | allocLocal EMPTY bool = let
+									val level = newLevel {parent=outermost, name=Temp.newlabel (), formals=[true]}
+								in
+									allocLocal level bool
+								end
+
+
 
 	fun staticLink (L(f1, p1, u1), L(f2, p2, u2), link) = (case u1 = u2 of
 															true => link
@@ -65,7 +64,7 @@ struct
 	fun unEx (Ex(e), level) = e
 	  | unEx (Nx(g), level) = T.ESEQ(g, T.CONST 0)
 	  | unEx (Cx(f), level) = let
-					  		val r = allocTemp (level ) (*register*)
+					  		val r = #temp (allocTemp (level)) (*register*)
 					        val l1 = Temp.newlabel() (*label*)
 					        val l2 = Temp.newlabel() (*label*)
 					        val b = f (l1, l2)
@@ -100,7 +99,7 @@ struct
 	fun unCx(Ex(T.CONST (0)), level) = (fn (l1, l2) => T.JUMP(T.NAME(l2), [l2]))
 	  | unCx(Ex(T.CONST (_)), level) = (fn (l1, l2) => T.JUMP(T.NAME(l1), [l1]))
 	  | unCx(Ex(e), level) = let
-	  						val t1 = T.TEMP(allocTemp level)
+	  						val t1 = T.TEMP(#temp (allocTemp level))
 	  					in
 							(fn (l1, l2) => T.SEQ(T.MOVE(t1, e),  T.CJUMP(T.NE, t1, T.CONST(0), l1, l2)))
 						end
@@ -119,8 +118,8 @@ struct
   		  							)
 
   	fun transArrayVar (exp, index, level): exp = 	let
-  												val id = allocTemp level
-  												val loc = allocTemp level
+  												val id = #temp (allocTemp level)
+  												val loc = #temp (allocTemp level)
   												val pass = Temp.newlabel()
   												val exit = Temp.newlabel()
   												val access = Temp.newlabel()
@@ -165,7 +164,7 @@ struct
 	        val t = Temp.newlabel()
 	        val f = Temp.newlabel()
 	        val e = Temp.newlabel()
-	        val r = allocTemp level
+	        val r = #temp (allocTemp level)
 	    in
 			Ex(
 				T.ESEQ(
@@ -202,7 +201,7 @@ struct
 		        val i2 = unEx (e2, level)
 		        val t = Temp.newlabel()
 		        val e = Temp.newlabel()
-		        val r = allocTemp level
+		        val r = #temp (allocTemp level)
 		    in
 				Ex(
 		        T.ESEQ(
@@ -224,9 +223,9 @@ struct
 				)
 		    end
 
-	fun transWhile(e1, e2, ed) = let
+	fun transWhile(e1, e2, ed, level) = let
 								val i1 = unCx (e1, level)
-								val i2 = unNx (e2, level)
+								val i2 = unNx (e2)
 								val cond = Temp.newlabel()
 								val body = Temp.newlabel()
 							 in
@@ -254,8 +253,8 @@ struct
 									val i1 = unNx body
 									val i2 = unEx (hi, level)
 									val i3 = unEx (lo, level)
-									val h = allocTemp level
-									val l = allocTemp level
+									val h = #temp (allocTemp level)
+									val l = #temp (allocTemp level)
 									val cond = Temp.newlabel()
 									val body = Temp.newlabel()
 								 in
@@ -298,27 +297,27 @@ struct
 							Ex(T.NAME(lab))
 						end
 	fun transCall (l, args, level) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, level)) args)))
-	fun transOP (A.PlusOp, e1, e2) 	 = Ex(T.BINOP(T.PLUS, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.MinusOp, e1, e2)	 = Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.TimesOp, e1, e2)	 = Ex(T.BINOP(T.MUL, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.DivideOp, e1, e2) = Ex(T.BINOP(T.DIV, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.EqOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)))
-	  | transOP (A.NeqOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)))
-	  | transOP (A.LtOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)))
-	  | transOP (A.LeOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2, level), unEx(e1, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)))
-	  | transOP (A.GtOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)))
-	  | transOP (A.GeOp, e1, e2) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2, level), unEx(e1, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)))
+	fun transOP (A.PlusOp, e1, e2, level) 	 = Ex(T.BINOP(T.PLUS, unEx(e1, level), unEx(e2, level)))
+	  | transOP (A.MinusOp, e1, e2, level)	 = Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)))
+	  | transOP (A.TimesOp, e1, e2, level)	 = Ex(T.BINOP(T.MUL, unEx(e1, level), unEx(e2, level)))
+	  | transOP (A.DivideOp, e1, e2, level) = Ex(T.BINOP(T.DIV, unEx(e1, level), unEx(e2, level)))
+	  | transOP (A.EqOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)), level)
+	  | transOP (A.NeqOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)), level)
+	  | transOP (A.LtOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)), level)
+	  | transOP (A.LeOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2, level), unEx(e1, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)), level)
+	  | transOP (A.GtOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)), level)
+	  | transOP (A.GeOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2, level), unEx(e1, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)), level)
 
-	fun transSeq (a::[]) = Ex(unEx(a, level))
-	  | transSeq (a::l) = Ex(T.ESEQ(unNx(a), unEx(transSeq(l), level)))
-	  | transSeq ([]) = Ex(T.CONST(0))
-	fun transLet (d::decs, body, level) = Ex(T.ESEQ(unNx(d), unEx(transLet(decs, body), level)))
-	  | transLet ([], body, level) = Ex(unEx(body), level)
+	fun transSeq (a::[], level) = Ex(unEx(a, level))
+	  | transSeq (a::l, level) = Ex(T.ESEQ(unNx(a), unEx(transSeq(l, level), level)))
+	  | transSeq ([], level) = Ex(T.CONST(0))
+	fun transLet (d::decs, body, level) = Ex(T.ESEQ(unNx(d), unEx(transLet(decs, body, level), level)))
+	  | transLet ([], body, level) = Ex(unEx(body, level))
 	fun transRec (lst, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("allocRecord")), (map (fn a => unEx(a, level)) lst)))
 	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
-	fun transBody (exp) = transAssign (Ex(T.TEMP F.RV), exp)
+	fun transBody (exp, level) = transAssign (Ex(T.TEMP F.RV), exp, level)
 
 
 	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())
