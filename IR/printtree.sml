@@ -1,63 +1,80 @@
 structure Printtree :
-     sig val printtree : TextIO.outstream * Tree.stm -> unit end =
+     sig
+	 	val printtree : TextIO.outstream * Tree.stm -> unit
+		val printfrags : TextIO.outstream * MIPSFrame.frag list -> unit
+	end =
 struct
+	structure T = Tree
+	structure F = MIPSFrame
 
-  structure T = Tree
-fun printtree (outstream, s0) =
- let fun say s =  TextIO.output(outstream,s)
-  fun sayln s= (say s; say "\n")
+	fun printtree (outstream, s0) =
+ 		let
+			fun say s =  TextIO.output(outstream,s)
+  			fun sayln s= (say s; say "\n")
 
-  fun indent 0 = ()
-    | indent i = (say "\t"; indent(i-1))
+  			fun indent 0 = ()
+    			| indent i = (say "\t"; indent(i-1))
 
-  fun stm(T.SEQ(a,b),d) =
-          (indent d; sayln "SEQ("; stm(a,d+1); sayln ","; stm(b,d+1); say ")")
-    | stm(T.LABEL lab, d) = (indent d; say "LABEL "; say (Symbol.name lab))
-    | stm(T.JUMP (e,_), d) =  (indent d; sayln "JUMP("; exp(e,d+1); say ")")
-    | stm(T.CJUMP(r,a,b,t,f),d) = (indent d; say "CJUMP(";
-				relop r; sayln ",";
-				exp(a,d+1); sayln ","; exp(b,d+1); sayln ",";
-				indent(d+1); say(Symbol.name t);
-				say ","; say (Symbol.name f); say ")")
-    | stm(T.MOVE(a,b),d) = (indent d; sayln "MOVE("; exp(a,d+1); sayln ",";
-			    exp(b,d+1); say ")")
-    | stm(T.EXP e, d) = (indent d; sayln "EXP("; exp(e,d+1); say ")")
+  			fun stm(T.SEQ(a,b),d) = (indent d; sayln "SEQ("; stm(a,d+1); sayln ","; stm(b,d+1); say ")")
+		      | stm(T.LABEL lab, d) = (indent d; say "LABEL "; say (Symbol.name lab))
+		      | stm(T.JUMP (e,_), d) =  (indent d; sayln "JUMP("; exp(e,d+1); say ")")
+		      | stm(T.CJUMP(r,a,b,t,f),d) = (indent d; say "CJUMP(";
+						relop r; sayln ",";
+						exp(a,d+1); sayln ","; exp(b,d+1); sayln ",";
+						indent(d+1); say(Symbol.name t);
+						say ","; say (Symbol.name f); say ")")
+		      | stm(T.MOVE(a,b),d) = (indent d; sayln "MOVE("; exp(a,d+1); sayln ",";
+					    exp(b,d+1); say ")")
+		      | stm(T.EXP e, d) = (indent d; sayln "EXP("; exp(e,d+1); say ")")
 
-  and exp(T.BINOP(p,a,b),d) = (indent d; say "BINOP("; binop p; sayln ",";
-			       exp(a,d+1); sayln ","; exp(b,d+1); say ")")
-    | exp(T.MEM(e),d) = (indent d; sayln "MEM("; exp(e,d+1); say ")")
-    | exp(T.TEMP t, d) = (indent d; say "TEMP t"; say(Int.toString t))
-    | exp(T.ESEQ(s,e),d) = (indent d; sayln "ESEQ("; stm(s,d+1); sayln ",";
-			  exp(e,d+1); say ")")
-    | exp(T.NAME lab, d) = (indent d; say "NAME "; say (Symbol.name lab))
-    | exp(T.CONST i, d) = (indent d; say "CONST "; say(Int.toString i))
-    | exp(T.CALL(e,el),d) = (indent d; sayln "CALL("; exp(e,d+1);
-			   app (fn a => (sayln ","; exp(a,d+2))) el;
-			   say ")")
+			and exp(T.BINOP(p,a,b),d) = (indent d; say "BINOP("; binop p; sayln ",";
+					       exp(a,d+1); sayln ","; exp(b,d+1); say ")")
+		      | exp(T.MEM(e),d) = (indent d; sayln "MEM("; exp(e,d+1); say ")")
+		      | exp(T.TEMP t, d) = (indent d; say "TEMP t"; say(Int.toString t))
+		      | exp(T.ESEQ(s,e),d) = (indent d; sayln "ESEQ("; stm(s,d+1); sayln ",";
+					  exp(e,d+1); say ")")
+		      | exp(T.NAME lab, d) = (indent d; say "NAME "; say (Symbol.name lab))
+		      | exp(T.CONST i, d) = (indent d; say "CONST "; say(Int.toString i))
+		      | exp(T.CALL(e,el),d) = (indent d; sayln "CALL("; exp(e,d+1);
+					   app (fn a => (sayln ","; exp(a,d+2))) el;
+					   say ")")
 
-  and binop T.PLUS = say "PLUS"
-    | binop T.MINUS = say "MINUS"
-    | binop T.MUL = say "MUL"
-    | binop T.DIV = say "DIV"
-    | binop T.AND = say "AND"
-    | binop T.OR = say "OR"
-    | binop T.LSHIFT = say "LSHIFT"
-    | binop T.RSHIFT = say "RSHIFT"
-    | binop T.ARSHIFT = say "ARSHIFT"
-    | binop T.XOR = say "XOR"
+		  	and binop T.PLUS = say "PLUS"
+		      | binop T.MINUS = say "MINUS"
+		      | binop T.MUL = say "MUL"
+		      | binop T.DIV = say "DIV"
+		      | binop T.AND = say "AND"
+		      | binop T.OR = say "OR"
+		      | binop T.LSHIFT = say "LSHIFT"
+		      | binop T.RSHIFT = say "RSHIFT"
+		      | binop T.ARSHIFT = say "ARSHIFT"
+		      | binop T.XOR = say "XOR"
 
-  and relop T.EQ = say "EQ"
-    | relop T.NE = say "NE"
-    | relop T.LT = say "LT"
-    | relop T.GT = say "GT"
-    | relop T.LE = say "LE"
-    | relop T.GE = say "GE"
-    | relop T.ULT = say "ULT"
-    | relop T.ULE = say "ULE"
-    | relop T.UGT = say "UGT"
-    | relop T.UGE = say "UGE"
+			and relop T.EQ = say "EQ"
+			  | relop T.NE = say "NE"
+		      | relop T.LT = say "LT"
+		      | relop T.GT = say "GT"
+		      | relop T.LE = say "LE"
+		      | relop T.GE = say "GE"
+		      | relop T.ULT = say "ULT"
+		      | relop T.ULE = say "ULE"
+		      | relop T.UGT = say "UGT"
+		      | relop T.UGE = say "UGE"
 
- in  stm(s0,0); sayln ""; TextIO.flushOut outstream
-end
+		in
+			stm(s0,0); sayln ""; TextIO.flushOut outstream
+		end
+
+	fun printfrag out (F.PROC{body=b, frame=_}) = (TextIO.output(out, ("Frag:\n")); printtree (out, b); TextIO.output(out, "\n\n"))
+	  | printfrag out (F.STRING(l, s)) = TextIO.output(out, ("String Frag:\t\"" ^ s ^ "\"\n\n"))
+
+	(*
+	fun printfraghelp (out, 0, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ((Int.toString (1 + List.length frags)) ^ "Tig-Main:" ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, 1, frags))
+	  | printfraghelp (out, i, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ("Frag:\t\t" ^ (Int.toString i) ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, i+1, frags))
+	  | printfraghelp (out, i, (F.STRING(l, s))::frags) = (TextIO.output(out, ("String Frag:\t\"" ^ s ^ "\"\n\n")); printfraghelp (out, i, frags))
+	  | printfraghelp (out, i, []) = TextIO.output(out, ("End"))
+	 *)
+
+	fun printfrags (out, frags) = (map (printfrag out) frags; TextIO.output(out, "Done with " ^ (Int.toString (List.length frags)) ^ "frags"))
 
 end

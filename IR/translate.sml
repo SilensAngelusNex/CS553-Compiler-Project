@@ -291,6 +291,7 @@ struct
 	fun transInt i = Ex(T.CONST i)
 	fun transString s = let
 							val lab = Temp.newlabel ()
+							val _ = (print ("String \"" ^ s ^ "\"-> fragList\n"))
 							(* put F.String(lab, s) onto frag list*)
 						in
 							fragList := !fragList@[F.STRING(lab, s)];
@@ -324,4 +325,8 @@ struct
 	  | procEntryExit {level=EMPTY, body=body} = ()
 
 	fun treeStm a = unNx a
+
+	fun frag (L(frame, a, u), stm) = F.PROC{body=stm, frame=frame}
+	  | frag (EMPTY, exp) = frag (outermost, exp)
+
 end

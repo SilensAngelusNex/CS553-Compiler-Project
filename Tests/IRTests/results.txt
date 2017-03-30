@@ -1,8 +1,8 @@
+Frag:
 EXP(
-	ESEQ(
-		MOVE(
-			TEMP t124,
-			CONST 0),
-		BINOP(PLUS,
-			TEMP t124,
-			CONST 3)))
+	NAME L21)
+
+
+String Frag:	"red"
+
+Done with 2frags

@@ -437,8 +437,16 @@ struct
 	* 	API							*
 	*  								*)
 
-	fun transProg exp = (
-		FindEscape.findEscape exp;
-		Printtree.printtree (TextIO.openOut "results.txt" , Translate.treeStm (#exp (transExp (Translate.outermost, ENV.base_venv, ENV.base_tenv) exp)));
-		Translate.getResult ())
+	fun transProg exp = let
+							val _ = FindEscape.findEscape exp;
+							val level =  Translate.outermost
+							val main =  Translate.treeStm (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
+							val frags = Translate.getResult ()
+							val frags = Translate.frag(level, main)::frags
+							val out = TextIO.openOut "results.txt"
+						in
+							Printtree.printfrags(out, frags);
+							frags
+						end
+
 end

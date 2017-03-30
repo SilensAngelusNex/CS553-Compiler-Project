@@ -393,12 +393,14 @@ struct
                                                  }))
 
 
-            and munchArgs(0, arg::args) = (munchStm(T.MOVE(T.MEM(T.TEMP Frame.SP), arg)); munchArgs (1, args))
-              | munchArgs(1, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A0, arg)); Frame.A0)::munchArgs (2, args)
-              | munchArgs(2, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A1, arg)); Frame.A0)::munchArgs (3, args)
-              | munchArgs(3, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A2, arg)); Frame.A0)::munchArgs (4, args)
-              | munchArgs(4, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A3, arg)); Frame.A0)::munchArgs (5, args)
-              | munchArgs(i, arg::args) = (munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS, T.TEMP Frame.SP, T.CONST(4 * (i - 4)))), arg)); munchArgs (i + 1, args))
+            and munchArgs(0, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A0, arg)); Frame.A0)::munchArgs (1, args)
+              | munchArgs(1, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A1, arg)); Frame.A1)::munchArgs (2, args)
+              | munchArgs(2, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A2, arg)); Frame.A2)::munchArgs (3, args)
+              | munchArgs(3, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A3, arg)); Frame.A3)::munchArgs (4, args)
+              | munchArgs(i, arg::args) = (munchStm(T.SEQ(
+				  											T.MOVE(T.TEMP Frame.SP, T.BINOP(T.PLUS, Frame.SP, T.CONST(4))),
+				  											T.MOVE(T.MEM(T.TEMP Frame.SP), arg)));
+										  munchArgs (i + 1, args))
               | munchArgs(i, []) = []
         in
             munchStm stm;
