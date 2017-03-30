@@ -32,7 +32,10 @@ struct
 	val FP = case List.nth (specialregs, 5) of (temp, name) => temp
 	val RV = case List.nth (specialregs, 6) of (temp, name) => temp
 	val RA = case List.nth (specialregs, 7) of (temp, name) => temp
-
+	val A0 = case List.nth (argregs, 0) of (temp, name) => temp
+	val A1 = case List.nth (argregs, 1) of (temp, name) => temp
+	val A2 = case List.nth (argregs, 2) of (temp, name) => temp
+	val A3 = case List.nth (argregs, 3) of (temp, name) => temp
 
 	val wordSize = 4
 
