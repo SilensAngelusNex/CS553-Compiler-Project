@@ -1,0 +1,16 @@
+EXP(
+	ESEQ(
+		SEQ(
+			JUMP(
+				NAME L354),
+			SEQ(
+				LABEL L354,
+				SEQ(
+					MOVE(
+						TEMP t375,
+						CONST 3),
+					JUMP(
+						NAME L355)))),
+		ESEQ(
+			LABEL L355,
+			TEMP t375)))
