@@ -20,6 +20,7 @@ sig
 
 	val string : (Temp.label * string) -> string
 	val name : frame -> string
+	val label : frame -> Temp.label
 	val wordSize: int
 	val exp : access -> Tree.exp -> Tree.exp
 	val newFrame  : {name: Temp.label, formals: bool list} -> frame

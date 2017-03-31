@@ -1,34 +1,34 @@
-L166:		.asciiz		"str2"
-L165:		.asciiz		" "
-L164:		.asciiz		"str"
-L168:
+L140:		.asciiz		"str2"
+L139:		.asciiz		" "
+L138:		.asciiz		"str"
+L137:
 	move	t108, t105
-	addi	t290, t286, 1
-	add	 t109, t290, t100
-	jal L160
+	addi	t301, t297, 1
+	add	 t109, t301, t100
+	jal L136
 
-	addi	t291, t100, 0
-	add	 t106, t291, t100
-	j	 L167
+	addi	t302, t100, 0
+	add	 t106, t302, t100
+	jr	 t107
 
-L167:
-L170:
+L141:
+L136:
 	move	t108, t105
-	move	t109, t284
+	move	t109, t295
 	add	t110, t100, t100
-	jal L163
+	jal L137
 
 	add	t106, t100, t100
-	j	 L169
+	jr	 t107
 
-L169:
-L172:
+L142:
+tig_main:
 	move	t108, t105
-	addi	t294, t100, 0
-	add	 t109, t294, t100
+	addi	t305, t100, 0
+	add	 t109, t305, t100
 	add	t110, t100, t100
-	jal L163
+	jal L137
 
-	j	 L171
+	j	 L143
 
-L171:
+L143:

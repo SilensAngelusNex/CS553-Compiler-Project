@@ -421,7 +421,7 @@ struct
 																									   	  | SOME(ENV.VarEntry (_))						=> (ErrorMsg.error pos("Given name is a variable name: " ^ (Symbol.name name)); (venv, tenv))
 																										  | SOME(ENV.FunEntry {level=level, label=_, formals=f,result=ty})	=>  let
 																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
-																																											val accesses = Translate.getLevelArgs level
+																																											val accesses, label = Translate.getLevelInfo level
 																																											val venv'' = foldl (fn (({name=s, ty=ty, escape=esc}, a), t) => Symbol.enter (t, s, ENV.VarEntry{access=a, ty=ty})) venv' (ListPair.zip (paramList, accesses))
 																													  														val {exp=exp,ty=ty1} = transExp (level, venv'', tenv') body
 																																											val result = Translate.transBody (exp, level)

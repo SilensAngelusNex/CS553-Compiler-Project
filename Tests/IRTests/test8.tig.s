@@ -1,33 +1,33 @@
-L234:
-	addi	t610, t552, 10
-	addi	 t609, t610, ~20
-	addi	t611, t552, 31
-	srlv	 t608, t609, t611	add	 t604, t608, t552
-	addi	t612, t552, 0
-	beq	 t604, t612, L228
-j L227
-L228:
-	addi	t613, t552, 1
-	add	 t605, t613, t552
-L229:
-	move	t606, t605
-	addi	t614, t552, 0
-	beq	 t606, t614, L231
-j L230
-L231:
-	addi	t615, t552, 40
-	add	 t607, t615, t552
-L232:
-	j	 L233
+tig_main:
+	addi	t326, t100, 10
+	addi	 t325, t326, ~20
+	addi	t327, t100, 31
+	srlv	 t324, t325, t327	add	 t320, t324, t100
+	addi	t328, t100, 0
+	beq	 t320, t328, L152
+j L151
+L152:
+	addi	t329, t100, 1
+	add	 t321, t329, t100
+L153:
+	move	t322, t321
+	addi	t330, t100, 0
+	beq	 t322, t330, L155
+j L154
+L155:
+	addi	t331, t100, 40
+	add	 t323, t331, t100
+L156:
+	j	 L157
 
-L227:
-	addi	t616, t552, 0
-	add	 t605, t616, t552
-	j	 L229
+L151:
+	addi	t332, t100, 0
+	add	 t321, t332, t100
+	j	 L153
 
-L230:
-	addi	t617, t552, 30
-	add	 t607, t617, t552
-	j	 L232
+L154:
+	addi	t333, t100, 30
+	add	 t323, t333, t100
+	j	 L156
 
-L233:
+L157:

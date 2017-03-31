@@ -14,7 +14,8 @@ struct
 	fun regTemps l = (map (fn (name) => (Temp.newtemp (), name)) l)
 	fun getTemps l = (map (fn (temp, name) => temp) l)
 
-	fun name (t, l, i) = Symbol.name t 
+	fun name (t, l, i) = Symbol.name t
+	fun label (t, l, i) = t
 
 	val specialregs = regTemps ["$zero", "$at", "$v0", "$v1", "$gp", "$sp", "$fp", "$ra"]
 	val argregs = regTemps ["$a0", "$a1", "$a2", "$a3"]

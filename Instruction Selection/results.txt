@@ -1,42 +1,69 @@
-String Frag:	"str2"
-
-String Frag:	" "
-
-String Frag:	"str"
-
 Frag:
-MOVE(
-	TEMP t106,
-	ESEQ(
-		EXP(
-			CALL(
-				NAME L160,
-					TEMP t105,
-					BINOP(PLUS,
-						TEMP t286,
-						CONST 1))),
-		CONST 0))
-
-
-Frag:
-MOVE(
-	TEMP t106,
-	ESEQ(
-		EXP(
-			CALL(
-				NAME L163,
-					TEMP t105,
-					TEMP t284,
-					NAME L164)),
-		NAME L165))
-
-
-Frag:
-EXP(
-	CALL(
-		NAME L163,
-			TEMP t105,
-			CONST 0,
-			NAME L166))
+SEQ(
+	LABEL tig_main,
+	EXP(
+		ESEQ(
+			SEQ(
+				SEQ(
+					MOVE(
+						TEMP t322,
+						ESEQ(
+							SEQ(
+								SEQ(
+									MOVE(
+										TEMP t320,
+										BINOP(RSHIFT,
+											BINOP(MINUS,
+												CONST 10,
+												CONST 20),
+											CONST 31)),
+									CJUMP(NE,
+										TEMP t320,
+										CONST 0,
+										L151,L152)),
+								SEQ(
+									SEQ(
+										LABEL L151,
+										SEQ(
+											MOVE(
+												TEMP t321,
+												CONST 0),
+											JUMP(
+												NAME L153))),
+									SEQ(
+										LABEL L152,
+										SEQ(
+											MOVE(
+												TEMP t321,
+												CONST 1),
+											JUMP(
+												NAME L153))))),
+							ESEQ(
+								LABEL L153,
+								TEMP t321))),
+					CJUMP(NE,
+						TEMP t322,
+						CONST 0,
+						L154,L155)),
+				SEQ(
+					SEQ(
+						LABEL L154,
+						SEQ(
+							MOVE(
+								TEMP t323,
+								CONST 30),
+							JUMP(
+								NAME L156))),
+					SEQ(
+						LABEL L155,
+						SEQ(
+							MOVE(
+								TEMP t323,
+								CONST 40),
+							JUMP(
+								NAME L156))))),
+			ESEQ(
+				LABEL L156,
+				TEMP t323))))
 
 

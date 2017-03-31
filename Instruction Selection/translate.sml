@@ -14,14 +14,14 @@ struct
 
 	type access = level * F.access
 
-	val outermost = L(F.newFrame {name=Temp.namedlabel "tig-main", formals=[true]}, EMPTY, ref ())
+	val outermost = L(F.newFrame {name=Temp.namedlabel "tig_main", formals=[true]}, EMPTY, ref ())
 
 	val fragList: F.frag list ref = ref []
 
 	fun getResult () = let val result = !fragList in fragList := []; result end
 
-	fun getLevelArgs (L(frame, p, u)) = map (fn frameAccess => (L(frame, p, u) , frameAccess)) (F.formals frame)
-	  | getLevelArgs EMPTY = []
+	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (F.formals frame), (F.label frame))
+	  | getLevelInfo EMPTY = ([], Temp.newlabel ())
 
 	fun newLevel {parent=parent, name=name, formals=formals} = let
 																	val n = F.newFrame {name=name, formals=true::formals}
@@ -321,7 +321,8 @@ struct
 	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
-	fun transBody (exp, level) = transAssign (Ex(T.TEMP F.RV), exp, level)
+	fun transBody (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(transAssign (Ex(T.TEMP F.RV), exp, L(frame, p, u)))), T.JUMP(T.TEMP (F.RA), [])))
+	fun transProc (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
 
 
 	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())
@@ -329,7 +330,7 @@ struct
 
 	fun treeStm a = unNx a
 
-	fun frag (L(frame, a, u), stm) = F.PROC{body=stm, frame=frame}
+	fun frag (L(frame, a, u), stm) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), stm), frame=frame}
 	  | frag (EMPTY, exp) = frag (outermost, exp)
 
 end

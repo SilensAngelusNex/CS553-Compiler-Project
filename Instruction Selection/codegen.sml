@@ -100,16 +100,16 @@ struct
                         dst=[],
                         jump=SOME([a])
                     })
-              | munchStm(T.JUMP(e1, tLst)) = (* dasfbshdajbfkjhsdbfkjhasdbkj *)
+              | munchStm(T.JUMP(e1, tLst)) =
                 emit(A.OPER{
-                        assem="\tj\t 's0\n\n",
-                        src=[munchExp e1, Frame.R0],
+                        assem="\tjr\t 's0\n\n",
+                        src=[munchExp e1],
                         dst=[],
                         jump=SOME(tLst)
                     })
               | munchStm(T.CJUMP(T.EQ, e1, e2, l1, l2)) =
                 emit(A.OPER{
-                        assem="\tbeq\t 's0, 's1, " ^ l1 ^ "\nj " ^ l2 ^ "\n" ,
+                        assem="\tbeq\t 's0, 's1, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                         src=[munchExp e1, munchExp e2],
                         dst=[],
                         jump=SOME([l1, l2])

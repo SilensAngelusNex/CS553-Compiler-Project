@@ -69,7 +69,7 @@ struct
 	  | printfrag out (F.STRING(l, s)) = TextIO.output(out, ("String Frag:\t\"" ^ s ^ "\"\n\n"))
 
 	(*
-	fun printfraghelp (out, 0, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ((Int.toString (1 + List.length frags)) ^ "Tig-Main:" ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, 1, frags))
+	fun printfraghelp (out, 0, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ((Int.toString (1 + List.length frags)) ^ "Tig_Main:" ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, 1, frags))
 	  | printfraghelp (out, i, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ("Frag:\t\t" ^ (Int.toString i) ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, i+1, frags))
 	  | printfraghelp (out, i, (F.STRING(l, s))::frags) = (TextIO.output(out, ("String Frag:\t\"" ^ s ^ "\"\n\n")); printfraghelp (out, i, frags))
 	  | printfraghelp (out, i, []) = TextIO.output(out, ("End"))
