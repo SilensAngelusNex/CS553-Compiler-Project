@@ -8,14 +8,15 @@ structure Main = struct
 
     fun getsome (SOME x) = x
 
-    fun emitproc out (F.STRING(lab,s)) = TextIO.output(out, s ^ "\n")
+    fun emitproc out (F.STRING(lab,s)) = TextIO.output(out, F.string(lab,s))
       | emitproc out (F.PROC{body,frame}) =
         let
-            val _ = print ("emit " ^ "F.name frame" ^ "\n")
+            val _ = print ("emit " ^ F.name frame ^ "\n")
             (*         val _ = Printtree.printtree(out,body); *)
             val stms = C.linearize body
-            (*         val _ = app (fn s => Printtree.printtree(out,s)) stms; *)
+            (*  val _ = app (fn s => Printtree.printtree(out,s)) stms   *)
             val stms' = C.traceSchedule(C.basicBlocks stms)
+            (*  val _ = app (fn s => Printtree.printtree(out,s)) stms'    *)
             val instrs =   List.concat(map (G.codegen frame) stms')
             val format0 = Assem.format(Temp.makestring)
             val x = print ("instrus length: " ^ (Int.toString (List.length (instrs))) ^"\n")

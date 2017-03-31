@@ -14,6 +14,8 @@ struct
 	fun regTemps l = (map (fn (name) => (Temp.newtemp (), name)) l)
 	fun getTemps l = (map (fn (temp, name) => temp) l)
 
+	fun name (t, l, i) = Symbol.name t 
+
 	val specialregs = regTemps ["$zero", "$at", "$v0", "$v1", "$gp", "$sp", "$fp", "$ra"]
 	val argregs = regTemps ["$a0", "$a1", "$a2", "$a3"]
 	val callersaves = regTemps ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9"]
@@ -24,6 +26,8 @@ struct
 	val tempMap = foldl (fn ((temp, name), table) => Temp.Table.enter (table, temp, (temp, name)))
 					(Temp.Table.empty)
 					(specialregs@argregs@callersaves@calleesaves)
+
+ 	fun string (lab, str) = lab ^ ":" ^ "\t\t.asciiz\t\t" ^ "\"" ^ str ^ "\"\n"
 
 	val R0 = case List.nth (specialregs, 0) of (temp, name) => temp
 	val V0 = case List.nth (specialregs, 2) of (temp, name) => temp

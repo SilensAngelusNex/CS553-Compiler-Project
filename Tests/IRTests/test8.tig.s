@@ -1,34 +1,33 @@
-L43:
-	addi	'd0, 's0, 10
-	addi	'd0, 's0, ~20
-	addi	'd0, 's0, 31
-	srlv	'd0, 's0, 's1
-	add		'd0, 's0, 's1
-	addi	'd0, 's0, 0
-	beq		's0, 's1, L37
-	j L36
-L37:
-	addi	'd0, 's0, 1
-	add	 'd0, 's0, 's1
-L38:
-	move	'd0, 's0
-	addi	'd0, 's0, 0
-	beq	 's0, 's1, L40
-	j L39
-L40:
-	addi	'd0, 's0, 40
-	add	 'd0, 's0, 's1
-L41:
-	j	 L42
+L234:
+	addi	t610, t552, 10
+	addi	 t609, t610, ~20
+	addi	t611, t552, 31
+	srlv	 t608, t609, t611	add	 t604, t608, t552
+	addi	t612, t552, 0
+	beq	 t604, t612, L228
+j L227
+L228:
+	addi	t613, t552, 1
+	add	 t605, t613, t552
+L229:
+	move	t606, t605
+	addi	t614, t552, 0
+	beq	 t606, t614, L231
+j L230
+L231:
+	addi	t615, t552, 40
+	add	 t607, t615, t552
+L232:
+	j	 L233
 
-L36:
-	addi	'd0, 's0, 0
-	add	 'd0, 's0, 's1
-	j	 L38
+L227:
+	addi	t616, t552, 0
+	add	 t605, t616, t552
+	j	 L229
 
-L39:
-	addi	'd0, 's0, 30
-	add	 'd0, 's0, 's1
-	j	 L41
+L230:
+	addi	t617, t552, 30
+	add	 t607, t617, t552
+	j	 L232
 
-L42:
+L233:

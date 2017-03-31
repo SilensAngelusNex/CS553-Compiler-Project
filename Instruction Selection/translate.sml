@@ -14,7 +14,7 @@ struct
 
 	type access = level * F.access
 
-	val outermost = L(F.newFrame {name=Temp.newlabel (), formals=[true]}, EMPTY, ref ())
+	val outermost = L(F.newFrame {name=Temp.namedlabel "tig-main", formals=[true]}, EMPTY, ref ())
 
 	val fragList: F.frag list ref = ref []
 
@@ -297,7 +297,7 @@ struct
 							val _ = (print ("String \"" ^ s ^ "\"-> fragList\n"))
 							(* put F.String(lab, s) onto frag list*)
 						in
-							fragList := !fragList@[F.STRING(lab, s)];
+							fragList := F.STRING(lab, s)::(!fragList);
 							Ex(T.NAME(lab))
 						end
 	fun transCall (l, args, level) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, level)) args)))

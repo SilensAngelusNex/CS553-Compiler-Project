@@ -399,8 +399,9 @@ struct
 																																	val symTy = case lookUpSymbolTENV (tenv, sym, rpos) of
 																																					SOME(ty) => ty
 																																				  | NONE => (ErrorMsg.error pos ("Unrecognized function result type") ; Types.UNDEFINED)
-																																	val nextLevel = Translate.newLevel {parent=level, name=Temp.newlabel(), formals=map (fn a => !(#escape a)) params'}
-																																	val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=symTy})
+																																	val funLabel = Temp.newlabel()
+																																	val nextLevel = Translate.newLevel {parent=level, name=funLabel, formals=map (fn a => !(#escape a)) params'}
+																																	val fnDec = ENV.FunEntry({level=nextLevel, label=funLabel, formals=map #ty params', result=symTy})
 																																	val venv' = Symbol.enter (venv, name, fnDec)
 																																in
 																																	(venv', tenv, params'::paramList)
@@ -408,8 +409,9 @@ struct
 		| processFunctionHeaders (level, {name=name,params=params,result=NONE,body=body,pos=pos}, (venv, tenv, paramList)) = 	let
 																													val x = Int.toString pos
 																													val (params', m) = foldr (fn (p,acc) => transparam(p, tenv, acc)) ([], M.empty) params
-																													val nextLevel = Translate.newLevel {parent=level, name=Temp.newlabel(), formals=map (fn a => !(#escape a)) params'}
-																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=Types.UNIT})
+																													val funLabel = Temp.newlabel()
+																													val nextLevel = Translate.newLevel {parent=level, name=funLabel, formals=map (fn a => !(#escape a)) params'}
+																													val fnDec = ENV.FunEntry({level=nextLevel, label=funLabel, formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
 
 																												in
@@ -444,7 +446,7 @@ struct
 							val level =  Translate.outermost
 							val main =  Translate.treeStm (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
 							val frags = Translate.getResult ()
-							val frags = Translate.frag(level, main)::frags
+							val frags = frags@[Translate.frag(level, main)]
 							val out = TextIO.openOut "results.txt"
 						in
 							Printtree.printfrags(out, frags);

@@ -1,67 +1,42 @@
+String Frag:	"str2"
+
+String Frag:	" "
+
+String Frag:	"str"
+
+Frag:
+MOVE(
+	TEMP t106,
+	ESEQ(
+		EXP(
+			CALL(
+				NAME L160,
+					TEMP t105,
+					BINOP(PLUS,
+						TEMP t286,
+						CONST 1))),
+		CONST 0))
+
+
+Frag:
+MOVE(
+	TEMP t106,
+	ESEQ(
+		EXP(
+			CALL(
+				NAME L163,
+					TEMP t105,
+					TEMP t284,
+					NAME L164)),
+		NAME L165))
+
+
 Frag:
 EXP(
-	ESEQ(
-		SEQ(
-			SEQ(
-				MOVE(
-					TEMP t175,
-					ESEQ(
-						SEQ(
-							SEQ(
-								MOVE(
-									TEMP t173,
-									BINOP(RSHIFT,
-										BINOP(MINUS,
-											CONST 10,
-											CONST 20),
-										CONST 31)),
-								CJUMP(NE,
-									TEMP t173,
-									CONST 0,
-									L36,L37)),
-							SEQ(
-								SEQ(
-									LABEL L36,
-									SEQ(
-										MOVE(
-											TEMP t174,
-											CONST 0),
-										JUMP(
-											NAME L38))),
-								SEQ(
-									LABEL L37,
-									SEQ(
-										MOVE(
-											TEMP t174,
-											CONST 1),
-										JUMP(
-											NAME L38))))),
-						ESEQ(
-							LABEL L38,
-							TEMP t174))),
-				CJUMP(NE,
-					TEMP t175,
-					CONST 0,
-					L39,L40)),
-			SEQ(
-				SEQ(
-					LABEL L39,
-					SEQ(
-						MOVE(
-							TEMP t176,
-							CONST 30),
-						JUMP(
-							NAME L41))),
-				SEQ(
-					LABEL L40,
-					SEQ(
-						MOVE(
-							TEMP t176,
-							CONST 40),
-						JUMP(
-							NAME L41))))),
-		ESEQ(
-			LABEL L41,
-			TEMP t176)))
+	CALL(
+		NAME L163,
+			TEMP t105,
+			CONST 0,
+			NAME L166))
 
 

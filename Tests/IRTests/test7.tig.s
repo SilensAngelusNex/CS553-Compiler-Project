@@ -1,37 +1,34 @@
-L29:
-L24
-	move	'd0, 's0
-	addi	'd0, 's0, 0
-	add	 'd0, 's0, 's1
-	add	'd0, 's0, 's1
-	jal 's0
+L166:		.asciiz		"str2"
+L165:		.asciiz		" "
+L164:		.asciiz		"str"
+L168:
+	move	t108, t105
+	addi	t290, t286, 1
+	add	 t109, t290, t100
+	jal L160
 
-	j	 L28
+	addi	t291, t100, 0
+	add	 t106, t291, t100
+	j	 L167
 
-L28:
-L31:
-L22
-	move	'd0, 's0
-	addi	'd0, 's0, 1
-	add	 'd0, 's0, 's1
-	jal 's0
+L167:
+L170:
+	move	t108, t105
+	move	t109, t284
+	add	t110, t100, t100
+	jal L163
 
-	addi	'd0, 's0, 0
-	add	 'd0, 's0, 's1
-	j	 L30
+	add	t106, t100, t100
+	j	 L169
 
-L30:
-str
- 
-L33:
-L24
-	move	'd0, 's0
-	move	'd0, 's0
-	add	'd0, 's0, 's1
-	jal 's0
+L169:
+L172:
+	move	t108, t105
+	addi	t294, t100, 0
+	add	 t109, t294, t100
+	add	t110, t100, t100
+	jal L163
 
-	add	'd0, 's0, 's1
-	j	 L32
+	j	 L171
 
-L32:
-str2
+L171:

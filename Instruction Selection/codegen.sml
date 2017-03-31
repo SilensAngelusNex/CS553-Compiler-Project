@@ -212,7 +212,7 @@ struct
 
 
             and munchExp(T.TEMP t): Assem.temp = t
-              | munchExp(T.NAME l) = result (fn r => emit(A.LABEL { assem=l ^ "\n", lab=l }))
+              (*| munchExp(T.NAME l) = result (fn r => emit(A.LABEL { assem=l ^ "\n", lab=l }))*)
               | munchExp(T.CONST(i)) =
                   result (fn r => emit(A.OPER {
                                                 assem="\taddi\t'd0, 's0, " ^ Int.toString i ^"\n",
@@ -383,13 +383,13 @@ struct
                                                  })
                         )
               | munchExp(T.ESEQ(stm1, e1)) = (munchStm stm1; munchExp e1)
-              | munchExp(T.CALL(e, args)) =
+              | munchExp(T.CALL(T.NAME(l), args)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem=(preCall () ^ "\tjal 's0\n\n" ^ postCall ()),
-                                                 src=munchExp(e)::munchArgs(0, args),
+                                                 assem=(preCall () ^ "\tjal 'j0\n\n" ^ postCall ()),
+                                                 src=munchArgs(0, args),
                                                  dst=[Frame.V0, Frame.V1],
-                                                 jump=NONE
+                                                 jump=SOME([l])
                                                  }))
 
 
