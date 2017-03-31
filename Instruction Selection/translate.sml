@@ -20,6 +20,9 @@ struct
 
 	fun getResult () = let val result = !fragList in fragList := []; result end
 
+	fun getLevelArgs (L(frame, p, u)) = map (fn frameAccess => (L(frame, p, u) , frameAccess)) (F.formals frame)
+	  | getLevelArgs EMPTY = []
+
 	fun newLevel {parent=parent, name=name, formals=formals} = let
 																	val n = F.newFrame {name=name, formals=true::formals}
 															   in
@@ -291,6 +294,7 @@ struct
 	fun transInt i = Ex(T.CONST i)
 	fun transString s = let
 							val lab = Temp.newlabel ()
+							val _ = (print ("String \"" ^ s ^ "\"-> fragList\n"))
 							(* put F.String(lab, s) onto frag list*)
 						in
 							fragList := !fragList@[F.STRING(lab, s)];
@@ -324,4 +328,8 @@ struct
 	  | procEntryExit {level=EMPTY, body=body} = ()
 
 	fun treeStm a = unNx a
+
+	fun frag (L(frame, a, u), stm) = F.PROC{body=stm, frame=frame}
+	  | frag (EMPTY, exp) = frag (outermost, exp)
+
 end

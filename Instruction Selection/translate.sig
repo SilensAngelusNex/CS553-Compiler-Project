@@ -12,7 +12,8 @@ sig
 	val procEntryExit : {level: level, body: exp} -> unit
 	structure F : FRAME
 	val getResult : unit -> F.frag list
-	val fragList : F.frag list ref
+	val frag: level * Tree.stm -> F.frag
+	val getLevelArgs : level -> access list
 
 	val transOP : Absyn.oper * exp * exp * level -> exp
 	val transSeq : exp list * level -> exp

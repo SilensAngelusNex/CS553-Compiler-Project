@@ -398,7 +398,7 @@ struct
               | munchArgs(2, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A2, arg)); Frame.A2)::munchArgs (3, args)
               | munchArgs(3, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A3, arg)); Frame.A3)::munchArgs (4, args)
               | munchArgs(i, arg::args) = (munchStm(T.SEQ(
-				  											T.MOVE(T.TEMP Frame.SP, T.BINOP(T.PLUS, Frame.SP, T.CONST(4))),
+				  											T.MOVE(T.TEMP Frame.SP, T.BINOP(T.PLUS, T.TEMP Frame.SP, T.CONST(4))),
 				  											T.MOVE(T.MEM(T.TEMP Frame.SP), arg)));
 										  munchArgs (i + 1, args))
               | munchArgs(i, []) = []

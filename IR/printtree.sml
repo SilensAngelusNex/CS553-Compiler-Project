@@ -75,6 +75,10 @@ struct
 	  | printfraghelp (out, i, []) = TextIO.output(out, ("End"))
 	 *)
 
-	fun printfrags (out, frags) = (map (printfrag out) frags; TextIO.output(out, "Done with " ^ (Int.toString (List.length frags)) ^ "frags"))
+	fun printfrags (out, frags) = (
+									(map (printfrag out) frags);
+									TextIO.flushOut out;
+									()
+								  )
 
 end

@@ -13,6 +13,7 @@ sig
 	structure F : FRAME
 	val getResult : unit -> F.frag list
 	val frag: level * Tree.stm -> F.frag
+	val getLevelArgs : level -> access list
 
 	val transOP : Absyn.oper * exp * exp * level -> exp
 	val transSeq : exp list * level -> exp

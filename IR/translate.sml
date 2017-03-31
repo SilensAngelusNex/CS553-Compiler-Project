@@ -20,6 +20,9 @@ struct
 
 	fun getResult () = let val result = !fragList in fragList := []; result end
 
+	fun getLevelArgs (L(frame, p, u)) = map (fn frameAccess => (L(frame, p, u) , frameAccess)) (F.formals frame)
+	  | getLevelArgs EMPTY = []
+
 	fun newLevel {parent=parent, name=name, formals=formals} = let
 																	val n = F.newFrame {name=name, formals=true::formals}
 															   in

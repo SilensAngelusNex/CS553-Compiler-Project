@@ -285,7 +285,7 @@ struct
 				 							LOOP(label, last) 	=> {exp=(Translate.transBreak (label)), ty=Types.UNIT}
 										  | NOLOOP 				=> ((ErrorMsg.error pos ("Break called outside of a loop.")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 
-			and trvar (A.SimpleVar(id, pos)) 			= {exp=(Translate.transSimpleVar (getVarAccess(venv, id), level)), ty=(lookUpSymbol (venv, id, pos))}
+			and trvar (A.SimpleVar(id, pos)) 			= (print (Symbol.symbol id); {exp=(Translate.transSimpleVar (getVarAccess(venv, id), level)), ty=(lookUpSymbol (venv, id, pos))})
 				| trvar (A.FieldVar(var, id, pos)) 	    = let
 															val {exp=exp,ty=ty} = trvar var
 														  in
@@ -411,6 +411,7 @@ struct
 																													val nextLevel = Translate.newLevel {parent=level, name=Temp.newlabel(), formals=map (fn a => !(#escape a)) params'}
 																													val fnDec = ENV.FunEntry({level=nextLevel, label=Temp.newlabel(), formals=map #ty params', result=Types.UNIT})
 																													val venv' = Symbol.enter (venv, name, fnDec)
+
 																												in
 																													(venv', tenv, params'::paramList)
 																												end
@@ -420,7 +421,8 @@ struct
 																									   	  | SOME(ENV.VarEntry (_))						=> (ErrorMsg.error pos("Given name is a variable name: " ^ (Symbol.name name)); (venv, tenv))
 																										  | SOME(ENV.FunEntry {level=level, label=_, formals=f,result=ty})	=>  let
 																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
-																																											val venv'' = foldl (fn ({name=s, ty=ty, escape=esc}, t) => Symbol.enter (t, s, ENV.VarEntry{access=Translate.allocLocal (level) (!esc), ty=ty})) venv' paramList
+																																											val accesses = Translate.getLevelArgs level
+																																											val venv'' = foldl (fn (({name=s, ty=ty, escape=esc}, a), t) => Symbol.enter (t, s, ENV.VarEntry{access=a, ty=ty})) venv' (ListPair.zip (paramList, accesses))
 																													  														val {exp=exp,ty=ty1} = transExp (level, venv'', tenv') body
 																																											val result = Translate.transBody (exp, level)
 
@@ -437,8 +439,16 @@ struct
 	* 	API							*
 	*  								*)
 
-	fun transProg exp = (
-		FindEscape.findEscape exp;
-		Printtree.printtree (TextIO.openOut "results.txt" , Translate.treeStm (#exp (transExp (Translate.outermost, ENV.base_venv, ENV.base_tenv) exp)));
-		Translate.getResult ())
+	fun transProg exp = let
+							val _ = FindEscape.findEscape exp;
+							val level =  Translate.outermost
+							val main =  Translate.treeStm (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
+							val frags = Translate.getResult ()
+							val frags = Translate.frag(level, main)::frags
+							val out = TextIO.openOut "results.txt"
+						in
+							Printtree.printfrags(out, frags);
+							frags
+						end
+
 end

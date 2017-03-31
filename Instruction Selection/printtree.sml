@@ -1,7 +1,7 @@
 structure Printtree :
      sig
 	 	val printtree : TextIO.outstream * Tree.stm -> unit
-		val printfrags : TextIO.outstream * Tree.stm -> unit
+		val printfrags : TextIO.outstream * MIPSFrame.frag list -> unit
 	end =
 struct
 	structure T = Tree
@@ -65,9 +65,20 @@ struct
 			stm(s0,0); sayln ""; TextIO.flushOut outstream
 		end
 
-	fun printfraghelp (out, i, (PROC{body=b, frame=_})::frags) = (TextIO.output(outstream, ("Frag:\t\t" ^ (Int.toString i))); printtree b; TextIO.output(outstream, "\n\n"); printfraghelp (out, i+1, frags))
-	  | printfraghelp (out, i, (STRING(l, s))::frags) = (TextIO.output(outstream, ("String Frag:\t" ^ s)); TextIO.output(outstream, "\n\n"); printfraghelp (out, i, frags))
-	  | printfraghelp (out, i, []) = ()
+	fun printfrag out (F.PROC{body=b, frame=_}) = (TextIO.output(out, ("Frag:\n")); printtree (out, b); TextIO.output(out, "\n\n"))
+	  | printfrag out (F.STRING(l, s)) = TextIO.output(out, ("String Frag:\t\"" ^ s ^ "\"\n\n"))
 
-	fun printfrag (out, frags) = printfraghelp (out, 1, frags)
+	(*
+	fun printfraghelp (out, 0, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ((Int.toString (1 + List.length frags)) ^ "Tig-Main:" ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, 1, frags))
+	  | printfraghelp (out, i, (F.PROC{body=b, frame=_})::frags) = (TextIO.output(out, ("Frag:\t\t" ^ (Int.toString i) ^ "\n")); printtree (out, b); TextIO.output(out, "\n\n"); printfraghelp (out, i+1, frags))
+	  | printfraghelp (out, i, (F.STRING(l, s))::frags) = (TextIO.output(out, ("String Frag:\t\"" ^ s ^ "\"\n\n")); printfraghelp (out, i, frags))
+	  | printfraghelp (out, i, []) = TextIO.output(out, ("End"))
+	 *)
+
+	fun printfrags (out, frags) = (
+									(map (printfrag out) frags);
+									TextIO.flushOut out;
+									()
+								  )
+
 end
