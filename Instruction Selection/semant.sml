@@ -285,7 +285,7 @@ struct
 				 							LOOP(label, last) 	=> {exp=(Translate.transBreak (label)), ty=Types.UNIT}
 										  | NOLOOP 				=> ((ErrorMsg.error pos ("Break called outside of a loop.")); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 
-			and trvar (A.SimpleVar(id, pos)) 			= (print (Symbol.symbol id); {exp=(Translate.transSimpleVar (getVarAccess(venv, id), level)), ty=(lookUpSymbol (venv, id, pos))})
+			and trvar (A.SimpleVar(id, pos)) 			= {exp=(Translate.transSimpleVar (getVarAccess(venv, id), level)), ty=(lookUpSymbol (venv, id, pos))}
 				| trvar (A.FieldVar(var, id, pos)) 	    = let
 															val {exp=exp,ty=ty} = trvar var
 														  in

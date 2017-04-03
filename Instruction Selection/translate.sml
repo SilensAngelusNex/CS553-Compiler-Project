@@ -294,7 +294,6 @@ struct
 	fun transInt i = Ex(T.CONST i)
 	fun transString s = let
 							val lab = Temp.newlabel ()
-							val _ = (print ("String \"" ^ s ^ "\"-> fragList\n"))
 							(* put F.String(lab, s) onto frag list*)
 						in
 							fragList := F.STRING(lab, s)::(!fragList);
@@ -322,7 +321,9 @@ struct
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
 	fun transBody (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(transAssign (Ex(T.TEMP F.RV), exp, L(frame, p, u)))), T.JUMP(T.TEMP (F.RA), [])))
+	  | transBody (exp, EMPTY) =  Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(transAssign (Ex(T.TEMP F.RV), exp, EMPTY))), T.JUMP(T.TEMP (F.RA), [])))
 	fun transProc (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
+	  | transProc (exp, EMPTY) = Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
 
 
 	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())
