@@ -300,16 +300,54 @@ struct
 							Ex(T.NAME(lab))
 						end
 	fun transCall (l, args, level) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, level)) args)))
+
+	fun transRel (oper, ex1, ex2, resultT, resultF) = let
+														val result = Temp.newtemp ()
+														val t = Temp.newlabel ()
+														val f = Temp.newlabel ()
+														val e = Temp.newlabel ()
+													  in
+													  	Ex(
+															T.ESEQ(
+																T.SEQ(
+																	T.CJUMP(oper, ex1, ex2, t, f),
+																	T.SEQ(
+																		T.SEQ(
+																			T.LABEL(t),
+																			T.SEQ(
+																				T.MOVE(
+																					T.TEMP(result),
+																					resultT)
+																				,
+																				T.JUMP(T.LABEL(e), [e]))),
+																		T.SEQ(
+																			T.LABEL(f),
+																			T.SEQ(
+																				T.MOVE(
+																					T.TEMP(result),
+																					resultF)
+																				,
+																				T.JUMP(T.LABEL(e), [e])))
+																		)
+																	),
+																T.ESEQ(
+																	T.LABEL(e),
+																	T.TEMP(result)
+																	)
+																)
+															)
+													  end
+
 	fun transOP (A.PlusOp, e1, e2, level) 	 = Ex(T.BINOP(T.PLUS, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.MinusOp, e1, e2, level)	 = Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.TimesOp, e1, e2, level)	 = Ex(T.BINOP(T.MUL, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.DivideOp, e1, e2, level) = Ex(T.BINOP(T.DIV, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.EqOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)), level)
-	  | transOP (A.NeqOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)), level)
-	  | transOP (A.LtOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)), level)
-	  | transOP (A.LeOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2, level), unEx(e1, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)), level)
-	  | transOP (A.GtOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 0), SOME(Ex(T.CONST 1)), level)
-	  | transOP (A.GeOp, e1, e2, level) 	 = transIf(Ex(T.BINOP(T.RSHIFT, T.BINOP(T.MINUS, unEx(e2, level), unEx(e1, level)), T.CONST(F.wordSize * 8 - 1))), Ex(T.CONST 1), SOME(Ex(T.CONST 0)), level)
+	  | transOP (A.DivideOp, e1, e2, level)  = Ex(T.BINOP(T.DIV, unEx(e1, level), unEx(e2, level)))
+	  | transOP (A.EqOp, e1, e2, level) 	 = transRel(T.EQ, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
+	  | transOP (A.NeqOp, e1, e2, level) 	 = transRel(T.NE, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
+	  | transOP (A.LtOp, e1, e2, level) 	 = transRel(T.LT, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
+	  | transOP (A.LeOp, e1, e2, level) 	 = transRel(T.LE, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
+	  | transOP (A.GtOp, e1, e2, level) 	 = transRel(T.GT, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
+	  | transOP (A.GeOp, e1, e2, level) 	 = transRel(T.GE, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
 
 	fun transSeq (a::[], level) = Ex(unEx(a, level))
 	  | transSeq (a::l, level) = Ex(T.ESEQ(unNx(a), unEx(transSeq(l, level), level)))

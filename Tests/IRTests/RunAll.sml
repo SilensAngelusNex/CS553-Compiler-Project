@@ -1,8 +1,8 @@
-CM.make "../../IR/sources.cm";
+CM.make "../../Instruction Selection/sources.cm";
 
 fun run fileName =
 	let
-		val result = (print ("Running test: \t" ^ fileName ^ "\n"); Main.main (fileName ^ ".tig"))
+		val result = (print ("Running test: \t" ^ fileName ^ "\n"); Main.compile (fileName ^ ".tig"))
 	in
 		print ("Done test: \t" ^ fileName ^ "\n\n\n\n")
 	end

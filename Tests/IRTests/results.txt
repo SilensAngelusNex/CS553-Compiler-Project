@@ -1,67 +1,55 @@
 Frag:
-EXP(
-	ESEQ(
-		SEQ(
-			SEQ(
-				MOVE(
-					TEMP t126,
-					ESEQ(
-						SEQ(
-							SEQ(
-								MOVE(
-									TEMP t124,
-									BINOP(RSHIFT,
-										BINOP(MINUS,
-											CONST 10,
-											CONST 20),
-										CONST 31)),
-								CJUMP(NE,
-									TEMP t124,
-									CONST 0,
-									L21,L22)),
-							SEQ(
-								SEQ(
-									LABEL L21,
-									SEQ(
-										MOVE(
-											TEMP t125,
-											CONST 0),
-										JUMP(
-											NAME L23))),
-								SEQ(
-									LABEL L22,
-									SEQ(
-										MOVE(
-											TEMP t125,
-											CONST 1),
-										JUMP(
-											NAME L23))))),
-						ESEQ(
-							LABEL L23,
-							TEMP t125))),
-				CJUMP(NE,
-					TEMP t126,
-					CONST 0,
-					L24,L25)),
-			SEQ(
-				SEQ(
-					LABEL L24,
-					SEQ(
-						MOVE(
-							TEMP t127,
-							CONST 30),
-						JUMP(
-							NAME L26))),
-				SEQ(
-					LABEL L25,
-					SEQ(
-						MOVE(
-							TEMP t127,
-							CONST 40),
-						JUMP(
-							NAME L26))))),
+SEQ(
+	LABEL tig_main,
+	EXP(
 		ESEQ(
-			LABEL L26,
-			TEMP t127)))
+			SEQ(
+				SEQ(
+					MOVE(
+						TEMP t153,
+						ESEQ(
+							SEQ(
+								CJUMP(GT,
+									CONST 10,
+									CONST 20,
+									L20,L21),
+								SEQ(
+									SEQ(
+										LABEL L20,
+										MOVE(
+											TEMP t152,
+											CONST 1)),
+									SEQ(
+										LABEL L21,
+										MOVE(
+											TEMP t152,
+											CONST 0)))),
+							ESEQ(
+								LABEL L22,
+								TEMP t152))),
+					CJUMP(NE,
+						TEMP t153,
+						CONST 0,
+						L23,L24)),
+				SEQ(
+					SEQ(
+						LABEL L23,
+						SEQ(
+							MOVE(
+								TEMP t154,
+								CONST 30),
+							JUMP(
+								NAME L25))),
+					SEQ(
+						LABEL L24,
+						SEQ(
+							MOVE(
+								TEMP t154,
+								CONST 40),
+							JUMP(
+								NAME L25))))),
+			ESEQ(
+				LABEL L25,
+				TEMP t154))))
 
 
