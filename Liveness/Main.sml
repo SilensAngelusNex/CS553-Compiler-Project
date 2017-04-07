@@ -8,20 +8,18 @@ structure Main = struct
 
     fun getsome (SOME x) = x
 
-    fun emitproc out (F.STRING(lab,s)) = TextIO.output(out, F.string(lab,s))
-      | emitproc out (F.PROC{body,frame}) =
-        let
-            (*  val _ = print ("emit " ^ F.name frame ^ "\n")
-            val _ = Printtree.printtree(out,body); *)
-            val stms = C.linearize body
-            val stms' = C.traceSchedule(C.basicBlocks stms)
-            val instrs =   List.concat(map (G.codegen frame) stms')
-            val graph = MakeGraph.instr2graph instrs
-            val format0 = Assem.format(Temp.makestring)
-            (*  val x = print ("instrus length: " ^ (Int.toString (List.length (instrs))) ^"\n")    *)
-        in
-            app (fn i => TextIO.output(out,format0 i)) instrs
-        end
+    fun emitproc out instrs = app (fn i => TextIO.output(out, Assem.format(Temp.makestring) i)) instrs;
+
+    fun processFrag (F.STRING(lab,s), instrs) = (print ("String Frag: " ^ F.string(lab,s)); instrs) (* should emit? *)
+      | processFrag (F.PROC{body,frame}, instrs) =
+            let
+                val stms     = C.linearize body
+                val stms'    = C.traceSchedule(C.basicBlocks stms)
+                val instrs'  = List.concat(map (G.codegen frame) stms')
+            in
+                instrs@instrs'
+            end
+
 
     fun withOpenFile fname f =
         let
@@ -35,8 +33,10 @@ structure Main = struct
             val absyn = Parse.parse filename
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
             val x = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
+            val instrs = (foldl processFrag [] frags)
+            val graph = MakeGraph.instr2graph instrs
         in
-            withOpenFile (filename ^ ".s") (fn out => (app (emitproc out) frags))
+            withOpenFile (filename ^ ".s") (fn out => emitproc out instrs)
         end
 
 end

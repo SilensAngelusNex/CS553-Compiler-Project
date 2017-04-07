@@ -24,9 +24,9 @@ struct
 
 
 
-	val tempMap = foldl (fn ((temp, name), table) => Temp.Table.enter (table, temp, (temp, name)))
+	(*val tempMap = foldl (fn ((temp, name), table) => Temp.Table.enter (table, temp, (temp, name)))
 					(Temp.Table.empty)
-					(specialregs@argregs@callersaves@calleesaves)
+					(specialregs@argregs@callersaves@calleesaves)*)
 
  	fun string (lab, str) = lab ^ ":" ^ "\t\t.asciiz\t\t" ^ "\"" ^ str ^ "\"\n"
 
@@ -96,7 +96,7 @@ struct
 				epilog="END " ^ Symbol.name name ^ "\n"
 			}
 
-	fun tempName t: string = case Temp.Table.look (tempMap, t) of
+	(*fun tempName t: string = case Temp.Table.look (tempMap, t) of
 							SOME(temp, name) => name
-						  | NONE => Temp.makestring t
+						  | NONE => Temp.makestring t*)
 end

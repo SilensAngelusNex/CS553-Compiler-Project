@@ -135,5 +135,4 @@ fun printGraph stringify g =
 	NodeMap.app prOneNode g
     end
 
-	structure Table = IntMapTable(type key = node fun getInt(id,i,s1,s2) = id)
 end

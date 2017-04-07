@@ -37,11 +37,14 @@ codegen.sml
 assem.sml
 canon.sml
 
+funcgraph.sig
+funcgraph.sml
+MakeGraph.sig
+MakeGraph.sml
+
 (*
 liveness.sig
 liveness.sml
-funcgraph.sig
-funcgraph.sml
 flow.sig
 flowgraph.sml
 *)

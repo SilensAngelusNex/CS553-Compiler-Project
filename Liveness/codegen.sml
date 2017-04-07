@@ -102,8 +102,7 @@ struct
                 emit(A.MOVE {
                         assem="\tadd\t\t'd0, 's0, $r0\n" ,
                         src=munchExp e2,
-                        dst=i,
-                        jump=NONE
+                        dst=i
                     })
               | munchStm(T.MOVE(e1, e2)) = ErrorMsg.error ~1 ("Trying to move into non-location")
               | munchStm(T.JUMP(T.NAME l, a)) =
@@ -481,8 +480,7 @@ struct
                       fn r => emit(A.MOVE {
                                                assem="\taddi\t'd0, 's0, 0\n",
                                                src=(munchExp e1),
-                                               dst=r,
-                                               jump=NONE
+                                               dst=r
                                                 })
                         )
               | munchExp(T.BINOP(T.PLUS, e1, T.CONST (i))) =
@@ -499,8 +497,7 @@ struct
                         fn r => emit(A.MOVE {
                                                  assem="\taddi\t'd0, 's0, 0\n",
                                                  src=(munchExp e1),
-                                                 dst=r,
-                                                 jump=NONE
+                                                 dst=r
                                                  })
                         )
               | munchExp(T.BINOP(T.PLUS, T.CONST(i), e1)) =
@@ -535,8 +532,7 @@ struct
                       fn r => emit(A.MOVE {
                                                assem="\taddi\t'd0, 's0, 0\n",
                                                src=(munchExp e1),
-                                               dst=r,
-                                               jump=NONE
+                                               dst=r
                                                 })
                         )
               | munchExp(T.BINOP(T.MINUS, e1, T.CONST (i))) =
@@ -571,8 +567,7 @@ struct
                         fn r => emit(A.MOVE {
                                                  assem="\taddi\t'd0, 's0\n",
                                                  src=(munchExp e1),
-                                                 dst=r,
-                                                 jump=NONE
+                                                 dst=r
                                                  })
                         )
               | munchExp(T.BINOP(T.DIV, e1, e2)) =
@@ -598,8 +593,7 @@ struct
                         fn r => emit(A.MOVE {
                                                  assem="\taddi\t'd0, 's0\n",
                                                  src=(munchExp e1),
-                                                 dst=r,
-                                                 jump=NONE
+                                                 dst=r
                                                  })
                         )
               | munchExp(T.BINOP(T.MUL, e1, e2)) =

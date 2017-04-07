@@ -31,7 +31,7 @@ sig
 	val procEntryExit1 : (frame * Tree.stm) -> Tree.stm
 	val procEntryExit2 : frame * Assem.instr list -> Assem.instr list
 	val procEntryExit3 : Symbol.symbol * 'a -> {prolog: string, body: 'a, epilog: string}
-	val tempMap : register Temp.Table.table
-	val tempName : Temp.temp -> string
+	(*val tempMap : register Temp.Table.table
+	val tempName : Temp.temp -> string*)
 
 end
