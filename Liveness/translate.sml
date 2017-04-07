@@ -367,9 +367,11 @@ struct
 	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())
 	  | procEntryExit {level=EMPTY, body=body} = ()
 
-	fun treeStm a = unNx a
+	fun treeExp a = unEx a
 
-	fun frag (L(frame, a, u), stm) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), stm), frame=frame}
+	fun frag (L(frame, a, u), Ex(exp)) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), T.MOVE(F.V0, exp)), frame=frame}
+	  | (L(frame, a, u), Nx(stm)) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), stm), frame=frame}
+	  | (L(frame, a, u), Cx(cond)) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), T.MOVE(F.V0, unEx(Cx(cond)))), frame=frame}
 	  | frag (EMPTY, exp) = frag (outermost, exp)
 
 end

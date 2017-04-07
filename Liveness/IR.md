@@ -160,3 +160,16 @@ while !changed:
 
 
     env: should function labels be the same as their frame labels????
+
+
+1.
+
+
+2.
+    CDC
+    BCDB
+    B(CD+)
+
+
+
+node 1 dominates node 2 if you must go through 1 to get to 2

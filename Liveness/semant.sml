@@ -444,7 +444,7 @@ struct
 	fun transProg exp = let
 							val _ = FindEscape.findEscape exp;
 							val level =  Translate.outermost
-							val main =  Translate.treeStm (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
+							val main =  (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
 							val frags = Translate.getResult ()
 							val frags = frags@[Translate.frag(level, main)]
 							val out = TextIO.openOut "results.txt"

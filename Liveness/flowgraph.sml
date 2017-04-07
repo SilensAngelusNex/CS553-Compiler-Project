@@ -1,9 +1,11 @@
-structure Flow =
+structure Flow :> FLOW =
 struct
-    datatype flowgraph = FGRAPH of {control: Graph.graph,
-				    def: Temp.temp list Graph.Table.table,
-				    use: Temp.temp list Graph.Table.table,
-				    ismove: bool Graph.Table.table}
+    datatype flowgraph = FGRAPH of {
+                                    control: FuncGraph.graph,
+                				    def: Temp.temp list FuncGraph.Table.table,
+                				    use: Temp.temp list FuncGraph.Table.table,
+                				    ismove: bool FuncGraph.Table.table
+                                    }
 
   (* Note:  any "use" within the block is assumed to be BEFORE a "def"
         of the same variable.  If there is a def(x) followed by use(x)

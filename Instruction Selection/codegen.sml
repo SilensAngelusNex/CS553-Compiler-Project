@@ -552,7 +552,7 @@ struct
                     result (
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intToString (i * j)) ^ "\n",
-                                                 src=[],
+                                                 src=[Frame.R0],
                                                  dst=[r],
                                                  jump=NONE
                                                  })
