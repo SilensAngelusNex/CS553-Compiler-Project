@@ -21,18 +21,18 @@ struct
 	val trans = Translate.outermost
 
 	val venvs = [
-				 (Symbol.symbol ("print"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]},
+				 (Symbol.symbol ("print"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "print", formals=[false]},
 				 									 label=Temp.newlabel(), formals=[Types.STRING], result=Types.UNIT
 														})),
-				 (Symbol.symbol ("flush"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[]}, label=Temp.newlabel(), formals=[], result=Types.UNIT})),
-				 (Symbol.symbol ("getchar"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[]}, label=Temp.newlabel(), formals=[], result=Types.STRING})),
-				 (Symbol.symbol ("ord"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.STRING], result=Types.INT})),
-				 (Symbol.symbol ("chr"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.STRING})),
-				 (Symbol.symbol ("size"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.STRING], result=Types.INT})),
-				 (Symbol.symbol ("substring"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false, false, false]}, label=Temp.newlabel(), formals=[Types.STRING, Types.INT, Types.INT], result=Types.STRING})),
-				 (Symbol.symbol ("concat"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false, false]}, label=Temp.newlabel(), formals=[Types.STRING,Types.STRING], result=Types.STRING})),
-				 (Symbol.symbol ("not"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT})),
-				 (Symbol.symbol ("exit"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.newlabel(), formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT}))
+				 (Symbol.symbol ("flush"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "flush", formals=[]}, label=Temp.newlabel(), formals=[], result=Types.UNIT})),
+				 (Symbol.symbol ("getchar"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "getchar", formals=[]}, label=Temp.newlabel(), formals=[], result=Types.STRING})),
+				 (Symbol.symbol ("ord"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "ord", formals=[false]}, label=Temp.newlabel(), formals=[Types.STRING], result=Types.INT})),
+				 (Symbol.symbol ("chr"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "chr", formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.STRING})),
+				 (Symbol.symbol ("size"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "size", formals=[false]}, label=Temp.newlabel(), formals=[Types.STRING], result=Types.INT})),
+				 (Symbol.symbol ("substring"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "substring", formals=[false, false, false]}, label=Temp.newlabel(), formals=[Types.STRING, Types.INT, Types.INT], result=Types.STRING})),
+				 (Symbol.symbol ("concat"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "concat", formals=[false, false]}, label=Temp.newlabel(), formals=[Types.STRING,Types.STRING], result=Types.STRING})),
+				 (Symbol.symbol ("not"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "not", formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT})),
+				 (Symbol.symbol ("exit"), FunEntry({level=Translate.newLevel {parent=trans, name=Temp.namedlabel "exit", formals=[false]}, label=Temp.newlabel(), formals=[Types.INT], result=Types.INT}))
 				 ]
 
 	val empty: enventry Symbol.table = Symbol.empty
