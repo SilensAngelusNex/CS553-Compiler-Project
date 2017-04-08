@@ -1,0 +1,21 @@
+Node:	0
+	Ins:	t100 
+	Outs:	t100 
+Node:	1
+	Ins:	t100 
+	Outs:	t189 
+Node:	2
+	Ins:	t189 
+	Outs:	t188 
+Node:	3
+	Ins:	t188 
+	Outs:	t190 
+Node:	4
+	Ins:	t190 
+	Outs:	
+Node:	5
+	Ins:	
+	Outs:	
+Node:	6
+	Ins:	
+	Outs:	

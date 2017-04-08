@@ -34,8 +34,11 @@ structure Main = struct
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
             val x = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
             val instrs = (foldl processFrag [] frags)
-            val graph = MakeGraph.instr2graph instrs
+            val graph = Live.instr2graph instrs
+			val graph = Live.dataAnalysis graph
+			val out = TextIO.openOut "graph.txt"
         in
+			Live.show (out, graph);
             withOpenFile (filename ^ ".s") (fn out => emitproc out instrs)
         end
 

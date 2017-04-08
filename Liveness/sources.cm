@@ -39,12 +39,5 @@ canon.sml
 
 funcgraph.sig
 funcgraph.sml
-MakeGraph.sig
-MakeGraph.sml
-
-(*
-liveness.sig
-liveness.sml
-flow.sig
-flowgraph.sml
-*)
+Liveness.sig
+Liveness.sml

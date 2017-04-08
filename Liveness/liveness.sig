@@ -1,13 +1,12 @@
 signature LIVE =
 sig
-    datatype igraph =
-                IGRAPH of {
-                            graph: IGRAPH.graph,
-                            tnode: Temp.temp -> IGRAPH.node,
-                            gtemp: IGRAPH.node -> Temp.temp,
-                            moves: (IGRAPH.node * IGRAPH.node) list
-                            }
-    val interferenceGraph : Flow.flowgraph -> igraph * (Flow.Graph.node -> Temp.temp list)
-
-    val show : outstream * igraph -> unit
+    type graph
+	type node
+	type nodeID
+	structure F : FUNCGRAPH
+	structure S : ORD_SET
+	val liveness : TextIO.outstream * Assem.instr list -> graph
+    val instr2graph : Assem.instr list -> graph
+	val dataAnalysis : graph -> graph
+	val show : TextIO.outstream * graph -> unit
 end

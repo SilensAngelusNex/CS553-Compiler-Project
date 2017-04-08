@@ -135,4 +135,6 @@ fun printGraph stringify g =
 	NodeMap.app prOneNode g
     end
 
+fun size g = List.length (NodeMap.listItems g)
+
 end
