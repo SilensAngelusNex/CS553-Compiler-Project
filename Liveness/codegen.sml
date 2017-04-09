@@ -116,7 +116,7 @@ struct
                 emit(A.OPER{
                         assem="\tjr\t\t's0\n\n",
                         src=[munchExp e1],
-                        dst=[],
+                        dst=[Frame.V0, Frame.V1],
                         jump=SOME(tLst)
                     })
               | munchStm(T.CJUMP(T.EQ, T.CONST i, T.CONST j, l1, l2)) = if i = j

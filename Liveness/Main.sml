@@ -10,8 +10,8 @@ structure Main = struct
 
     fun emitproc out instrs = app (fn i => TextIO.output(out, Assem.format(Temp.makestring) i)) instrs;
 
-    fun processFrag (F.STRING(lab,s), instrs) = (print ("String Frag: " ^ F.string(lab,s)); instrs) (* should emit? *)
-      | processFrag (F.PROC{body,frame}, instrs) =
+    fun processFrag out (F.STRING(lab,s), instrs) = (TextIO.output (out, F.string(lab, s)); instrs) (* should emit? *)
+      | processFrag out(F.PROC{body,frame}, instrs) =
             let
                 val stms     = C.linearize body
                 val stms'    = C.traceSchedule(C.basicBlocks stms)
@@ -28,18 +28,18 @@ structure Main = struct
             handle e => (TextIO.closeOut out; raise e)
         end
 
-    fun compile filename =
+    fun compile filename = withOpenFile (filename ^ ".g") (fn graphOut => withOpenFile (filename ^ ".s") (fn assemOut =>
         let
             val absyn = Parse.parse filename
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
             val x = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
-            val instrs = (foldl processFrag [] frags)
+            val instrs = (foldl (processFrag assemOut) [] frags)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
-			val out = TextIO.openOut "graph.txt"
+
         in
-			Live.show (out, graph);
-            withOpenFile (filename ^ ".s") (fn out => emitproc out instrs)
-        end
+			Live.show (graphOut, graph);
+            emitproc assemOut instrs
+        end))
 
 end

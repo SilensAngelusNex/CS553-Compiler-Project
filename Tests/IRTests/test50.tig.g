@@ -1,4 +1,3 @@
-L16:		.asciiz		"red"
 Node:	0
 	Ins:	
 	Outs:	

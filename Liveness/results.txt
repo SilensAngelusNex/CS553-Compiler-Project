@@ -1,14 +1,10 @@
+String Frag:	"red"
+
 Frag:
 SEQ(
 	LABEL tig_main,
 	MOVE(
 		TEMP t102,
-		ESEQ(
-			MOVE(
-				TEMP t188,
-				CONST 2),
-			BINOP(PLUS,
-				TEMP t188,
-				CONST 3))))
+		NAME L18))
 
 
