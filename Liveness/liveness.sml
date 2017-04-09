@@ -6,6 +6,7 @@ struct
     structure F = FuncGraph(struct type ord_key = int val compare = Int.compare end)
     structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end)
 	structure S = SplaySetFn(struct type ord_key = Temp.temp val compare = Temp.compare end)
+	(*	structure I = InterferenceGraph	*)
 
     type node = (S.set * S.set * S.set * S.set * bool)
 	type nodeID = F.nodeID
@@ -66,6 +67,21 @@ struct
     fun dataAnalysis graph = case livenessHelper (graph, (F.size graph) - 1, true) of
 								(g, true)  => g
 							  | (g, false) => dataAnalysis (g)
+
+	(*
+	fun getTempSet graph =
+		let
+			fun help graph i =
+				let
+					val
+
+	fun getTempList graph = S.listItems (getTempSet graph)
+
+	fun insertInterNodes graph i = foldl (fn ((t, i), g) => F.addNode (g, i, t)) F.empty (getTempList graph)
+
+	fun makeInterference graph = insertInterEdges graph (insertInterNodes graph (F.size graph)) (F.size graph)
+
+	*)
 
     fun show (outstream, graph) =
 		let

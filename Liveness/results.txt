@@ -5,6 +5,6 @@ SEQ(
 	LABEL tig_main,
 	MOVE(
 		TEMP t102,
-		NAME L18))
+		NAME L10))
 
 

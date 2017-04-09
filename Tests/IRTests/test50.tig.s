@@ -1,5 +1,6 @@
+L10:		.asciiz		"red"
 tig_main:
-	la		t102, L16
-	j		L17
+	la		t102, L10
+	j		L11
 
-L17:
+L11:

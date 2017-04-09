@@ -126,14 +126,14 @@ struct
                 emit(A.OPER{
                         assem="\tbeq\t\t's0, 's1, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                         src=[Frame.R0, munchExp e2],
-                        dst=[],
+                        dst=[Frame.R0],
                         jump=SOME([l1, l2])
                     })
               | munchStm(T.CJUMP(T.EQ, e1, T.CONST 0, l1, l2)) =
                 emit(A.OPER{
                         assem="\tbeq\t\t's0, 's1, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                         src=[munchExp e1, Frame.R0],
-                        dst=[],
+                        dst=[Frame.R0],
                         jump=SOME([l1, l2])
                     })
               | munchStm(T.CJUMP(T.EQ, e1, e2, l1, l2)) =
@@ -150,14 +150,14 @@ struct
                 emit(A.OPER{
                         assem="\tbeq\t\t's0, 's1, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
                         src=[Frame.R0, munchExp e2],
-                        dst=[],
+                        dst=[Frame.R0],
                         jump=SOME([l1, l2])
                     })
               | munchStm(T.CJUMP(T.NE, e1, T.CONST 0, l1, l2)) =
                 emit(A.OPER{
                         assem="\tbeq\t\t's0, 's1, " ^ l2 ^ "\n\tj\t\t " ^ l1 ^ "\n" ,
                         src=[munchExp e1, Frame.R0],
-                        dst=[],
+                        dst=[Frame.R0],
                         jump=SOME([l1, l2])
                     })
               | munchStm(T.CJUMP(T.NE, e1, e2, l1, l2)) =
@@ -177,7 +177,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -188,7 +188,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
                             src=[munchExp e1, Frame.R0],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -213,7 +213,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
                             src=[munchExp e1, Frame.R0],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -224,7 +224,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -249,7 +249,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -260,7 +260,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
                             src=[munchExp e1, Frame.R0],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -285,7 +285,7 @@ struct
                     emit(A.OPER{
                             assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -296,7 +296,7 @@ struct
                   emit(A.OPER{
                           assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                           src=[munchExp e1, Frame.R0],
-                          dst=[cond],
+                          dst=[cond, Frame.R0],
                           jump=SOME([l1, l2])
                       })
                 end
@@ -332,7 +332,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -357,7 +357,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'do, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n",
                             src=[munchExp e1, Frame.R0],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -368,7 +368,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -393,7 +393,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                             src=[munchExp e1, Frame.R0],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -404,7 +404,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -429,7 +429,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                             src=[Frame.R0, munchExp e2],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -440,7 +440,7 @@ struct
                     emit(A.OPER{
                             assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
                             src=[munchExp e1, Frame.R0],
-                            dst=[cond],
+                            dst=[cond, Frame.R0],
                             jump=SOME([l1, l2])
                         })
                    end
@@ -463,7 +463,7 @@ struct
                   result (fn r => emit(A.OPER {
                                                 assem="\taddi\t'd0, 's0, " ^ (intToString i) ^"\n",
                                                 src=[Frame.R0],
-                                                dst=[r],
+                                                dst=[r, Frame.R0],
                                                 jump=NONE
                                             }))
               | munchExp(T.BINOP(T.PLUS, T.CONST (i), T.CONST (j))) =
@@ -471,7 +471,7 @@ struct
                       fn r => emit(A.OPER {
                                                assem="\taddi\t'd0, 's0, " ^ (intToString (i + j)) ^ "\n",
                                                src=[Frame.R0],
-                                               dst=[r],
+                                               dst=[r, Frame.R0],
                                                jump=NONE
                                                 })
                         )
@@ -523,7 +523,7 @@ struct
                       fn r => emit(A.OPER {
                                                assem="\taddi\t'd0, 's0, " ^ (intToString (i - j)) ^ "\n",
                                                src=[Frame.R0],
-                                               dst=[r],
+                                               dst=[r, Frame.R0],
                                                jump=NONE
                                                 })
                         )
@@ -558,7 +558,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t 'd0, 's0, " ^ (intToString (i div j)) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -575,7 +575,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\tdiv\t\t's0, 's1\n\tmflo\t'd0\n",
                                                  src=[munchExp e1, munchExp e2],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -584,7 +584,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intToString (i * j)) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -610,7 +610,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.andb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -628,7 +628,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.orb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -646,7 +646,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.xorb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -664,7 +664,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.<< (IntInf.fromInt i, (Word.fromInt j)))) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -691,7 +691,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (wordToString (Word.>> (Word.fromInt i, (Word.fromInt j)))) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -718,7 +718,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.~>> (IntInf.fromInt i, (Word.fromInt j)))) ^ "\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
@@ -772,7 +772,7 @@ struct
                         fn r => emit(A.OPER {
                                                  assem="\tlw\t\t'd0, " ^ (intToString i) ^ "('s0)\n",
                                                  src=[Frame.R0],
-                                                 dst=[r],
+                                                 dst=[r, Frame.R0],
                                                  jump=NONE
                                                  })
                         )
