@@ -10,6 +10,6 @@ sig
 	val addMove : graph * temp * temp -> graph
 	val addInter : graph * temp * temp -> graph
 
-	val removeNode: 'a graph * temp -> 'a graph
-	val removeNode': 'a graph * temp -> 'a graph
+	val removeNode: graph * temp -> graph
+	val removeNode': graph * temp -> graph
 end

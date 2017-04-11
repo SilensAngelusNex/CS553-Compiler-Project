@@ -39,5 +39,7 @@ canon.sml
 
 funcgraph.sig
 funcgraph.sml
+InterferenceGraph.sig
+InterferenceGraph.sml
 Liveness.sig
 Liveness.sml

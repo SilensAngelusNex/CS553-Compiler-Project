@@ -6,12 +6,13 @@ struct
     structure F = FuncGraph(struct type ord_key = int val compare = Int.compare end)
     structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end)
 	structure S = SplaySetFn(struct type ord_key = Temp.temp val compare = Temp.compare end)
-	(*	structure I = InterferenceGraph	*)
+	structure I = InterferenceGraph
 
     type node = (S.set * S.set * S.set * S.set * bool)
 	type nodeID = F.nodeID
 				(* Defs, Uses, Out, In *)
     type graph = node F.graph
+	type intfGraph = InterferenceGraph.graph
 
     fun updateGraph instrs (i, g, m) = if i < List.length instrs
                                      then
@@ -68,20 +69,36 @@ struct
 								(g, true)  => g
 							  | (g, false) => dataAnalysis (g)
 
-	(*
-	fun getTempSet graph =
+
+	fun getTempList graph =
 		let
+			fun oneLine (def, use, out, ins, bool) = S.union(def, S.union(use, S.union(ins, out)))
 			fun help graph i =
-				let
-					val
+					if i <= 0
+					then S.empty
+					else S.union(oneLine (F.nodeInfo (F.getNode (graph, i))), (help graph (i -1)))
+			val tempSet = help graph (F.size graph)
+		in
+		S.listItems (tempSet)
+		end
 
-	fun getTempList graph = S.listItems (getTempSet graph)
+	fun getEdgeList graph =
+		let
+			fun oneLine (def, use, out, ins, bool) = []  (* TODO *)
+			fun help graph i =
+				if i <= 0
+				then []
+				else (oneLine (F.nodeInfo (F.getNode (graph, i))))@(help graph (i - 1))
+		in
+		help graph (F.size graph)
+		end
 
-	fun insertInterNodes graph i = foldl (fn ((t, i), g) => F.addNode (g, i, t)) F.empty (getTempList graph)
+	fun insertInterNodes graph = foldl (fn (t, g) => I.addTemp (g, t)) I.empty (getTempList graph)
 
-	fun makeInterference graph = insertInterEdges graph (insertInterNodes graph (F.size graph)) (F.size graph)
+	fun insertInterEdges graph intergraph = foldl (fn ((e1, e2, b), g) => I.addEdge (g, e1, e2, b)) intergraph (getEdgeList graph)
 
-	*)
+	fun makeInterference graph = insertInterEdges graph (insertInterNodes graph)
+
 
     fun show (outstream, graph) =
 		let
