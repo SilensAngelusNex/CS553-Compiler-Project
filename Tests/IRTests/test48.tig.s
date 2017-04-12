@@ -1,14 +1,16 @@
-L21:
-	move	t106, t152
-	j		t107
+L134:
+	mov	t106, t484
+	jr		t107
 
-L23:
-L22:
-	move	t106, t154
-	j		t107
+L136:
+L135:
+	mov	t106, t486
+	jr		t107
 
-L24:
+L137:
 tig_main:
-	j		L25
+	addi	t488, t100, 0
+	add		t102, t488, $r0
+	j		L138
 
-L25:
+L138:

@@ -1,6 +1,7 @@
-L10:		.asciiz		"red"
+L140:		.asciiz		"red"
 tig_main:
-	la		t102, L10
-	j		L11
+	la		t491, L140
+	mov	t102, t491
+	j		L141
 
-L11:
+L141:

@@ -292,12 +292,20 @@ struct
 	fun beginLoop () = Temp.newlabel()
 	fun transNil () = Ex(T.CONST 0)
 	fun transInt i = Ex(T.CONST i)
+
+	fun loadString l =
+		let
+			val t = T.TEMP (Temp.newtemp ())
+		in
+			T.ESEQ(T.MOVE(t, T.NAME(l)), t)
+		end
+
 	fun transString s = let
 							val lab = Temp.newlabel ()
 							(* put F.String(lab, s) onto frag list*)
 						in
 							fragList := F.STRING(lab, s)::(!fragList);
-							Ex(T.NAME(lab))
+							Ex(loadString lab)
 						end
 	fun transCall (l, args, level) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, level)) args)))
 
@@ -338,10 +346,14 @@ struct
 															)
 													  end
 
+
 	fun transOP (A.PlusOp, e1, e2, level) 	 = Ex(T.BINOP(T.PLUS, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.MinusOp, e1, e2, level)	 = Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.TimesOp, e1, e2, level)	 = Ex(T.BINOP(T.MUL, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.DivideOp, e1, e2, level)  = Ex(T.BINOP(T.DIV, unEx(e1, level), unEx(e2, level)))
+	  | transOP (A.EqOp, Ex(T.NAME n1), Ex(T.NAME n2), level)	= Ex(T.CALL(T.NAME(Temp.namedlabel("stringEqual")), [loadString n1, loadString n2]))
+	  | transOP (A.EqOp, e1, Ex(T.NAME n), level)			= Ex(T.CALL(T.NAME(Temp.namedlabel("stringEqual")), [unEx(e1, level), loadString n]))
+	  | transOP (A.EqOp, Ex(T.NAME n), e2, level)			= Ex(T.CALL(T.NAME(Temp.namedlabel("stringEqual")), [unEx(e2, level), loadString n]))
 	  | transOP (A.EqOp, e1, e2, level) 	 = transRel(T.EQ, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
 	  | transOP (A.NeqOp, e1, e2, level) 	 = transRel(T.NE, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
 	  | transOP (A.LtOp, e1, e2, level) 	 = transRel(T.LT, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)

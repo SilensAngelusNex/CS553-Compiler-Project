@@ -36,9 +36,9 @@ structure Main = struct
             val instrs = (foldl (processFrag assemOut) [] frags)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
-
+            val interGraph = Live.makeInterference graph
         in
-			Live.show (graphOut, graph);
+			Live.show (TextIO.stdOut, graph);
             emitproc assemOut instrs
         end))
 

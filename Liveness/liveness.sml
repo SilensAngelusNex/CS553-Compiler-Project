@@ -29,7 +29,7 @@ struct
 
     fun addLabelEdge i m (lab, g) = case M.find (m, lab) of
                                 SOME(j) => F.addEdge(g, {from=i, to=j})
-                              | NONE => (print ("Why do you do this to me... " ^ (Symbol.name lab) ^ "\n"); g)
+                              | NONE => (print ("Jumping to undefined label (Could be built a library function. We have not yet implemented this): " ^ (Symbol.name lab) ^ "\n"); g)
 
     fun addEdges instrs (i, (g, m)) = if i < List.length instrs
                                      then
@@ -44,7 +44,7 @@ struct
     fun instr2graph instrs: graph =
             let
                 val g = addEdges instrs (0, (updateGraph instrs (0, F.empty, M.empty)))
-                val _ = F.printGraph (fn (n, (a,b,c, d, e)) => Int.toString n) g
+                (*val _ = F.printGraph (fn (n, (a,b,c, d, e)) => Int.toString n) g*)
             in
                 g
             end
@@ -77,20 +77,28 @@ struct
 					if i <= 0
 					then S.empty
 					else S.union(oneLine (F.nodeInfo (F.getNode (graph, i))), (help graph (i -1)))
-			val tempSet = help graph (F.size graph)
+			val tempSet = help graph ((F.size graph) - 1)
 		in
 		S.listItems (tempSet)
 		end
 
 	fun getEdgeList graph =
 		let
-			fun oneLine (def, use, out, ins, bool) = []  (* TODO *)
+            fun createList (d, l, bool) = foldl (fn (i, acc) => if d = i then acc else (d, i, bool)::acc) [] l
+			fun oneLine (def, use, out, ins, bool) = let
+                                                        val def = S.listItems def
+                                                        val ins = S.listItems ins
+                                                        val defCIns = foldl (fn (d, acc) => acc@createList(d, ins, bool)) [] def
+                                                        val defCdef = foldl (fn (d, acc) => acc@createList(d, def, bool)) [] def
+                                                     in
+                                                        defCIns
+                                                     end
 			fun help graph i =
 				if i <= 0
 				then []
 				else (oneLine (F.nodeInfo (F.getNode (graph, i))))@(help graph (i - 1))
 		in
-		help graph (F.size graph)
+		help graph ((F.size graph) - 1)
 		end
 
 	fun insertInterNodes graph = foldl (fn (t, g) => I.addTemp (g, t)) I.empty (getTempList graph)
@@ -113,7 +121,7 @@ struct
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) outs;
 					TextIO.output(outstream, "\n")
 				end
-			val ids = List.tabulate((F.size graph), (fn i => i))
+			val ids = List.tabulate(((F.size graph) - 1), (fn i => i))
 		in
 			app printNode ids;
 			TextIO.flushOut (outstream)
@@ -124,7 +132,7 @@ struct
 			val graph = instr2graph instrs
 			val graph' = dataAnalysis graph
 		in
-			show (outstream, graph');
+			show (TextIO.stdOut, graph');
 			graph'
 		end
 

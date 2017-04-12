@@ -8,5 +8,6 @@ sig
 	val liveness : TextIO.outstream * Assem.instr list -> graph
     val instr2graph : Assem.instr list -> graph
 	val dataAnalysis : graph -> graph
+    val makeInterference : graph -> InterferenceGraph.graph
 	val show : TextIO.outstream * graph -> unit
 end

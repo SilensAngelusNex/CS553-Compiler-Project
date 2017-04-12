@@ -1,10 +1,62 @@
-String Frag:	"red"
-
 Frag:
 SEQ(
 	LABEL tig_main,
 	MOVE(
 		TEMP t102,
-		NAME L10))
+		ESEQ(
+			SEQ(
+				SEQ(
+					MOVE(
+						TEMP t740,
+						ESEQ(
+							SEQ(
+								CJUMP(GT,
+									CONST 10,
+									CONST 20,
+									L247,L248),
+								SEQ(
+									SEQ(
+										LABEL L247,
+										SEQ(
+											MOVE(
+												TEMP t739,
+												CONST 1),
+											JUMP(
+												NAME L249))),
+									SEQ(
+										LABEL L248,
+										SEQ(
+											MOVE(
+												TEMP t739,
+												CONST 0),
+											JUMP(
+												NAME L249))))),
+							ESEQ(
+								LABEL L249,
+								TEMP t739))),
+					CJUMP(NE,
+						TEMP t740,
+						CONST 0,
+						L250,L251)),
+				SEQ(
+					SEQ(
+						LABEL L250,
+						SEQ(
+							MOVE(
+								TEMP t741,
+								CONST 30),
+							JUMP(
+								NAME L252))),
+					SEQ(
+						LABEL L251,
+						SEQ(
+							MOVE(
+								TEMP t741,
+								CONST 40),
+							JUMP(
+								NAME L252))))),
+			ESEQ(
+				LABEL L252,
+				TEMP t741))))
 
 
