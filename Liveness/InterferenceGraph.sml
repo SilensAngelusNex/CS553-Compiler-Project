@@ -43,9 +43,27 @@ struct
 	fun removeNode ((g1, g2, m), t) = (G.removeNode (g1, t), G.removeNode (g2, t), (case M.remove (m, t) of (a, b) => a))
 	fun removeNode' ((g1, g2, m), t) = (G.removeNode' (g1, t), G.removeNode' (g2, t), (case M.remove (M.insert (m, t, BLANK), t) of (a, b) => a))
 
-	fun interDegree ((g1, g2, m), t) = G.outDegree (G.getNode(g1, t))
+	fun interDegree ((g1, g2, m), t) =
+		case getColor ((g1, g2, m), t) of
+			BLANK => G.outDegree (G.getNode(g1, t))
+		  | COLOR(_) => (case Int.maxInt of SOME(i) => i | NONE => 10000000)
 	fun moveDegree ((g1, g2, m), t) = G.inDegree (G.getNode(g2, t))
 	fun degree ((g1, g2, s), t) = G.outDegree (G.getNode(g1, t)) + G.degree (G.getNode(g2, t))
+
+	fun moveRelated ((g1, g2, m), t) = G.degree (G.getNode(g2, t)) > 0
+	fun unFreeze ((g1, g2, m), t) = fold
+		let
+			val moveEdges = (map (fn (s) => {from=t, to=s}) (G.successors (g, t)))@(map (fn (p) => {from=p, to=t}) (G.predecessors (g, t)))
+			val g2' = foldl (fn (e, g) => G.removeEdge (g, e)) g2 moveEdges
+		in
+			(g1, g2', m)
+		end
+
+	fun getColor ((g1, g2, m), t) =
+		case M.find (m, t) of
+			SOME(COLOR(i)) => COLOR(i)
+		  | SOME(BLANK) => BLANK
+		  | NONE => (print "Error: finding color of nonexistant node."; BLANK)
 
 	val tempToString = Temp.makestring
 	fun colorToString (COLOR(i)) = "COLOR:\t" ^ (Int.toString i)
