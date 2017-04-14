@@ -381,9 +381,9 @@ struct
 
 	fun treeExp a = unEx a
 
-	fun frag (L(frame, a, u), Ex(exp)) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), T.MOVE(T.TEMP (F.V0), exp)), frame=frame}
-	  | frag (L(frame, a, u), Nx(stm)) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), stm), frame=frame}
-	  | frag (L(frame, a, u), Cx(cond)) = F.PROC{body=T.SEQ(T.LABEL(F.label frame), T.MOVE(T.TEMP (F.V0), unEx(Cx(cond), L(frame, a, u)))), frame=frame}
+	fun frag (L(frame, a, u), Ex(exp)) = F.PROC{body=T.SEQ(T.SEQ(T.LABEL(F.label frame), T.MOVE(T.TEMP (F.V0), exp)), T.JUMP(T.TEMP(F.RA), [])), frame=frame}
+	  | frag (L(frame, a, u), Nx(stm)) = F.PROC{body=T.SEQ(T.SEQ(T.LABEL(F.label frame), stm), T.JUMP(T.TEMP(F.RA), [])), frame=frame}
+	  | frag (L(frame, a, u), Cx(cond)) = F.PROC{body=T.SEQ(T.SEQ(T.LABEL(F.label frame), T.MOVE(T.TEMP (F.V0), unEx(Cx(cond), L(frame, a, u)))), T.JUMP(T.TEMP(F.RA), [])), frame=frame}
 	  | frag (EMPTY, exp) = frag (outermost, exp)
 
 end

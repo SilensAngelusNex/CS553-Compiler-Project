@@ -1,27 +1,27 @@
 tig_main:
-	j		L248
-L248:
-	addi	t742, t100, 0
-	add		t739, t742, $r0
-L249:
-	mov	t740, t739
-	beq		t740, t100, L251
-	j		 L250
-L251:
-	addi	t743, t100, 40
-	add		t741, t743, $r0
-L252:
-	mov	t102, t741
-	j		L253
+	j		L18
+L18:
+	li		t162, 0
+	move	t159, t162
+L19:
+	move	t160, t159
+	beq		t160, t100, L21
+	j		 L20
+L21:
+	li		t163, 40
+	move	t161, t163
+L22:
+	move	t102, t161
+	jr		t107
 
-L247:
-	addi	t744, t100, 1
-	add		t739, t744, $r0
-	j		L249
+L17:
+	li		t164, 1
+	move	t159, t164
+	j		L19
 
-L250:
-	addi	t745, t100, 30
-	add		t741, t745, $r0
-	j		L252
+L20:
+	li		t165, 30
+	move	t161, t165
+	j		L22
 
-L253:
+L23:

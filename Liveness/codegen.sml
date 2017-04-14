@@ -613,17 +613,17 @@ struct
               | munchExp(T.NAME l) = (ErrorMsg.error ~1 ("Unexpected Instance of T.NAME") ; result (fn r => ()))
               | munchExp(T.CONST(i)) =
                   result (fn r => emit(A.OPER {
-                                                assem="\taddi\t'd0, 's0, " ^ (intToString i) ^"\n",
-                                                src=[Frame.R0],
-                                                dst=[r, Frame.R0],
+                                                assem="\tli\t\t'd0, " ^ (intToString i) ^"\n",
+                                                src=[],
+                                                dst=[r],
                                                 jump=NONE
                                             }))
               | munchExp(T.BINOP(T.PLUS, T.CONST (i), T.CONST (j))) =
                   result (
                       fn r => emit(A.OPER {
-                                               assem="\taddi\t'd0, 's0, " ^ (intToString (i + j)) ^ "\n",
-                                               src=[Frame.R0],
-                                               dst=[r, Frame.R0],
+                                               assem="\tli\t\t'd0, " ^ (intToString (i + j)) ^ "\n",
+                                               src=[],
+                                               dst=[r],
                                                jump=NONE
                                                 })
                         )
@@ -673,9 +673,9 @@ struct
               | munchExp(T.BINOP(T.MINUS, T.CONST (i), T.CONST (j))) =
                   result (
                       fn r => emit(A.OPER {
-                                               assem="\taddi\t'd0, 's0, " ^ (intToString (i - j)) ^ "\n",
-                                               src=[Frame.R0],
-                                               dst=[r, Frame.R0],
+                                               assem="\tli\t'd0, " ^ (intToString (i - j)) ^ "\n",
+                                               src=[],
+                                               dst=[r],
                                                jump=NONE
                                                 })
                         )
@@ -708,9 +708,9 @@ struct
               | munchExp(T.BINOP(T.DIV, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t 'd0, 's0, " ^ (intToString (i div j)) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t\t 'd0, " ^ (intToString (i div j)) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -734,9 +734,9 @@ struct
               | munchExp(T.BINOP(T.MUL, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (intToString (i * j)) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t\t'd0, " ^ (intToString (i * j)) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -760,9 +760,9 @@ struct
               | munchExp(T.BINOP(T.AND, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.andb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t\t'd0, " ^ (intInfToString (IntInf.andb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -778,9 +778,9 @@ struct
               | munchExp(T.BINOP(T.OR, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.orb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t\t'd0, " ^ (intInfToString (IntInf.orb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -796,9 +796,9 @@ struct
               | munchExp(T.BINOP(T.XOR, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.xorb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t'd0, " ^ (intInfToString (IntInf.xorb (IntInf.fromInt i, IntInf.fromInt j))) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -814,9 +814,9 @@ struct
               | munchExp(T.BINOP(T.LSHIFT, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.<< (IntInf.fromInt i, (Word.fromInt j)))) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t\t'd0, " ^ (intInfToString (IntInf.<< (IntInf.fromInt i, (Word.fromInt j)))) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -841,9 +841,9 @@ struct
               | munchExp(T.BINOP(T.RSHIFT, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (wordToString (Word.>> (Word.fromInt i, (Word.fromInt j)))) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t\t'd0, " ^ (wordToString (Word.>> (Word.fromInt i, (Word.fromInt j)))) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -868,9 +868,9 @@ struct
               | munchExp(T.BINOP(T.ARSHIFT, T.CONST i, T.CONST j)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\taddi\t'd0, 's0, " ^ (intInfToString (IntInf.~>> (IntInf.fromInt i, (Word.fromInt j)))) ^ "\n",
-                                                 src=[Frame.R0],
-                                                 dst=[r, Frame.R0],
+                                                 assem="\tli\t'd0, " ^ (intInfToString (IntInf.~>> (IntInf.fromInt i, (Word.fromInt j)))) ^ "\n",
+                                                 src=[],
+                                                 dst=[r],
                                                  jump=NONE
                                                  })
                         )
@@ -948,6 +948,30 @@ struct
                                         dst=[Frame.V0, Frame.V1],
                                         jump=SOME([l])
                                     });
+								postCall ())
+							)
+			  | munchExp(T.CALL(T.TEMP(t), args)) =
+				  result (
+					  	fn r => (
+							  	preCall ();
+							  	emit(A.OPER {
+									  	assem="\tjalr\t\t's0\n\n",
+									  	src=t::munchArgs(0, args),
+									  	dst=[Frame.V0, Frame.V1],
+									  	jump=SOME([])
+									});
+								postCall ())
+							)
+			  | munchExp(T.CALL(e1, args)) =
+				  result (
+					  	fn r => (
+							  	preCall ();
+							  	emit(A.OPER {
+									  	assem="\tjalr\t\t's0\n\n",
+									  	src=(munchExp e1)::munchArgs(0, args),
+									  	dst=[Frame.V0, Frame.V1],
+									  	jump=SOME([])
+									});
 								postCall ())
 							)
 

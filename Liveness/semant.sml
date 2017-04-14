@@ -96,7 +96,13 @@ struct
 
 	fun binOp (left, right, oper, pos, level) =
 		(checkPair(left, right, pos);
-		{exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT})
+		case #ty left of
+			Types.INT => {exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT}
+		  | Types.STRING => (	case oper of
+			  						A.EqOp => {exp=Translate.transCall ("stringEqual", [#exp left, #exp right], level), ty=Types.INT}
+		  						  | A.NeqOp => {exp=Translate.transOP (A.NeqOp, Translate.transInt 0, Translate.transCall ("stringEqual", [#exp left, #exp right], level), level), ty=Types.INT}
+							      | _ => (ErrorMsg.error pos ("Operator not defined for type string."); {exp=Translate.transNil (), ty=Types.UNDEFINED}))
+		  | _ => {exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT})
 
 	fun getSuper ({exp=exp1, ty=ty1}, {exp=exp2, ty=ty2}, pos) = 	case ((isSubtype(ty1, ty2, pos)), (isSubtype(ty2, ty1, pos))) of
 																	  (true, true) => ty1
