@@ -26,15 +26,17 @@ struct
                                 t
                                 end
 
-            fun postCall () = ""
-            fun preCall () = ""
+			fun preCall () = () (* Emit some things? Push live callersaves onto stack. *)
+            fun postCall () = () (* Emit some things? Pop live callersaves from stack. *)
+			fun prologue () = () (* Emit some things? Push calleesaves onto stack if we use them. *)
+            fun epilogue () = () (* Emit some things? Push calleesaves from stack if we used them. *)
 
             fun munchStm(T.SEQ(a,b)): unit = (munchStm a; munchStm b)
               | munchStm(T.EXP(m1)) = (munchExp m1; ())
               | munchStm(T.LABEL lab) = emit (A.LABEL{assem=lab ^ ":\n", lab=lab})
               | munchStm(T.MOVE(T.TEMP i, T.TEMP j)) =
                 emit(A.MOVE{
-                        assem="\tmov\t'd0, 's0\n",
+                        assem="\tmove\t'd0, 's0\n",
                         src=j,
                         dst=i
                     })
@@ -71,9 +73,15 @@ struct
                     val t = Temp.newtemp ()
                 in
                 emit(A.OPER{
-                        assem="\tlw\t\t'd0, 0('s0)\n\tsw\t\t'd1, 0('s1)\n" ,
-                        src=[munchExp e2, munchExp e1],
+                        assem="\tlw\t\t'd0, 0('s0)\n" ,
+                        src=[munchExp e2],
                         dst=[t],
+                        jump=NONE
+                    });
+				emit(A.OPER{
+                        assem="\tsw\t\t'd1, 0('s1)\n" ,
+                        src=[munchExp e1],
+                        dst=[],
                         jump=NONE
                     })
                 end
@@ -100,7 +108,7 @@ struct
                     })
               | munchStm(T.MOVE(T.TEMP i, e2)) =
                 emit(A.MOVE {
-                        assem="\tadd\t\t'd0, 's0, $r0\n" ,
+                        assem="\tmove\t'd0, 's0\n" ,
                         src=munchExp e2,
                         dst=i
                     })
@@ -175,9 +183,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's1, 's0\n" ,
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -186,9 +200,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's1, 's0" ,
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -197,9 +217,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'do, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's1, 's0\n" ,
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -211,9 +237,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's0, 's1\n" ,
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -222,9 +254,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's0, 's1\n" ,
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -233,8 +271,14 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's0, 's1\n" ,
                             src=[munchExp e1, munchExp e2],
+                            dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[],
                             dst=[cond],
                             jump=SOME([l1, l2])
                         })
@@ -247,20 +291,32 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            assem="\tslt\t\t'd0, 's1, 's0\n",
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
-                            jump=SOME([l1, l2])
-                        })
+                            jump=NONE
+                        });
+					emit(A.OPER{
+							assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+							src=[cond],
+							dst=[],
+							jump=SOME([l1, l2])
+						})
                   end
               | munchStm(T.CJUMP(T.LE, e1, T.CONST 0, l1, l2)) =
                   let
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            assem="\tslt\t\t'd0, 's1, 's0\n",
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -269,9 +325,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            assem="\tslt\t\t'd0, 's1, 's0\n",
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -283,9 +345,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's0, 's1\n" ,
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -293,23 +361,35 @@ struct
                 let
                   val cond = Temp.newtemp()
                 in
-                  emit(A.OPER{
-                          assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
-                          src=[munchExp e1, Frame.R0],
-                          dst=[cond, Frame.R0],
-                          jump=SOME([l1, l2])
-                      })
+                	emit(A.OPER{
+                        	assem="\tslt\t\t'd0, 's0, 's1\n" ,
+                        	src=[munchExp e1, Frame.R0],
+                        	dst=[cond, Frame.R0],
+                        	jump=NONE
+                      });
+					emit(A.OPER{
+                          	assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                          	src=[cond],
+                          	dst=[],
+                          	jump=SOME([l1, l2])
+                        })
                 end
               | munchStm(T.CJUMP(T.GE, e1, e2, l1, l2)) =
                   let
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tslt\t\t'd0, 's0, 's1\n" ,
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
-                            jump=SOME([l1, l2])
-                        })
+                            jump=NONE
+                        });
+					emit(A.OPER{
+							assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+							src=[cond],
+							dst=[],
+							jump=SOME([l1, l2])
+						})
                   end
               | munchStm(T.CJUMP(T.UGT, T.CONST i, T.CONST j, l1, l2)) = if (Word.fromInt i) > (Word.fromInt j)
                     then emit(A.OPER{ assem="\tj\t\t" ^ l1 ^ "\n" , src=[], dst=[], jump=SOME([l1]) })
@@ -319,9 +399,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            assem="\tsltu\t'd0, 's0, 's1\n",
                             src=[munchExp e1, Frame.R0],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -330,9 +416,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            assem="\tsltu\t'd0, 's0, 's1\n",
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -341,9 +433,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            assem="\tsltu\t'd0, 's0, 's1\n",
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -355,9 +453,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'do, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n",
+                            assem="\tsltu\t'd0, 's0, 's1\n",
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -366,9 +470,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's0, 's1\n" ,
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -377,9 +487,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's0, 's1\n" ,
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l2 ^ "\n\tj\t\t" ^ l1 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -391,9 +507,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's1, 's0\n" ,
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -402,9 +524,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's1, 's0\n" ,
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -413,9 +541,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's1, 's0\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's1, 's0\n" ,
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -427,9 +561,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's0, 's1\n",
                             src=[Frame.R0, munchExp e2],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -438,9 +578,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's0, 's1\n",
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n",
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                    end
@@ -449,9 +595,15 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tsltu\t'd0, 's0, 's1\n\tbeqz\t'd0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            assem="\tsltu\t'd0, 's0, 's1\n" ,
                             src=[munchExp e1, munchExp e2],
                             dst=[cond],
+                            jump=NONE
+                        });
+					emit(A.OPER{
+                            assem="\tbeqz\t's0, " ^ l1 ^ "\n\tj\t\t" ^ l2 ^ "\n" ,
+                            src=[cond],
+                            dst=[],
                             jump=SOME([l1, l2])
                         })
                   end
@@ -478,8 +630,8 @@ struct
               | munchExp(T.BINOP(T.PLUS, e1, T.CONST (0))) =
                   result (
                       fn r => emit(A.MOVE {
-                                               assem="\taddi\t'd0, 's0, 0\n",
-                                               src=(munchExp e1),
+                                               assem="\tmove\t'd0, 's0\n",
+                                               src=munchExp e1,
                                                dst=r
                                                 })
                         )
@@ -495,8 +647,8 @@ struct
               | munchExp(T.BINOP(T.PLUS, T.CONST(0), e1)) =
                     result (
                         fn r => emit(A.MOVE {
-                                                 assem="\taddi\t'd0, 's0, 0\n",
-                                                 src=(munchExp e1),
+                                                 assem="\tmove\t'd0, 's0\n",
+                                                 src=munchExp e1,
                                                  dst=r
                                                  })
                         )
@@ -530,8 +682,8 @@ struct
               | munchExp(T.BINOP(T.MINUS, e1, T.CONST (0))) =
                   result (
                       fn r => emit(A.MOVE {
-                                               assem="\taddi\t'd0, 's0, 0\n",
-                                               src=(munchExp e1),
+                                               assem="\tmove\t'd0, 's0\n",
+                                               src=munchExp e1,
                                                dst=r
                                                 })
                         )
@@ -565,8 +717,8 @@ struct
               | munchExp(T.BINOP(T.DIV, e1, T.CONST(1))) =
                     result (
                         fn r => emit(A.MOVE {
-                                                 assem="\taddi\t'd0, 's0\n",
-                                                 src=(munchExp e1),
+                                                 assem="\tmove\t'd0, 's0\n",
+                                                 src=munchExp e1,
                                                  dst=r
                                                  })
                         )
@@ -591,8 +743,8 @@ struct
               | munchExp(T.BINOP(T.MUL, e1, T.CONST(1))) =
                     result (
                         fn r => emit(A.MOVE {
-                                                 assem="\taddi\t'd0, 's0\n",
-                                                 src=(munchExp e1),
+                                                 assem="\tmove\t'd0, 's0\n",
+                                                 src=munchExp e1,
                                                  dst=r
                                                  })
                         )
@@ -788,12 +940,16 @@ struct
               | munchExp(T.ESEQ(stm1, e1)) = (munchStm stm1; munchExp e1)
               | munchExp(T.CALL(T.NAME(l), args)) =
                     result (
-                        fn r => emit(A.OPER {
-                                                 assem=(preCall () ^ "\tjal\t\t'j0\n\n" ^ postCall ()),
-                                                 src=munchArgs(0, args),
-                                                 dst=[Frame.V0, Frame.V1],
-                                                 jump=SOME([l])
-                                                 }))
+                        fn r => (
+								preCall ();
+								emit(A.OPER {
+                                        assem="\tjal\t\t'j0\n\n",
+                                        src=munchArgs(0, args),
+                                        dst=[Frame.V0, Frame.V1],
+                                        jump=SOME([l])
+                                    });
+								postCall ())
+							)
 
 
             and munchArgs(0, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A0, arg)); Frame.A0)::munchArgs (1, args)
@@ -806,7 +962,9 @@ struct
 										  munchArgs (i + 1, args))
               | munchArgs(i, []) = []
         in
+			prologue ();
             munchStm stm;
+			epilogue ();
             rev(!ilist)
         end
 end

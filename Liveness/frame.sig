@@ -18,6 +18,8 @@ sig
 	val A2 : Temp.temp
 	val A3 : Temp.temp
 
+	val usableRegs : Temp.temp list
+
 	val string : (Temp.label * string) -> string
 	val name : frame -> string
 	val label : frame -> Temp.label

@@ -1,0 +1,30 @@
+.text
+
+main:
+	j		L25
+L25:
+	addi	$t0, $zero, 0
+	add		$t1, $t0, $zero
+L26:
+	move	$t2, $t1
+	beq		$t2, $zero, L28
+	j		 L27
+L28:
+	addi	$t3, $zero, 40
+	add		$t6, $t3, $zero
+L29:
+	move	$v0, $t6
+	j		L30
+
+L24:
+	addi	$t4, $zero, 1
+	add		$t1, $t4, $zero
+	j		L26
+
+L27:
+	addi	$t5, $zero, 30
+	add		$t6, $t5, $zero
+	j		L29
+
+L30:
+	jr $ra

@@ -19,10 +19,8 @@ struct
 
 	val specialregs = regTemps ["$zero", "$at", "$v0", "$v1", "$gp", "$sp", "$fp", "$ra"]
 	val argregs = regTemps ["$a0", "$a1", "$a2", "$a3"]
-	val callersaves = regTemps ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9"]
-	val calleesaves = regTemps ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7"]
-
-
+	val callersaves = regTemps ["$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"]
+	val calleesaves = regTemps ["$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7"]
 
 	(*val tempMap = foldl (fn ((temp, name), table) => Temp.Table.enter (table, temp, (temp, name)))
 					(Temp.Table.empty)
@@ -41,6 +39,11 @@ struct
 	val A1 = case List.nth (argregs, 1) of (temp, name) => temp
 	val A2 = case List.nth (argregs, 2) of (temp, name) => temp
 	val A3 = case List.nth (argregs, 3) of (temp, name) => temp
+
+	fun getTemps ((t, n)::l) = t::(getTemps l)
+	  | getTemps [] = []
+
+	val usableRegs = [R0, V0, V1, A0, A1, A2, A3]@(getTemps calleesaves)@(getTemps callersaves)
 
 	val wordSize = 4
 

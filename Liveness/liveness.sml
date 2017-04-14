@@ -8,7 +8,7 @@ struct
 	structure S = SplaySetFn(struct type ord_key = Temp.temp val compare = Temp.compare end)
 	structure I = InterferenceGraph
 
-    type node = (S.set * S.set * S.set * S.set * bool)
+    type node = (string * S.set * S.set * S.set * S.set * bool)
 	type nodeID = F.nodeID
 				(* Defs, Uses, Out, In *)
     type graph = node F.graph
@@ -17,9 +17,9 @@ struct
     fun updateGraph instrs (i, g, m) = if i < List.length instrs
                                      then
                                          case List.nth (instrs, i) of
-                                            A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp} => updateGraph instrs (i+1, F.addNode(g, i, (S.addList (S.empty, dstLst), S.addList (S.empty, srcLst), S.empty, S.empty, false)), m)
-                                          | A.LABEL{assem=a, lab=label} => updateGraph instrs (i+1, F.addNode(g, i, (S.empty, S.empty, S.empty, S.empty, false)), M.insert (m, label, i))
-                                          | A.MOVE{assem=a, dst=dst, src=src} => updateGraph instrs (i+1, F.addNode(g, i, (S.singleton dst, S.singleton src, S.empty, S.empty, true)), m)
+                                            A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp} => updateGraph instrs (i+1, F.addNode(g, i, (a, S.addList (S.empty, dstLst), S.addList (S.empty, srcLst), S.empty, S.empty, false)), m)
+                                          | A.LABEL{assem=a, lab=label} => updateGraph instrs (i+1, F.addNode(g, i, (a, S.empty, S.empty, S.empty, S.empty, false)), M.insert (m, label, i))
+                                          | A.MOVE{assem=a, dst=dst, src=src} => updateGraph instrs (i+1, F.addNode(g, i, (a, S.singleton dst, S.singleton src, S.empty, S.empty, true)), m)
                                      else
                                         (g, m)
 
@@ -49,15 +49,15 @@ struct
                 g
             end
 
-	fun unionIns l = foldl (fn (n, r) => case F.nodeInfo n of (def, use, ins, outs, move) => S.union (ins, r)) S.empty l
+	fun unionIns l = foldl (fn (n, r) => case F.nodeInfo n of (a, def, use, ins, outs, move) => S.union (ins, r)) S.empty l
 
 	fun livenessHelper (graph, id, bool) =
 		let
 			val this = F.getNode (graph, id)
-			val (def, use, ins, outs, move) = F.nodeInfo this
+			val (a, def, use, ins, outs, move) = F.nodeInfo this
 			val ins' = S.union (use, (S.difference (outs, def)))
 			val out' = unionIns (F.succs' graph this)
-			val graph' = F.changeNodeData (graph, id, (def, use, ins', out', move))
+			val graph' = F.changeNodeData (graph, id, (a, def, use, ins', out', move))
 			val bool' = bool andalso (S.equal (ins, ins') andalso S.equal (outs, out'))
 		in
 			if id <= 0
@@ -72,7 +72,7 @@ struct
 
 	fun getTempList graph =
 		let
-			fun oneLine (def, use, out, ins, bool) = S.union(def, S.union(use, S.union(ins, out)))
+			fun oneLine (a, def, use, out, ins, bool) = S.union(def, S.union(use, S.union(ins, out)))
 			fun help graph i =
 					if i <= 0
 					then S.empty
@@ -85,14 +85,25 @@ struct
 	fun getEdgeList graph =
 		let
             fun createList (d, l, bool) = foldl (fn (i, acc) => if d = i then acc else (d, i, bool)::acc) [] l
-			fun oneLine (def, use, out, ins, bool) = let
-                                                        val def = S.listItems def
-                                                        val ins = S.listItems ins
-                                                        val defCIns = foldl (fn (d, acc) => acc@createList(d, ins, bool)) [] def
-                                                        val defCdef = foldl (fn (d, acc) => acc@createList(d, def, bool)) [] def
-                                                     in
-                                                        defCIns
-                                                     end
+			fun oneLine (a, def, use, out, ins, false) =
+				let
+                    val def = S.listItems def
+                    val out = S.listItems ins
+                    val defCOut = foldl (fn (d, acc) => acc@createList(d, out, false)) [] def
+                 in
+                    defCOut
+                 end
+			  | oneLine (a, def, use, out, ins, true) =
+  				let
+                    val out = S.listItems (S.difference (ins, use))
+					val def = S.listItems def
+					val use = S.listItems use
+                    val defCOut = foldl (fn (d, acc) => acc@createList(d, out, false)) [] def
+					val moves   = foldl (fn (d, acc) => acc@createList(d, use, false)) [] def
+                in
+                	moves@defCOut
+                end
+
 			fun help graph i =
 				if i <= 0
 				then []
@@ -113,9 +124,9 @@ struct
 			fun printNode id =
 				let
 					val this = F.getNode (graph, id)
-					val (def, use, ins, outs, move) = F.nodeInfo this
+					val (a, def, use, ins, outs, move) = F.nodeInfo this
 				in
-					TextIO.output(outstream, "Node:\t" ^ (Int.toString id) ^ "\n\tIns:\t");
+					TextIO.output(outstream, "Node:\t" ^ (Int.toString id) ^ "\t" ^ a ^ "\n\tIns:\t");
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) ins;
 					TextIO.output(outstream, "\n\tOuts:\t");
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) outs;
