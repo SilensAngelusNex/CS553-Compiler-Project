@@ -68,4 +68,14 @@ struct
 	val tempToString = Temp.makestring
 	fun colorToString (COLOR(i)) = "COLOR:\t" ^ (Int.toString i)
 	  | colorToString (BLANK) = "BLANK"
+
+	fun nextTosimplify g =
+		let
+			fun help (t::l) = if degree (g, t) < SIMPLIFY_DEGREE then SOME(t) else help (l)
+			  | help ([]) = NONE
+		in
+			help (keyList g)
+		end
+
+	fun size (g1, g2, m) = M.numItems m
 end

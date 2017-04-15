@@ -40,9 +40,6 @@ struct
 	val A2 = case List.nth (argregs, 2) of (temp, name) => temp
 	val A3 = case List.nth (argregs, 3) of (temp, name) => temp
 
-	fun getTemps ((t, n)::l) = t::(getTemps l)
-	  | getTemps [] = []
-
 	val usableRegs = [R0, V0, V1, A0, A1, A2, A3]@(getTemps calleesaves)@(getTemps callersaves)
 
 	val wordSize = 4
@@ -72,9 +69,21 @@ struct
 
 	  | allocLocal f false = InReg(allocTemp f)
 
+	fun allocArgTemp ((_, alist, _), i) =
+		let
+			val result = case i of
+							0 => A0
+						  | 1 => A1
+						  | 2 => A2
+						  | 3 => A3
+		in
+			alist := !alist@[InReg(result)];
+			result
+		end
+
 	fun allocLocals f (i, b::l) = (case i < 4 of
-									true	=> (allocTemp f		; allocLocals f (i + 1, l))
-								  | false 	=> (allocLocal f b	; allocLocals f (i + 1, l)))
+									true	=> (allocTemp (f, i)	; allocLocals f (i + 1, l))
+								  | false 	=> (allocLocal f b		; allocLocals f (i + 1, l)))
 
 	  | allocLocals f (i, [])   = f
 
