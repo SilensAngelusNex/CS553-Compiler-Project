@@ -1,8 +1,10 @@
 signature INTERFERENCE_GRAPH =
 sig
 	type graph
-	type color
 	type temp
+	type color
+	structure TM : ORD_MAP
+    structure CM : ORD_MAP
 
 	val empty : graph
 	val registersOnly : graph
@@ -19,10 +21,15 @@ sig
 	val removeNode : graph * temp -> graph
 	val removeNode' : graph * temp -> graph
 
-	val interDegree : graph * temp -> int
+	(*val interDegree : graph * temp -> int*)
 	val moveDegree : graph * temp -> int
 	val degree : graph * temp -> int
 
 	val tempToString : temp -> string
 	val colorToString : color -> string
+
+	val successors: graph * temp -> temp list
+	val predecessors: graph * temp -> temp list
+
+    val graphColor : graph -> graph * color TM.map
 end

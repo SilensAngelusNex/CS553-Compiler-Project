@@ -43,3 +43,6 @@ InterferenceGraph.sig
 InterferenceGraph.sml
 Liveness.sig
 Liveness.sml
+
+RegAlloc.sig
+RegAlloc.sml

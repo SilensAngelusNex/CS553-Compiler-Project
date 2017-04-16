@@ -76,13 +76,14 @@ struct
 						  | 1 => A1
 						  | 2 => A2
 						  | 3 => A3
+						  | _ => Temp.newtemp ()
 		in
 			alist := !alist@[InReg(result)];
 			result
 		end
 
 	fun allocLocals f (i, b::l) = (case i < 4 of
-									true	=> (allocTemp (f, i)	; allocLocals f (i + 1, l))
+									true	=> (allocArgTemp (f, i)	; allocLocals f (i + 1, l))
 								  | false 	=> (allocLocal f b		; allocLocals f (i + 1, l)))
 
 	  | allocLocals f (i, [])   = f

@@ -37,6 +37,7 @@ structure Main = struct
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
             val interGraph = Live.makeInterference graph
+            val instrs = RegAlloc.regAlloc (instrs, interGraph)
         in
 			Live.show (TextIO.stdOut, graph);
             emitproc assemOut instrs
