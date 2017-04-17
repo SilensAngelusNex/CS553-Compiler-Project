@@ -2,11 +2,11 @@ structure Live :> LIVE =
 struct
 
     structure A = Assem
-    (* structure FL = Flow *)
+    structure I = InterferenceGraph
+
     structure F = FuncGraph(struct type ord_key = int val compare = Int.compare end)
     structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end)
 	structure S = SplaySetFn(struct type ord_key = Temp.temp val compare = Temp.compare end)
-	structure I = InterferenceGraph
 
     type node = (string * S.set * S.set * S.set * S.set * bool)
 	type nodeID = F.nodeID

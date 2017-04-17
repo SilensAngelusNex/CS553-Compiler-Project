@@ -2,27 +2,17 @@ structure InterferenceGraph :> INTERFERENCE_GRAPH =
 struct
 	type temp = Temp.temp
 
-	structure K : ORD_KEY =
-	struct
-		type ord_key = temp
-		val compare = Temp.compare
-	end
-
-	structure G = FuncGraph(K)
-	structure M = SplayMapFn(K)
-
-	structure F = MIPSFrame
-	structure K1 : ORD_KEY =
-	struct
-		type ord_key = Temp.temp
-		val compare = Temp.compare
-	end
-
 	datatype color = COLOR of Temp.temp
 				   | BLANK
 
 	fun compare (COLOR(t1), COLOR(t2)) = Temp.compare(t1, t2)
 	  | compare (_, _) = LESS
+
+	structure K : ORD_KEY =
+	struct
+		type ord_key = temp
+		val compare = Temp.compare
+	end
 
 	structure K2 : ORD_KEY =
 	struct
@@ -30,11 +20,12 @@ struct
 		val compare = compare
 	end
 
-	structure TM = SplayMapFn(K1)
-	structure CM = SplayMapFn(K2)
+	structure G = FuncGraph(K)
+	structure TM = SplayMapFn(K)
 	structure S = SplaySetFn(K2)
+	structure F = MIPSFrame
 
-	type graph = unit G.graph * unit G.graph * color M.map
+	type graph = unit G.graph * unit G.graph * color TM.map
 
     datatype graphAction = SIMPLIFY of graph * Temp.temp
                          | COALESCE of graph * Temp.temp * Temp.temp
@@ -42,6 +33,8 @@ struct
                          | POTSPILL of graph * Temp.temp
 
     val nextColor = ref 0
+
+	val empty = (G.empty, G.empty, TM.empty)
 
 	val colors = map (fn reg => COLOR(reg)) MIPSFrame.usableRegs
 
@@ -53,14 +46,10 @@ struct
     		result
     	end
 
-
-
-	val empty = (G.empty, G.empty, M.empty)
-
-	fun itemList (_, _, m) = M.listItemsi m
+	fun itemList (_, _, m) = TM.listItemsi m
 	fun keyList g = map (fn (a, b) => a) (itemList g)
 
-	fun addTemp ((g1, g2, m), t) = (G.addNode (g1, t, ()), G.addNode (g2, t, ()), M.insert (m, t, BLANK))
+	fun addTemp ((g1, g2, m), t) = (G.addNode (g1, t, ()), G.addNode (g2, t, ()), TM.insert (m, t, BLANK))
 	val registersOnly = foldl (fn (t, g) => addTemp (g, t)) empty F.usableRegs
 
 	fun addMove ((g1, g2, m), t1, t2) = (g1, G.addEdge (g2, {from=t2,to=t1}), m)
@@ -68,8 +57,8 @@ struct
 	fun addEdge (g, t1, t2, true)  = addMove(g, t1, t2)
 	  | addEdge (g, t1, t2, false) = addInter(g, t1, t2)
 
-	fun removeNode ((g1, g2, m), t) = (G.removeNode (g1, t), G.removeNode (g2, t), (case M.remove (m, t) of (a, b) => a))
-	fun removeNode' ((g1, g2, m), t) = (G.removeNode' (g1, t), G.removeNode' (g2, t), (case M.remove (M.insert (m, t, BLANK), t) of (a, b) => a))
+	fun removeNode ((g1, g2, m), t) = (G.removeNode (g1, t), G.removeNode (g2, t), (case TM.remove (m, t) of (a, b) => a))
+	fun removeNode' ((g1, g2, m), t) = (G.removeNode' (g1, t), G.removeNode' (g2, t), (case TM.remove (TM.insert (m, t, BLANK), t) of (a, b) => a))
 
 	fun successors ((g1, g2, m), t) = (G.succs (G.getNode (g1, t)))
 	fun predecessors ((g1, g2, m), t) = (G.preds (G.getNode (g1, t)))
@@ -88,7 +77,7 @@ struct
 	val tempToString = Temp.makestring
 
 
-	fun size (g1, g2, m) = M.numItems m
+	fun size (g1, g2, m) = TM.numItems m
 
     (* take out the node *)
 	fun simplify (graph, n) = SIMPLIFY(removeNode(graph, n), n)
@@ -106,9 +95,8 @@ struct
 		end
 
 	fun pickSpill graph = case keyList (graph) of
-							SOME(a::l) => a
-							| SOME(_) => Temp.newtemp () (* ERROR *)
-							| NONE => Temp.newtemp (); (* ERROR *)
+							a::l => a
+							| _ => Temp.newtemp () (* ERROR *)
 
     fun potentialSpill graph =
 		let
@@ -136,6 +124,36 @@ struct
 			help (keyList g)
 		end
 
+	fun getNodesColor (m, nID) = case TM.find (m, nID) of
+									SOME(c) => c
+									| NONE => BLANK
+	fun getColor ((g1, g2, m), nID: K.ord_key) =
+		let
+			val all = S.addList(S.empty, (map (fn r => COLOR(r)) F.usableRegs))
+			val remaining = foldl (fn (n, s) => S.difference (s, S.singleton(getNodesColor (m, n)))) all (G.succs (G.getNode(g1, nID)))
+			val available = foldl (fn (n, s) => S.difference (s, S.singleton(getNodesColor (m, n)))) remaining (G.preds (G.getNode(g1, nID)))
+			val available: color list = S.listItems(available)
+		in
+			if List.length(available) > 0
+			then
+				let
+					val c = List.nth(available, 0)
+				in
+					((g1, g2, TM.insert (m, nID, c)), c)
+				end
+			else ((g1, g2, TM.insert (m, nID, BLANK)), BLANK)
+		end
+
+	fun addColoredNode (originalInterGraph, newInterG, nID): graph * color =
+		let
+			val interG = addTemp(newInterG, nID)
+			val interG = foldl (fn (t, g) => addInter(g, t, nID)) interG (successors (originalInterGraph, nID))
+			val g' = foldl (fn (t, g) => addInter(g, t, nID)) interG (predecessors (originalInterGraph, nID))
+			val (g'', color) = getColor (g', nID)
+		in
+			 (g'', color) (* Can actually spill !!! have to actually add to graph*)
+		end
+
     fun graphColor interGraph =
         let
             fun trySimplify interGraph = case nextToSimplify interGraph of
@@ -148,41 +166,7 @@ struct
                                             SOME(n) => unFreeze (interGraph, n)
                                           | NONE => potentialSpill interGraph
 
-			fun getNodesColor (m, nID) = case M.find (m, nID) of
-										 	SOME(c) => c
-											| NONE => BLANK
-			fun getColor ((g1, g2, m), nID) =
-				let
-					val all = S.addList(S.empty, (map (fn r => COLOR(r)) F.usableRegs))
-					val succs = G.succs (G.getNode(g1, nID))
-					val preds = G.preds (G.getNode(g1, nID))
-					val remaining = foldl (fn (n, s) => S.difference (s, S.singleton(getNodesColor (m, n)))) all succs
-					val available = foldl (fn (n, s) => S.difference (s, S.singleton(getNodesColor (m, n)))) remaining preds
-					val available: color list = S.listItems(available)
-				in
-					if List.length(available) > 0
-					then
-						let
-							val c = List.nth(available, 0)
-						in
-							((g1, g2, TM.insert (m, nID, c)), c)
-						end
-					else ((g1, g2, TM.insert (m, nID, BLANK)), BLANK)
-				end
-
-			fun addColoredNode (originalInterGraph, newInterG, nID): graph * color =
-			    let
-			        val succs = successors (originalInterGraph, nID)
-			        val preds = predecessors (originalInterGraph, nID)
-			        val interG = addTemp(newInterG, nID)
-					val interG = foldl (fn (t, g) => addInter(g, t, nID)) interG succs
-			        val g' = foldl (fn (t, g) => addInter(g, t, nID)) interG preds
-					val (g'', color) = getColor (g', nID)
-			    in
-			         (g'', color) (* Can actually spill !!! have to actually add to graph*)
-			    end
-
-            and color interGraph =
+            fun color interGraph =
                 if size interGraph > 0
                 then
                     case trySimplify interGraph of
@@ -201,11 +185,11 @@ struct
                                                     (graph, TM.insert (tempToCol, n, c))
                                                 end
 
-                else ((G.empty, G.empty, M.empty), TM.empty)
+                else ((G.empty, G.empty, TM.empty), TM.empty)
 
             val (graph, tempToCol) = color interGraph
         in
-            (graph, tempToCol)
+            tempToCol
         end
 
 
@@ -213,8 +197,14 @@ struct
 	  | colorToString (BLANK) = "BLANK"
 
 	fun getColor ((g1, g2, m), t) =
-		case M.find (m, t) of
+		case TM.find (m, t) of
 			SOME(COLOR(i)) => COLOR(i)
 		  | SOME(BLANK) => BLANK
 		  | NONE => (print "Error: finding color of nonexistant node."; BLANK)
+
+	fun tempToReg tempToColorMap t = case TM.find (tempToColorMap, t) of
+										SOME(c) => ( case c of
+														COLOR(r) => r
+													  | BLANK    => (print "temp not found in temp->reg map"; F.R0))
+									  | NONE => (print "temp not found in temp->reg map"; F.R0)
 end

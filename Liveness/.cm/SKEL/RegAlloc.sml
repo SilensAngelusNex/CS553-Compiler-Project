@@ -1,3 +1,2 @@
 Skeleton 5
-d2f4d"A"d"F"d"Temp"дҐColor"ad"RegAlloc"jh6ad"M"gp1d"MIPSFrame"Cad"C"gp1€aдҐK1"ки0зр±гҐORD_KEY"aдҐK2"€Бad"TM"jgp1€Б
-зр±еҐSplayMapFn"ad"CM"jgp1€Б €Б5Ngp1c"ALLOC"
+d2f1d"Temp"ad"RegAlloc"jh8ad"A"gp1d"Assem"ad"F"зр±дҐMIPSFrame"ad"M"€/Cad"I"gp1d"InterferenceGraph"aдҐK1"ки0зр±гҐORD_KEY"aдҐK2"€Б(ad"TM"jgp1€Б#зр±еҐSplayMapFn"ad"CM"jgp1€Б9€ВNgp1c"ALLOC"

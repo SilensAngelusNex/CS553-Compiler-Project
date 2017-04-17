@@ -1,8 +1,10 @@
 structure RegAlloc :> ALLOC =
 struct
 
+	structure A = Assem
+	structure F = MIPSFrame
 	structure M = MIPSFrame
-	structure C = Color
+	structure I = InterferenceGraph
 
 	structure K1 : ORD_KEY =
 	struct
@@ -12,34 +14,16 @@ struct
 
 	structure K2 : ORD_KEY =
 	struct
-		type ord_key = C.color
-		val compare = C.compare
+		type ord_key = I.color
+		val compare = I.compare
 	end
 
 	structure TM = SplayMapFn(K1)
 	structure CM = SplayMapFn(K2)
 
-
-	fun tempToReg (colorToRegMap, tempToColorMap) =
-		let
-			fun getReg t = case TM.find (tempToColorMap, t) of
-							SOME(c) => (case CM.find (colorToRegMap, c) of
-											SOME(r) => r
-										  | NONE => (print "color not found in color->reg map"; F.R0))
-						  | NONE => (print "temp not found in temp->color map"; F.R0)
-			fun keySet m = map (fn (a, b) => a) (TM.listItemsi m)
-			val tempToRegMap = foldl (fn (t, m) => TM.insert (m, t, (getReg t))) TM.empty (keySet tempToColorMap)
-			fun result t = case TM.find (tempToRegMap, t) of
-								SOME(r) => r
-							  | NONE => (print "temp not found in temp->reg map"; F.R0)
-		in
-			result
-		end
-
-
-	fun allocRegs getReg (A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp}::instrus) = A.OPER{assem=a, dst=map getReg dstLst, src=map getReg srcLst, jump=jmp}::(allocRegs instrus)
-	  | allocRegs getReg (A.LABEL{assem=a, lab=label}::instrus) = A.LABEL{assem=a, lab=label}::(allocRegs instrus)
-	  | allocRegs getReg (A.MOVE{assem=a, dst=dst, src=src}::instrus) = A.MOVE{assem=a, dst=getReg (dst), src=getReg (src)}::(allocRegs instrus)
+	fun allocRegs getReg (A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp}::instrus) = A.OPER{assem=a, dst=map getReg dstLst, src=map getReg srcLst, jump=jmp}::(allocRegs getReg instrus)
+	  | allocRegs getReg (A.LABEL{assem=a, lab=label}::instrus) = A.LABEL{assem=a, lab=label}::(allocRegs getReg instrus)
+	  | allocRegs getReg (A.MOVE{assem=a, dst=dst, src=src}::instrus) = A.MOVE{assem=a, dst=getReg (dst), src=getReg (src)}::(allocRegs getReg instrus)
 	  | allocRegs getReg [] = []
 
 	fun removeRedundantMove (A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp}::instrus) = A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp}::(removeRedundantMove instrus)
@@ -49,8 +33,8 @@ struct
 
 	fun regAlloc (instrus, intergraph) =
 		let
-			val (tempToColorMap, colorToRegMap) = Color.graphColor intergraph
-			val getRegFunc = tempToReg (colorToRegMap, tempToColorMap)
+			val tempToColorMap = I.graphColor intergraph
+			val getRegFunc = I.tempToReg tempToColorMap
 			val instrus' = allocRegs getRegFunc instrus
 			val result = removeRedundantMove instrus'
 		in
