@@ -8,6 +8,14 @@ struct
 
 	type register = Temp.temp * string
 
+	structure K : ORD_KEY =
+	struct
+		type ord_key = Temp.temp
+		val compare = Temp.compare
+	end
+
+	structure TM = SplayMapFn(K)
+
 	datatype frag = PROC of {body: Tree.stm, frame: frame}
 				  | STRING of Temp.label * string
 
@@ -17,30 +25,36 @@ struct
 	fun name (t, l, i) = Symbol.name t
 	fun label (t, l, i) = t
 
+
 	val specialregs = regTemps ["$zero", "$at", "$v0", "$v1", "$gp", "$sp", "$fp", "$ra"]
 	val argregs = regTemps ["$a0", "$a1", "$a2", "$a3"]
 	val callersaves = regTemps ["$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"]
 	val calleesaves = regTemps ["$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7"]
 
-	(*val tempMap = foldl (fn ((temp, name), table) => Temp.Table.enter (table, temp, (temp, name)))
-					(Temp.Table.empty)
-					(specialregs@argregs@callersaves@calleesaves)*)
+	val tempMap = foldl (fn ((temp, name), table) => TM.insert (table, temp, name))
+					(TM.empty)
+					(specialregs@argregs@callersaves@calleesaves)
 
+	fun tempName t = case TM.find(tempMap, t) of
+							SOME(n) => n
+							| NONE => "uhh"
  	fun string (lab, str) = lab ^ ":" ^ "\t\t.asciiz\t\t" ^ "\"" ^ str ^ "\"\n"
 
 	val R0 = case List.nth (specialregs, 0) of (temp, name) => temp
+	val AT = case List.nth (specialregs, 1) of (temp, name) => temp
 	val V0 = case List.nth (specialregs, 2) of (temp, name) => temp
 	val V1 = case List.nth (specialregs, 3) of (temp, name) => temp
-	val SP = case List.nth (specialregs, 4) of (temp, name) => temp
-	val FP = case List.nth (specialregs, 5) of (temp, name) => temp
-	val RV = case List.nth (specialregs, 6) of (temp, name) => temp
+	val GP = case List.nth (specialregs, 4) of (temp, name) => temp
+	val SP = case List.nth (specialregs, 5) of (temp, name) => temp
+	val FP = case List.nth (specialregs, 6) of (temp, name) => temp
 	val RA = case List.nth (specialregs, 7) of (temp, name) => temp
 	val A0 = case List.nth (argregs, 0) of (temp, name) => temp
 	val A1 = case List.nth (argregs, 1) of (temp, name) => temp
 	val A2 = case List.nth (argregs, 2) of (temp, name) => temp
 	val A3 = case List.nth (argregs, 3) of (temp, name) => temp
 
-	val usableRegs = [R0, V0, V1, A0, A1, A2, A3]@(getTemps calleesaves)@(getTemps callersaves)
+	val unusableRegs = [R0, AT, GP, SP, FP, RA]
+	val usableRegs = (getTemps calleesaves)@(getTemps callersaves)@[V0, V1, A0, A1, A2, A3]
 
 	val wordSize = 4
 

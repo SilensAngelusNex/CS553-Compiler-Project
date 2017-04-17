@@ -8,7 +8,7 @@ structure Main = struct
 
     fun getsome (SOME x) = x
 
-    fun emitproc out instrs = app (fn i => TextIO.output(out, Assem.format(Temp.makestring) i)) instrs;
+    fun emitproc out instrs = app (fn i => TextIO.output(out, Assem.format(F.tempName) i)) instrs;
 
     fun processFrag out (F.STRING(lab,s), instrs) = (TextIO.output (out, F.string(lab, s)); instrs) (* should emit? *)
       | processFrag out(F.PROC{body,frame}, instrs) =
@@ -39,7 +39,7 @@ structure Main = struct
             val interGraph = Live.makeInterference graph
             val instrs = RegAlloc.regAlloc (instrs, interGraph)
         in
-			Live.show (TextIO.stdOut, graph);
+			(*Live.show (TextIO.stdOut, graph);*)
             emitproc assemOut instrs
         end))
 

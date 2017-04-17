@@ -320,8 +320,8 @@ struct
 	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
-	fun transBody (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(transAssign (Ex(T.TEMP F.RV), exp, L(frame, p, u)))), T.JUMP(T.TEMP (F.RA), [])))
-	  | transBody (exp, EMPTY) =  Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(transAssign (Ex(T.TEMP F.RV), exp, EMPTY))), T.JUMP(T.TEMP (F.RA), [])))
+	fun transBody (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(transAssign (Ex(T.TEMP F.V0), exp, L(frame, p, u)))), T.JUMP(T.TEMP (F.RA), [])))
+	  | transBody (exp, EMPTY) =  Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(transAssign (Ex(T.TEMP F.V0), exp, EMPTY))), T.JUMP(T.TEMP (F.RA), [])))
 	fun transProc (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
 	  | transProc (exp, EMPTY) = Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
 

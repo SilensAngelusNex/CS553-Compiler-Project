@@ -1,27 +1,65 @@
-String Frag:	"df"
-
-String Frag:	"a"
-
 Frag:
 SEQ(
 	SEQ(
 		LABEL tig_main,
 		MOVE(
-			TEMP t159,
-			CALL(
-				NAME stringEqual,
-					TEMP t162,
-					ESEQ(
+			TEMP t102,
+			ESEQ(
+				SEQ(
+					SEQ(
 						MOVE(
-							TEMP t209,
-							NAME L23),
-						TEMP t209),
-					ESEQ(
-						MOVE(
-							TEMP t210,
-							NAME L24),
-						TEMP t210)))),
+							TEMP t159,
+							ESEQ(
+								SEQ(
+									CJUMP(GT,
+										CONST 10,
+										CONST 20,
+										L38,L39),
+									SEQ(
+										SEQ(
+											LABEL L38,
+											SEQ(
+												MOVE(
+													TEMP t158,
+													CONST 1),
+												JUMP(
+													NAME L40))),
+										SEQ(
+											LABEL L39,
+											SEQ(
+												MOVE(
+													TEMP t158,
+													CONST 0),
+												JUMP(
+													NAME L40))))),
+								ESEQ(
+									LABEL L40,
+									TEMP t158))),
+						CJUMP(NE,
+							TEMP t159,
+							CONST 0,
+							L41,L42)),
+					SEQ(
+						SEQ(
+							LABEL L41,
+							SEQ(
+								MOVE(
+									TEMP t160,
+									CONST 30),
+								JUMP(
+									NAME L43))),
+						SEQ(
+							LABEL L42,
+							SEQ(
+								MOVE(
+									TEMP t160,
+									CONST 40),
+								JUMP(
+									NAME L43))))),
+				ESEQ(
+					LABEL L43,
+					TEMP t160)))),
 	JUMP(
-		TEMP t164))
+		TEMP t107))
 
 

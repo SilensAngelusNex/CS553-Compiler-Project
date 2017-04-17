@@ -34,6 +34,7 @@ struct
 	fun regAlloc (instrus, intergraph) =
 		let
 			val tempToColorMap = I.graphColor intergraph
+			val _ = I.printColorMap tempToColorMap
 			val getRegFunc = I.tempToReg tempToColorMap
 			val instrus' = allocRegs getRegFunc instrus
 			val result = removeRedundantMove instrus'

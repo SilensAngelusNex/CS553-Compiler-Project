@@ -4,6 +4,7 @@ sig
 	datatype color = COLOR of Temp.temp
 				   | BLANK
 	structure TM : ORD_MAP
+	structure F : FRAME
 
 	val empty : graph
 	val registersOnly : graph
@@ -13,6 +14,7 @@ sig
 	val keyList : graph -> Temp.temp list
 
 	val addTemp : graph * Temp.temp -> graph
+	val addUnusableTemp : graph * Temp.temp -> graph
 	val addEdge : graph * Temp.temp * Temp.temp * bool -> graph
 	val addMove : graph * Temp.temp * Temp.temp -> graph
 	val addInter : graph * Temp.temp * Temp.temp -> graph
@@ -26,7 +28,8 @@ sig
 
 	val tempToString : Temp.temp -> string
 	val colorToString : color -> string
-
+	val printColors : graph -> unit
+	val printColorMap : color TM.map -> unit
 	val successors: graph * Temp.temp -> Temp.temp list
 	val predecessors: graph * Temp.temp -> Temp.temp list
 

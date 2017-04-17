@@ -1,27 +1,27 @@
 tig_main:
-	j		L18
-L18:
-	li		t162, 0
-	move	t159, t162
-L19:
-	move	t160, t159
-	beq		t160, t100, L21
-	j		 L20
-L21:
-	li		t163, 40
-	move	t161, t163
-L22:
-	move	t102, t161
-	jr		t107
+	j		L39
+L39:
+	li		$v0, 0
+	move	$v1, $v0
+L40:
+	move	$v0, $v1
+	beq		$v0, $zero, L42
+	j		 L41
+L42:
+	li		$v0, 40
+	move	$v1, $v0
+L43:
+	move	$v0, $v1
+	jr		$ra
 
-L17:
-	li		t164, 1
-	move	t159, t164
-	j		L19
+L38:
+	li		$v0, 1
+	move	$v1, $v0
+	j		L40
 
-L20:
-	li		t165, 30
-	move	t161, t165
-	j		L22
+L41:
+	li		$v0, 30
+	move	$v1, $v0
+	j		L43
 
-L23:
+L44:

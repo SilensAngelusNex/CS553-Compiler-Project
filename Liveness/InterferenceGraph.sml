@@ -31,6 +31,7 @@ struct
                          | COALESCE of graph * Temp.temp * Temp.temp
                          | UNFREEZE of graph * Temp.temp
                          | POTSPILL of graph * Temp.temp
+						 | DONE of graph
 
     val nextColor = ref 0
 
@@ -49,7 +50,13 @@ struct
 	fun itemList (_, _, m) = TM.listItemsi m
 	fun keyList g = map (fn (a, b) => a) (itemList g)
 
-	fun addTemp ((g1, g2, m), t) = (G.addNode (g1, t, ()), G.addNode (g2, t, ()), TM.insert (m, t, BLANK))
+	fun addTemp ((g1, g2, m), t) = (G.addNode (g1, t, ()),
+									G.addNode (g2, t, ()),
+									case TM.find (m, t) of
+										SOME(x) => m
+									  | NONE => TM.insert (m, t, BLANK))
+
+	fun addUnusableTemp ((g1, g2, m), t) = (G.addNode (g1, t, ()), G.addNode (g2, t, ()), TM.insert (m, t, COLOR(t)))
 	val registersOnly = foldl (fn (t, g) => addTemp (g, t)) empty F.usableRegs
 
 	fun addMove ((g1, g2, m), t1, t2) = (g1, G.addEdge (g2, {from=t2,to=t1}), m)
@@ -63,19 +70,21 @@ struct
 	fun successors ((g1, g2, m), t) = (G.succs (G.getNode (g1, t)))
 	fun predecessors ((g1, g2, m), t) = (G.preds (G.getNode (g1, t)))
 
-	(*fun interDegree ((g1, g2, m), t) =
-		case C.getColor ((g1, g2, m), t) of
-			BLANK => G.outDegree (G.getNode(g1, t))
-		  | COLOR(_) => (case Int.maxInt of SOME(i) => i | NONE => 10000000)*)
-
-
 	fun moveDegree ((g1, g2, m), t) = G.inDegree (G.getNode(g2, t))
+
+	fun checkColor ((g1, g2, m), t) = case TM.find (m, t) of
+										SOME(x) => x
+									  | NONE => BLANK
+	fun interDegree ((g1, g2, m), t) =
+		case checkColor ((g1, g2, m), t) of
+			BLANK => G.outDegree (G.getNode(g1, t))
+		  | COLOR(_) => 10000000
+
 	fun degree ((g1, g2, s), t) = G.outDegree (G.getNode(g1, t)) + G.degree (G.getNode(g2, t))
 
 	fun moveRelated ((g1, g2, m), t) = G.degree (G.getNode(g2, t)) > 0
 
 	val tempToString = Temp.makestring
-
 
 	fun size (g1, g2, m) = TM.numItems m
 
@@ -94,35 +103,74 @@ struct
 			UNFREEZE((g1, g2', m), t)
 		end
 
-	fun pickSpill graph = case keyList (graph) of
-							a::l => a
-							| _ => Temp.newtemp () (* ERROR *)
+	fun pickSpill graph =
+		let
+			val lst = keyList (graph)
+			fun getNext (a::l) = (case checkColor(graph, a) of
+										COLOR(_) => getNext(l)
+									  | BLANK => a
+									  )
+			  | getNext ([]) = Temp.newtemp () (* ERROR !!!! *)
+		in
+			getNext (lst)
+		end
 
     fun potentialSpill graph =
 		let
+			val _ = print "SPILL!"
 			val n = pickSpill graph
 		in
 			POTSPILL(removeNode(graph, n), n)
 		end
 
+	fun printColor (g, t) = (case checkColor (g, t) of
+								  COLOR(r) => "COLOR(" ^ (Temp.makestring r) ^ ")"
+								| BLANK => "BLANK")
+	fun printColors g =
+		let
+			val _ = print "GRAPH: \n"
+			val lst = (keyList g)
+			fun colorL g (t::l) = (print ("\t" ^ (Temp.makestring t) ^ " has color " ^ (printColor (g, t) ^ "\n")); colorL g l)
+			   | colorL g ([]) = print "\n"
+		in
+			colorL g lst;
+			()
+		end
+
+	fun printColorMap m = (print "COLOR MAP: \n" ; TM.appi (fn (key, color) =>
+						case color of
+							COLOR(t) => print ("\t" ^ (Temp.makestring key)  ^ " has COLOR("^ (Temp.makestring t) ^ ")\n")
+						  | BLANK => print "\tis blank\n" ) m; ())
 	(* Find the next node to simplfy *)
 	fun nextToSimplify g =
 		let
-			fun help (t::l) = if degree (g, t) < List.length(MIPSFrame.usableRegs) then SOME(t) else help (l)
-			  | help ([]) = NONE
+			fun help (t::l) = let
+								val y = interDegree (g, t)
+							  in
+							  	if y < List.length(MIPSFrame.usableRegs)
+								then (print  ("Simplifying node: " ^ (Temp.makestring t) ^ "  which has interdegree " ^ (Int.toString y) ^  " and color " ^ (printColor (g, t)) ^ "\n"); SOME(t))
+								else help (l)
+							  end
+			 | help ([]) = NONE
+
+			 fun checkColored (t::l) = (case checkColor (g, t) of
+										   COLOR(_) => (print ("This is alredy colored: " ^ (Temp.makestring t) ^ "\n"); checkColored(l))
+										 | BLANK => false)
+			   | checkColored ([]) = true
+
+			  val keyl = keyList g
+
 		in
-			help (keyList g)
+			case help keyl of
+				SOME(x) => SOME(SOME(x))
+				| NONE => if checkColored(keyl)
+						  then SOME(NONE)
+						  else NONE
 		end
 
-	fun nextToCoalesce g = SOME(Temp.newtemp (), Temp.newtemp ())
+	fun nextToCoalesce g = NONE
 
-	fun nextToUnFreeze g =
-		let
-			fun help (t::l) = if degree (g, t) < List.length(MIPSFrame.usableRegs) then SOME(t) else help (l)
-			  | help ([]) = NONE
-		in
-			help (keyList g)
-		end
+	fun nextToUnFreeze g = NONE
 
 	fun getNodesColor (m, nID) = case TM.find (m, nID) of
 									SOME(c) => c
@@ -156,8 +204,10 @@ struct
 
     fun graphColor interGraph =
         let
+			val _ = printColors interGraph
             fun trySimplify interGraph = case nextToSimplify interGraph of
-                                            SOME(n) => simplify (interGraph, n)
+                                            SOME(SOME(n)) => simplify (interGraph, n)
+										  | SOME(NONE) => DONE(interGraph)
                                           | NONE => tryCoalesce interGraph
             and tryCoalesce interGraph = case nextToCoalesce interGraph of
                                             SOME(n1, n2) => coalesce (interGraph, n1, n2)
@@ -173,6 +223,7 @@ struct
                         SIMPLIFY(g, n)      => let
                                                   val (iGraph, tempToCol) = color g
                                                   val (graph, c) = addColoredNode (interGraph, iGraph, n)
+												  val _ = print  ("Just colored node: " ^ (Temp.makestring n) ^ "\n")
                                                 in
                                                     (graph, TM.insert (tempToCol, n, c))
                                                 end
@@ -184,12 +235,14 @@ struct
                                                 in
                                                     (graph, TM.insert (tempToCol, n, c))
                                                 end
+					  | DONE(g) => ( print "Things are already colored!\n";(g, TM.empty))
 
                 else ((G.empty, G.empty, TM.empty), TM.empty)
 
             val (graph, tempToCol) = color interGraph
         in
-            tempToCol
+            case graph of
+			 (_, _, m) => m
         end
 
 
@@ -204,7 +257,7 @@ struct
 
 	fun tempToReg tempToColorMap t = case TM.find (tempToColorMap, t) of
 										SOME(c) => ( case c of
-														COLOR(r) => r
-													  | BLANK    => (print "temp not found in temp->reg map"; F.R0))
-									  | NONE => (print "temp not found in temp->reg map"; F.R0)
+														COLOR(r) => (print ("Turning REGISTER: " ^ (Temp.makestring t) ^ " into " ^ (Temp.makestring t) ^ "\n"); r)
+													  | BLANK    => (print ("temp: " ^ (Temp.makestring t) ^ " is blank?\n"); F.FP))
+									  | NONE => (print ("temp: " ^ (Temp.makestring t) ^ " not found in temp->color map\n"); F.FP)
 end

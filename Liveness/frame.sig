@@ -3,21 +3,23 @@ sig
 	type frame
 	type access
 	type register
+	structure TM : ORD_MAP
 	datatype frag = PROC of {body: Tree.stm, frame: frame}
 				  | STRING of Temp.label * string
 
 	val FP : Temp.temp
-	val RV : Temp.temp
 	val R0 : Temp.temp
 	val SP : Temp.temp
 	val V0 : Temp.temp
 	val V1 : Temp.temp
+	val GP : Temp.temp
 	val RA : Temp.temp
 	val A0 : Temp.temp
 	val A1 : Temp.temp
 	val A2 : Temp.temp
 	val A3 : Temp.temp
 
+	val unusableRegs : Temp.temp list
 	val usableRegs : Temp.temp list
 
 	val string : (Temp.label * string) -> string
@@ -33,7 +35,7 @@ sig
 	val procEntryExit1 : (frame * Tree.stm) -> Tree.stm
 	val procEntryExit2 : frame * Assem.instr list -> Assem.instr list
 	val procEntryExit3 : Symbol.symbol * 'a -> {prolog: string, body: 'a, epilog: string}
-	(*val tempMap : register Temp.Table.table
-	val tempName : Temp.temp -> string*)
+	val tempMap : string TM.map
+	val tempName : Temp.temp -> string
 
 end
