@@ -1,2 +1,2 @@
 Skeleton 5
-d2f4d"Int"d"List"d"Temp"дўMIPSFrame"ad"InterferenceGraph"jh6aдўK"ки0зр±гўORD_KEY"CaдўK2"яЃad"G"jзр±я=gp1e"FuncGraph"ad"TM"jяЃ!gp1e"SplayMapFn"ad"S"jgp1яЃgp1e"SplaySetFn"ad"F"gp1яNgp1c"INTERFERENCE_GRAPH"
+d2f4d"Int"d"List"d"Temp"дўMIPSFrame"ad"InterferenceGraph"jh7aдўK"ки0зр±гўORD_KEY"aдўK2"яЃCad"G"jзр±я=gp1e"FuncGraph"ad"TM"jяЃ!gp1e"SplayMapFn"ad"S"jgp1яЃзр±еўSplaySetFn"ad"NS"jяЃ!я‚ad"F"gp1яNgp1c"INTERFERENCE_GRAPH"

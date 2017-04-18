@@ -101,7 +101,7 @@ struct
 					val def = S.listItems def
 					val use = S.listItems use
                     val defCOut = foldl (fn (d, acc) => acc@createList(d, out, false)) [] def
-					val moves   = foldl (fn (d, acc) => acc@createList(d, use, false)) [] def
+					val moves   = foldl (fn (d, acc) => acc@createList(d, use, true)) [] def
                 in
                 	moves@defCOut
                 end
@@ -110,8 +110,14 @@ struct
 				if i <= 0
 				then []
 				else (oneLine (F.nodeInfo (F.getNode (graph, i))))@(help graph (i - 1))
+
+			fun printR ((t1, t2, false)::l) = (print ((Temp.makestring t1) ^ " <-> " ^ (Temp.makestring t1) ^ "\n"); printR l)
+			  | printR ((t1, t2, true)::l) = (print ((Temp.makestring t1) ^ " <-- " ^ (Temp.makestring t1) ^ "\n"); printR l)
+			  | printR [] = ()
+			val result = help graph ((F.size graph) - 1)
 		in
-		help graph ((F.size graph) - 1)
+		printR result;
+		result
 		end
 
 	fun insertInterNodes graph = foldl (fn (t, g) => I.addTemp (g, t)) emptyGraph (getTempList graph)
@@ -128,7 +134,7 @@ struct
 					val this = F.getNode (graph, id)
 					val (a, def, use, ins, outs, move) = F.nodeInfo this
 				in
-					TextIO.output(outstream, "Node:\t" ^ (Int.toString id) ^ "\t" ^ a ^ "\n\tIns:\t");
+					TextIO.output(outstream, (if move then "Move " else "Oper ") ^ "Node:\t" ^ (Int.toString id) ^ "\t" ^ a ^ "\n\tIns:\t");
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) ins;
 					TextIO.output(outstream, "\n\tOuts:\t");
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) outs;

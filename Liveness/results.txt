@@ -8,57 +8,57 @@ SEQ(
 				SEQ(
 					SEQ(
 						MOVE(
-							TEMP t159,
+							TEMP t243,
 							ESEQ(
 								SEQ(
 									CJUMP(GT,
 										CONST 10,
 										CONST 20,
-										L38,L39),
+										L122,L123),
 									SEQ(
 										SEQ(
-											LABEL L38,
+											LABEL L122,
 											SEQ(
 												MOVE(
-													TEMP t158,
+													TEMP t242,
 													CONST 1),
 												JUMP(
-													NAME L40))),
+													NAME L124))),
 										SEQ(
-											LABEL L39,
+											LABEL L123,
 											SEQ(
 												MOVE(
-													TEMP t158,
+													TEMP t242,
 													CONST 0),
 												JUMP(
-													NAME L40))))),
+													NAME L124))))),
 								ESEQ(
-									LABEL L40,
-									TEMP t158))),
+									LABEL L124,
+									TEMP t242))),
 						CJUMP(NE,
-							TEMP t159,
+							TEMP t243,
 							CONST 0,
-							L41,L42)),
+							L125,L126)),
 					SEQ(
 						SEQ(
-							LABEL L41,
+							LABEL L125,
 							SEQ(
 								MOVE(
-									TEMP t160,
+									TEMP t244,
 									CONST 30),
 								JUMP(
-									NAME L43))),
+									NAME L127))),
 						SEQ(
-							LABEL L42,
+							LABEL L126,
 							SEQ(
 								MOVE(
-									TEMP t160,
+									TEMP t244,
 									CONST 40),
 								JUMP(
-									NAME L43))))),
+									NAME L127))))),
 				ESEQ(
-					LABEL L43,
-					TEMP t160)))),
+					LABEL L127,
+					TEMP t244)))),
 	JUMP(
 		TEMP t107))
 

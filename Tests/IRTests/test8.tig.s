@@ -1,27 +1,21 @@
 tig_main:
-	j		L39
-L39:
+	j		L123
+L123:
 	li		$v0, 0
-	move	$v1, $v0
-L40:
-	move	$v0, $v1
-	beq		$v0, $zero, L42
-	j		 L41
-L42:
+L124:
+	beq		$v0, $zero, L126
+	j		 L125
+L126:
 	li		$v0, 40
-	move	$v1, $v0
-L43:
-	move	$v0, $v1
+L127:
 	jr		$ra
 
-L38:
+L122:
 	li		$v0, 1
-	move	$v1, $v0
-	j		L40
+	j		L124
 
-L41:
+L125:
 	li		$v0, 30
-	move	$v1, $v0
-	j		L43
+	j		L127
 
-L44:
+L128:
