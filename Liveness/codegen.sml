@@ -945,7 +945,7 @@ struct
 								emit(A.OPER {
                                         assem="\tjal\t\t'j0\n\n",
                                         src=munchArgs(0, args),
-                                        dst=[Frame.V0, Frame.V1],
+                                        dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@Frame.callersaves,
                                         jump=SOME([l])
                                     });
 								postCall ())
@@ -957,7 +957,7 @@ struct
 							  	emit(A.OPER {
 									  	assem="\tjalr\t\t's0\n\n",
 									  	src=t::munchArgs(0, args),
-									  	dst=[Frame.V0, Frame.V1],
+									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@Frame.callersaves,
 									  	jump=SOME([])
 									});
 								postCall ())
@@ -969,7 +969,7 @@ struct
 							  	emit(A.OPER {
 									  	assem="\tjalr\t\t's0\n\n",
 									  	src=(munchExp e1)::munchArgs(0, args),
-									  	dst=[Frame.V0, Frame.V1],
+									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@Frame.callersaves,
 									  	jump=SOME([])
 									});
 								postCall ())

@@ -19,6 +19,8 @@ sig
 	val A2 : Temp.temp
 	val A3 : Temp.temp
 
+	val callersaves : Temp.temp list
+
 	val unusableRegs : Temp.temp list
 	val usableRegs : Temp.temp list
 

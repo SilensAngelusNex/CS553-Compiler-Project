@@ -54,7 +54,7 @@ struct
 	val A3 = case List.nth (argregs, 3) of (temp, name) => temp
 
 	val unusableRegs = [R0, AT, GP, SP, FP, RA]
-	val usableRegs = (getTemps calleesaves)@(getTemps callersaves)@[V0, V1, A0, A1, A2, A3]
+	val usableRegs = (getTemps calleesaves)@[V0, V1, A0, A1, A2, A3]@(getTemps callersaves)
 
 	val wordSize = 4
 
