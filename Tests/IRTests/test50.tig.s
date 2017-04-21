@@ -1,4 +1,4 @@
-L28:
+L13:
 	move	$fp, $sp
 	sw		$a0, 0($fp)
 	move	$a1, $a1
@@ -43,16 +43,16 @@ L28:
 	move	$fp, $a0
 	jr		$ra
 
-L29:
+L14:
 tig_main:
 	move	$a0, $fp
 	li		$v0, 3
 	move	$a1, $v0
 	li		$v0, 4
 	move	$a2, $v0
-	jal		L28
+	jal		L13
 
 	move	$v0, $v0
 	jr		$ra
 
-L30:
+L15:

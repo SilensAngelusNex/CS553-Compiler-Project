@@ -1,6 +1,6 @@
 Frag:
 SEQ(
-	LABEL L28,
+	LABEL L13,
 	SEQ(
 		SEQ(
 			MOVE(
@@ -16,11 +16,11 @@ SEQ(
 						TEMP t108),
 					SEQ(
 						MOVE(
-							TEMP t255,
+							TEMP t160,
 							TEMP t109),
 						SEQ(
 							MOVE(
-								TEMP t256,
+								TEMP t161,
 								TEMP t110),
 							MOVE(
 								TEMP t105,
@@ -99,8 +99,8 @@ SEQ(
 			MOVE(
 				TEMP t102,
 				BINOP(MINUS,
-					TEMP t255,
-					TEMP t256)),
+					TEMP t160,
+					TEMP t161)),
 			SEQ(
 				SEQ(
 					SEQ(
@@ -190,7 +190,7 @@ SEQ(
 		MOVE(
 			TEMP t102,
 			CALL(
-				NAME L28,
+				NAME L13,
 					TEMP t106,
 					CONST 3,
 					CONST 4))),

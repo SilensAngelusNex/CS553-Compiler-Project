@@ -97,12 +97,13 @@ struct
 
 	fun coalesce ((g1, g2, cm, tm), t1, t2) =
 		let
-			val newInterSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t1))), NS.addList (NS.empty, G.succs (G.getNode (g1, t2))))
-			val newInterPreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t1))), NS.addList (NS.empty, G.preds (G.getNode (g1, t2))))
+			val _ = print ("coelescing nodes: " ^ (Temp.makestring t1) ^ "and" ^ (Temp.makestring t1) ^ "\n")
+			val newInterSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1))))
+			val newInterPreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1))))
 			val newInterEdges = (map (fn t => (t1, t)) (NS.listItems newInterSuccs))@(map (fn t => (t, t1)) (NS.listItems newInterPreds))
 
-			val newMoveSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g2, t1))), NS.addList (NS.empty, G.succs (G.getNode (g2, t2))))
-			val newMovePreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g2, t1))), NS.addList (NS.empty, G.preds (G.getNode (g2, t2))))
+			val newMoveSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g2, t2))), NS.addList (NS.empty, G.succs (G.getNode (g2, t1))))
+			val newMovePreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g2, t2))), NS.addList (NS.empty, G.preds (G.getNode (g2, t1))))
 			val newMoveEdges = (map (fn t => (t1, t)) (NS.listItems newMoveSuccs))@(map (fn t => (t, t1)) (NS.listItems newMovePreds))
 
 			val graph = removeNode ((g1, g2, cm, tm), t2)
@@ -200,9 +201,9 @@ struct
 			val sig_deg = List.length F.usableRegs
 			val degree = foldl (fn (t, i) => if G.degree (G.getNode (g1, t)) >= sig_deg then i + 1 else i) 0 adj
 		in
-			if not (NS.member (NS.addList (NS.empty, (G.succs n1)), t2)) andalso degree < sig_deg
-			then (print "true\n"; true)
-			else (print "false\n"; false)
+			if not (t1 = t2) andalso not (NS.member (NS.addList (NS.empty, (G.succs n1)), t2)) andalso degree < sig_deg
+			then true
+			else false
 		end
 
 
@@ -213,15 +214,16 @@ struct
 				let
 					val adj = NS.listItems (NS.addList ((NS.addList (NS.empty, (G.succs n1))), (G.preds n1)))
 					fun help2 (t::l) = if heuristic (g1, G.getNodeID n1, t)
-										then SOME(G.getNode(g2, t)) (*this line throws exception when coelesce called first*)
+										then (print (Temp.makestring t); SOME(G.getNode(g2, t))) (*this line throws exception when coelesce called first*)
 										else help2 l
 					  | help2 [] = NONE
 				in
 					if List.length adj > 0 then (case help2 adj of SOME(n2) =>SOME(G.getNodeID n1, G.getNodeID n2) | NONE => NONE) else help l
 				end
 			  | help [] = NONE
+			  val result = help nodes
 		in
-			help nodes
+			result
 		end
 
 	fun nextToUnFreeze (g1, g2, cm, tm) =
@@ -287,7 +289,7 @@ struct
         let
 			val _ = printColors interGraph
 
-
+			(*)
             fun trySimplify interGraph = case nextToSimplify interGraph of
                                             SOME(SOME(n)) => simplify (interGraph, n)
 										  | SOME(NONE) => DONE(interGraph)
@@ -298,24 +300,25 @@ struct
             and tryUnFreeze interGraph = case nextToUnFreeze interGraph of
                                             SOME(n) => unFreeze (interGraph, n)
                                           | NONE => potentialSpill interGraph
+			*)
 
-			(*
-			fun trySimplify interGraph = case (print "s\n"; nextToSimplify interGraph) of
+
+			fun trySimplify interGraph = case nextToSimplify interGraph of
 											SOME(SOME(n)) => simplify (interGraph, n)
 										  | SOME(NONE) => DONE(interGraph)
 										  | NONE => tryUnFreeze interGraph
-			and tryCoalesce interGraph = case (print "c\n"; nextToCoalesce interGraph) of
+			and tryCoalesce interGraph = case nextToCoalesce interGraph of
 											SOME(n1, n2) => coalesce (interGraph, n1, n2)
 										  | NONE => trySimplify interGraph
-			and tryUnFreeze interGraph = case (print "u\n"; nextToUnFreeze interGraph) of
+			and tryUnFreeze interGraph = case nextToUnFreeze interGraph of
 											SOME(n) => unFreeze (interGraph, n)
 										  | NONE => potentialSpill interGraph
-			*)
+
 
             fun color interGraph =
                 if size interGraph > 0
                 then
-                    case trySimplify interGraph of
+                    case tryCoalesce interGraph of
                         SIMPLIFY(g, n)      => let
                                                   val iGraph = color g
                                                   val (graph, c) = addColoredNode (interGraph, iGraph, n)

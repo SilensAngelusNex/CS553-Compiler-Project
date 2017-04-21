@@ -116,7 +116,7 @@ struct
 			  | printR [] = ()
 			val result = help graph ((F.size graph) - 1)
 		in
-		printR result;
+		(*	printR result;	*)
 		result
 		end
 
