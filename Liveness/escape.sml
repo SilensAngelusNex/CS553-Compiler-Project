@@ -7,13 +7,13 @@ struct
 	type escEnv = (depth * bool ref) Symbol.table
 
 
-	fun addArgs (env, d, {name=n, escape=e, typ=_, pos=_}::p) = addArgs (Symbol.enter (env, n, (d, e)), d, p)
+	fun addArgs (env, d, {name=n, escape=e, typ=_, pos=_}::p) = (e := false; addArgs (Symbol.enter (env, n, (d, e)), d, p))
 	  | addArgs (env, _, []) = env
 
 
 	fun traverseVar (env, d, A.SimpleVar(n, pos)) =  (case Symbol.look (env, n) of
 													SOME (depth, b) => 	(if depth > d
-																		then b := true
+																		then (print ((Int.toString depth) ^ " " ^ (Int.toString d) ^ "\n"); b := true)
 																		else ())
 													| NONE => ())
 	  | traverseVar (env, d, A.FieldVar(v, n, pos)) = traverseVar (env, d, v)
@@ -30,6 +30,7 @@ struct
 	  | traverseExp (env, d, A.WhileExp {test=e1, body=e2, pos=_}) = (traverseExp(env, d, e1); traverseExp(env, d, e2))
 	  | traverseExp (env, d, A.ForExp {var=n, escape=e, lo=e1, hi=e2, body=e3, pos=_}) = (traverseExp(env, d, e1); traverseExp(env, d, e2); traverseExp(Symbol.enter (env, n, (d, e)), d, e3))
 	  | traverseExp (env, d, A.LetExp {decs=decs, body=e, pos=_}) = let
+	  				val _ = print "hello"
 	  																val env = foldl (fn (dec, newEnv) => traverseDec (newEnv, d, dec)) env decs
 	  															  in
 																  	traverseExp (env, d, e)
@@ -50,5 +51,5 @@ struct
 																				  traverseExp (env, d, e)
 																				end
 
-	fun findEscape prog = traverseExp (Symbol.beginScope Symbol.empty, 0, prog)
+	fun findEscape prog = ((print ("finding...\n")); traverseExp (Symbol.beginScope Symbol.empty, 0, prog))
 end

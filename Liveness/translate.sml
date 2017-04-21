@@ -16,11 +16,17 @@ struct
 
 	val outermost = L(F.newFrame {name=Temp.namedlabel "tig_main", formals=[true]}, EMPTY, ref ())
 
+	fun getFrame (L(f, _, _)) = f
+	  | getFrame EMPTY = getFrame outermost
+
+	fun removeFirst (a::l) = l
+	  | removeFirst [] = []
+
 	val fragList: F.frag list ref = ref []
 
 	fun getResult () = let val result = !fragList in fragList := []; result end
 
-	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (F.formals frame), (F.label frame))
+	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (removeFirst (F.formals frame)), (F.label frame))
 	  | getLevelInfo EMPTY = ([], Temp.newlabel ())
 
 	fun newLevel {parent=parent, name=name, formals=formals} = let
@@ -28,6 +34,10 @@ struct
 															   in
 															   		L(n, parent, ref ())
 															   end
+
+	fun equal (L(_, _, u1), L(_, _, u2)) = u1 = u2
+	  | equal (EMPTY, EMPTY) = (ErrorMsg.error 0 ("EMPTY level == EMPTY level"); true)
+	  | equal (_, _) = false
 
     fun allocTemp level = case level of L(f, _, _) 	=> {level=level, temp=F.allocTemp f}
    						  			  | EMPTY 		=> 	allocTemp (newLevel {parent=outermost, name=Temp.newlabel (), formals=[true]})
@@ -59,6 +69,16 @@ struct
 	  | staticLink (EMPTY, L(f2, p2, u2), link) = staticLink (EMPTY, p2, T.MEM(link))
 	  | staticLink (L(f1, p1, u1), EMPTY, link) = (ErrorMsg.error 0 ("Static link not found."); link)
 	  | staticLink (EMPTY, EMPTY, link) = link
+
+	fun callStaticLink (L(f1, p1, u1), L(f2, p2, u2), fp) =
+		if equal (p2, L(f1, p1, u1))
+		then fp
+		else if equal (p1, p2)
+			then T.MEM(fp)
+			else callStaticLink (p1, L(f2, p2, u2), T.MEM(fp))
+	  | callStaticLink (EMPTY, b, fp) = callStaticLink (outermost, b, fp)
+	  | callStaticLink (a, EMPTY, fp) = callStaticLink (a, outermost, fp)
+
 
 	fun transSimpleVar (SOME(l1, a), l2): exp = Ex(F.exp a (staticLink (l1, l2, T.TEMP(F.FP))))
 	  | transSimpleVar (NONE, l2): exp = (ErrorMsg.error 0 ("Var access not found."); Ex(T.CONST(0)))
@@ -307,7 +327,8 @@ struct
 							fragList := F.STRING(lab, s)::(!fragList);
 							Ex(loadString lab)
 						end
-	fun transCall (l, args, level) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, level)) args)))
+	fun transCall (l, args, SOME(callee), caller) = Ex(T.CALL (T.NAME l, (callStaticLink (caller, callee, (T.TEMP F.FP)))::(map (fn a => unEx(a, caller)) args)))
+	  | transCall (l, args, NONE, caller) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, caller)) args)))
 
 	fun transRel (oper, ex1, ex2, resultT, resultF) = let
 														val result = Temp.newtemp ()
@@ -370,10 +391,91 @@ struct
 	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
-	fun transBody (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(transAssign (Ex(T.TEMP F.V0), exp, L(frame, p, u)))), T.JUMP(T.TEMP (F.RA), [])))
-	  | transBody (exp, EMPTY) =  Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(transAssign (Ex(T.TEMP F.V0), exp, EMPTY))), T.JUMP(T.TEMP (F.RA), [])))
-	fun transProc (exp, L(frame, p, u)) = Nx(T.SEQ(T.SEQ(T.LABEL(F.label frame), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
-	  | transProc (exp, EMPTY) = Nx(T.SEQ(T.SEQ(T.LABEL(Temp.newlabel ()), unNx(exp)), T.JUMP(T.TEMP (F.RA), [])))
+
+	fun getLoc 0 = T.TEMP F.A0
+	  | getLoc 1 = T.TEMP F.A1
+	  | getLoc 2 = T.TEMP F.A2
+	  | getLoc 3 = T.TEMP F.A3
+	  | getLoc i = T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(4 * i)))
+
+	fun moveArgs size (i, (F.InReg t)::l) = T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l))
+	  | moveArgs size (i, (F.InFrame j)::l) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l))
+	  | moveArgs size (i, []) = T.MOVE(T.TEMP F.SP, T.BINOP (T.PLUS, T.TEMP F.SP, T.CONST size))
+
+	fun toStack (i, t::[]) = T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t)
+	  | toStack (i, t::l) = T.SEQ(T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t), toStack (i + 4, l))
+	  | toStack (i, []) = T.EXP(T.CONST 0)
+
+	fun fromStack (i, t::[]) = T.MOVE(T.TEMP t, T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))))
+	  | fromStack  (i, t::l) = T.SEQ(T.MOVE(T.TEMP t, T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i)))), fromStack (i + 4, l))
+	  | fromStack (i, []) = T.EXP(T.CONST 0)
+
+	val calleesaves = (F.getTemps F.calleesaves)@[F.RA]
+	fun saveCallees () = T.SEQ(toStack (0, calleesaves), T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST(4 * (List.length calleesaves)))))
+	fun restoreCallees () = T.SEQ(T.MOVE(T.TEMP F.SP, T.BINOP (T.PLUS, T.TEMP F.SP, T.CONST(4 * (List.length calleesaves)))), fromStack (0, calleesaves))
+
+	fun procEntry frame =
+		T.SEQ(
+			T.MOVE(T.TEMP F.FP, T.TEMP F.SP),
+			T.SEQ(
+				moveArgs (F.size frame) (0, F.formals frame),
+				saveCallees ())
+		)
+
+	fun procExit frame =
+		T.SEQ(
+			restoreCallees (),
+			T.SEQ(
+				T.MOVE(T.TEMP F.SP, T.TEMP F.FP),
+				T.MOVE(T.TEMP F.FP, T.MEM(T.TEMP F.FP))
+				))
+
+
+
+	fun transBody (exp, L(frame, p, u)) =
+		Nx(
+			T.SEQ(
+				T.LABEL(F.label frame),
+				T.SEQ(
+					procEntry frame,
+					T.SEQ(
+						unNx(transAssign (Ex(T.TEMP F.V0), exp, L(frame, p, u))),
+						T.SEQ(
+							procExit frame,
+							T.JUMP(T.TEMP (F.RA), []))))))
+	  | transBody (exp, EMPTY) =
+	  	Nx(
+			T.SEQ(
+				T.LABEL(Temp.newlabel ()),
+				T.SEQ(
+					procEntry (getFrame EMPTY),
+					T.SEQ(
+						unNx(transAssign (Ex(T.TEMP F.V0), exp, EMPTY)),
+						T.SEQ(
+							procExit (getFrame EMPTY),
+							T.JUMP(T.TEMP (F.RA), []))))))
+	fun transProc (exp, L(frame, p, u)) =
+		Nx(
+			T.SEQ(
+				T.LABEL(F.label frame),
+				T.SEQ(
+					procEntry frame,
+					T.SEQ(
+						unNx(exp),
+						T.SEQ(
+							procExit frame,
+							T.JUMP(T.TEMP (F.RA), []))))))
+	  | transProc (exp, EMPTY) =
+	  	Nx(
+			T.SEQ(
+				T.LABEL(Temp.newlabel ()),
+				T.SEQ(
+					procEntry (getFrame EMPTY),
+					T.SEQ(
+						 unNx(exp),
+						 T.SEQ(
+ 							procExit (getFrame EMPTY),
+						 	T.JUMP(T.TEMP (F.RA), []))))))
 
 
 	fun procEntryExit {level=L(f,_,_), body=body} = (fragList := !fragList@[F.PROC({body=F.procEntryExit1(f, unNx(body)), frame=f})]; ())

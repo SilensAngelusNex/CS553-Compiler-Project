@@ -27,7 +27,7 @@ sig
 	val transNil : unit -> exp
 	val transInt : int -> exp
 	val transString : string -> exp
-	val transCall : Temp.label * exp list * level -> exp
+	val transCall : Temp.label * exp list * level option * level -> exp
 	val transFor : exp * exp * exp * Temp.label * level -> exp
 	val transWhile : exp * exp * Temp.label * level -> exp
 	val transIf : exp * exp * exp option * level -> exp

@@ -1,4 +1,5 @@
 let
+	function f(a:int, b:int):int = a - b
 in
-	"red"
+	f(3, 4)
 end

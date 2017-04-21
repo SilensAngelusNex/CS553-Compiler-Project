@@ -14,7 +14,7 @@ sig
 	val keyList : graph -> Temp.temp list
 
 	val addTemp : graph * Temp.temp -> graph
-	val addUnusableTemp : graph * Temp.temp -> graph
+	val addRegister : graph * Temp.temp -> graph
 	val addEdge : graph * Temp.temp * Temp.temp * bool -> graph
 	val addMove : graph * Temp.temp * Temp.temp -> graph
 	val addInter : graph * Temp.temp * Temp.temp -> graph

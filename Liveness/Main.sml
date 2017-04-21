@@ -6,7 +6,7 @@ structure Main = struct
     structure C = Canon
     structure G = MIPSGen
 
-    fun getsome (SOME x) = x
+    (*	fun getsome (SOME x) = x	*)
 
     fun emitproc out instrs = app (fn i => TextIO.output(out, Assem.format(F.tempName) i)) instrs;
 

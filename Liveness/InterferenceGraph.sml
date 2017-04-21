@@ -60,8 +60,8 @@ struct
   										SOME(x) => tm
   									  | NONE => TM.insert (tm, t, t))
 
-	fun addUnusableTemp ((g1, g2, cm, tm), t) = (G.addNode (g1, t, ()), G.addNode (g2, t, ()), TM.insert (cm, t, COLOR(t)), TM.insert (tm, t, t))
-	val registersOnly = foldl (fn (t, g) => addTemp (g, t)) empty F.usableRegs
+	fun addRegister ((g1, g2, cm, tm), t) = (G.addNode (g1, t, ()), G.addNode (g2, t, ()), TM.insert (cm, t, COLOR(t)), TM.insert (tm, t, t))
+	val registersOnly = foldl (fn (t, g) => addRegister (g, t)) empty (F.usableRegs@F.unusableRegs)
 
 	fun addMove ((g1, g2, cm, tm), t1, t2) = (g1, G.addEdge (g2, {from=t2,to=t1}), cm, tm)
 	fun addInter ((g1, g2, cm, tm), t1, t2) = (G.doubleEdge (g1, t1, t2), g2, cm, tm)
@@ -213,7 +213,7 @@ struct
 				let
 					val adj = NS.listItems (NS.addList ((NS.addList (NS.empty, (G.succs n1))), (G.preds n1)))
 					fun help2 (t::l) = if heuristic (g1, G.getNodeID n1, t)
-										then SOME(G.getNode(g2, t))
+										then SOME(G.getNode(g2, t)) (*this line throws exception when coelesce called first*)
 										else help2 l
 					  | help2 [] = NONE
 				in
@@ -287,6 +287,7 @@ struct
         let
 			val _ = printColors interGraph
 
+
             fun trySimplify interGraph = case nextToSimplify interGraph of
                                             SOME(SOME(n)) => simplify (interGraph, n)
 										  | SOME(NONE) => DONE(interGraph)
@@ -297,6 +298,19 @@ struct
             and tryUnFreeze interGraph = case nextToUnFreeze interGraph of
                                             SOME(n) => unFreeze (interGraph, n)
                                           | NONE => potentialSpill interGraph
+
+			(*
+			fun trySimplify interGraph = case (print "s\n"; nextToSimplify interGraph) of
+											SOME(SOME(n)) => simplify (interGraph, n)
+										  | SOME(NONE) => DONE(interGraph)
+										  | NONE => tryUnFreeze interGraph
+			and tryCoalesce interGraph = case (print "c\n"; nextToCoalesce interGraph) of
+											SOME(n1, n2) => coalesce (interGraph, n1, n2)
+										  | NONE => trySimplify interGraph
+			and tryUnFreeze interGraph = case (print "u\n"; nextToUnFreeze interGraph) of
+											SOME(n) => unFreeze (interGraph, n)
+										  | NONE => potentialSpill interGraph
+			*)
 
             fun color interGraph =
                 if size interGraph > 0

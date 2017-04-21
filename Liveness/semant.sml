@@ -99,8 +99,8 @@ struct
 		case #ty left of
 			Types.INT => {exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT}
 		  | Types.STRING => (	case oper of
-			  						A.EqOp => {exp=Translate.transCall ("stringEqual", [#exp left, #exp right], level), ty=Types.INT}
-		  						  | A.NeqOp => {exp=Translate.transOP (A.NeqOp, Translate.transInt 0, Translate.transCall ("stringEqual", [#exp left, #exp right], level), level), ty=Types.INT}
+			  						A.EqOp => {exp=Translate.transCall ("stringEqual", [#exp left, #exp right], NONE, level), ty=Types.INT}
+		  						  | A.NeqOp => {exp=Translate.transOP (A.NeqOp, Translate.transInt 0, Translate.transCall ("stringEqual", [#exp left, #exp right], NONE, level), level), ty=Types.INT}
 							      | _ => (ErrorMsg.error pos ("Operator not defined for type string."); {exp=Translate.transNil (), ty=Types.UNDEFINED}))
 		  | _ => {exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT})
 
@@ -211,7 +211,7 @@ struct
 												  end
 
 				| trexp(A.CallExp{func, args, pos}) = (case Symbol.look(venv, func) of
-														 SOME(ENV.FunEntry{level=_, label=l, formals=paramTys, result=ty}) => {exp=(Translate.transCall (l, (map #exp (paramList (paramTys, args, pos))), level)), ty=lookUpActualSymType (ty, pos)}
+														 SOME(ENV.FunEntry{level=callee, label=l, formals=paramTys, result=ty}) => {exp=(Translate.transCall (l, (map #exp (paramList (paramTys, args, pos))), SOME(callee), level)), ty=lookUpActualSymType (ty, pos)}
 														| SOME(ENV.VarEntry{access=_, ty=_}) => (ErrorMsg.error pos ("Symbol is not a function: " ^ (Symbol.name func)); {exp=(Translate.transNil ()), ty=Types.UNDEFINED})
 														| NONE => (ErrorMsg.error pos ("Unrecognized function  " ^ (Symbol.name func)); {exp=(Translate.transNil ()), ty=Types.UNDEFINED}))
 				| trexp(A.AssignExp{var, exp, pos}) = let
@@ -448,7 +448,6 @@ struct
 	*  								*)
 
 	fun transProg exp = let
-							val _ = FindEscape.findEscape exp;
 							val level =  Translate.outermost
 							val main =  (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
 							val frags = Translate.getResult ()

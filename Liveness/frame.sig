@@ -1,7 +1,8 @@
 signature FRAME =
 sig
 	type frame
-	type access
+	datatype access = InReg of Temp.temp
+					| InFrame of int
 	type register
 	structure TM : ORD_MAP
 	datatype frag = PROC of {body: Tree.stm, frame: frame}
@@ -19,7 +20,8 @@ sig
 	val A2 : Temp.temp
 	val A3 : Temp.temp
 
-	val callersaves : Temp.temp list
+	val callersaves  : (Temp.temp * string) list
+	val calleesaves  : (Temp.temp * string) list
 
 	val unusableRegs : Temp.temp list
 	val usableRegs : Temp.temp list
@@ -31,6 +33,7 @@ sig
 	val exp : access -> Tree.exp -> Tree.exp
 	val newFrame  : {name: Temp.label, formals: bool list} -> frame
 	val formals : frame -> access list
+	val size : frame -> int
 	val allocTemp : frame -> Temp.temp
 	val allocLocal : frame -> bool -> access
 	val externalCall : string * Tree.exp list -> Tree.exp
@@ -39,5 +42,6 @@ sig
 	val procEntryExit3 : Symbol.symbol * 'a -> {prolog: string, body: 'a, epilog: string}
 	val tempMap : string TM.map
 	val tempName : Temp.temp -> string
+	val getTemps : (Temp.temp * string) list -> Temp.temp list
 
 end

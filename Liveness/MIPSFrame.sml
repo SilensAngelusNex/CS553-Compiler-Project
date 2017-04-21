@@ -37,7 +37,7 @@ struct
 
 	fun tempName t = case TM.find(tempMap, t) of
 							SOME(n) => n
-							| NONE => "uhh"
+							| NONE => Temp.makestring t
  	fun string (lab, str) = lab ^ ":" ^ "\t\t.asciiz\t\t" ^ "\"" ^ str ^ "\"\n"
 
 	val R0 = case List.nth (specialregs, 0) of (temp, name) => temp
@@ -54,7 +54,7 @@ struct
 	val A3 = case List.nth (argregs, 3) of (temp, name) => temp
 
 	val unusableRegs = [R0, AT, GP, SP, FP, RA]
-	val usableRegs = (getTemps calleesaves)@[V0, V1, A0, A1, A2, A3]@(getTemps callersaves)
+	val usableRegs = (getTemps calleesaves)@(getTemps callersaves)@[A0, A1, A2, A3, V0, V1]
 
 	val wordSize = 4
 
@@ -64,6 +64,7 @@ struct
 	  | exp (InReg(t)) _ = Tree.TEMP(t)
 
 	fun formals (_, a, _): access list = !a
+	fun size (_, _, a): int = !a * 4
 
 
 	fun allocTemp (_, alist, _) = let
@@ -96,9 +97,7 @@ struct
 			result
 		end
 
-	fun allocLocals f (i, b::l) = (case i < 4 of
-									true	=> (allocArgTemp (f, i)	; allocLocals f (i + 1, l))
-								  | false 	=> (allocLocal f b		; allocLocals f (i + 1, l)))
+	fun allocLocals f (i, b::l) = (print (Bool.toString b); (allocLocal f b; allocLocals f (i + 1, l)))
 
 	  | allocLocals f (i, [])   = f
 

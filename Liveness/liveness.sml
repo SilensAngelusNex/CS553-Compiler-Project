@@ -14,7 +14,7 @@ struct
     type graph = node F.graph
 	type intfGraph = InterferenceGraph.graph
 
-    val emptyGraph = foldl (fn (t, g) => I.addUnusableTemp (g, t)) I.empty I.F.unusableRegs
+    val emptyGraph = I.registersOnly (* foldl (fn (t, g) => I.addUnusableTemp (g, t)) I.empty I.F.unusableRegs *)
 
     fun updateGraph instrs (i, g, m) = if i < List.length instrs
                                      then
