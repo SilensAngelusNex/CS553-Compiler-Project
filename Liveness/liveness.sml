@@ -7,6 +7,7 @@ struct
     structure F = FuncGraph(struct type ord_key = int val compare = Int.compare end)
     structure M = SplayMapFn(struct type ord_key = string val compare = String.compare end)
 	structure S = SplaySetFn(struct type ord_key = Temp.temp val compare = Temp.compare end)
+    structure LS = SplaySetFn(struct type ord_key = string val compare = String.compare end)
 
     type node = (string * S.set * S.set * S.set * S.set * bool)
 	type nodeID = F.nodeID
@@ -15,6 +16,8 @@ struct
 	type intfGraph = InterferenceGraph.graph
 
     val emptyGraph = I.registersOnly (* foldl (fn (t, g) => I.addUnusableTemp (g, t)) I.empty I.F.unusableRegs *)
+
+    val labelSet = foldl (fn (l, s) => LS.add (s, l)) LS.empty ["tig_initArray", "tig_stringEqual", "tig_allocRecord", "tig_exit"]
 
     fun updateGraph instrs (i, g, m) = if i < List.length instrs
                                      then
@@ -31,7 +34,9 @@ struct
 
     fun addLabelEdge i m (lab, g) = case M.find (m, lab) of
                                 SOME(j) => F.addEdge(g, {from=i, to=j})
-                              | NONE => (print ("Jumping to undefined label (Could be built a library function. We have not yet implemented this): " ^ (Symbol.name lab) ^ "\n"); g)
+                              | NONE => case LS.member(labelSet, lab) of
+                                        true => g
+                                      | false => (ErrorMsg.error 0 ("Jumping to undefined label : " ^ (Symbol.name lab) ^ "\n"); g)
 
     fun addEdges instrs (i, (g, m)) = if i < List.length instrs
                                      then
