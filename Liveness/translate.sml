@@ -129,16 +129,21 @@ struct
 	  | unCx(Nx(g), level) = (ErrorMsg.error 0 ("UnCx an Nx? Stop that."); (fn (l1, l2) => T.SEQ(g,  T.JUMP(T.NAME(l1), [l1]))))
 	  | unCx(Cx(f), level) = f
 
-	fun transRecordVar (exp, index, level) = Ex(
-  		  								T.MEM(
-  											T.BINOP(
-  												T.PLUS,
-  												T.BINOP(
-  													T.MUL, T.CONST(index), T.CONST(F.wordSize)),
-  												unEx(exp, level)
-  											)
-  										)
-  		  							)
+	fun transRecordVar (exp, index, level) =
+
+	let
+		val _ = print ("\nINDEX:" ^ (Int.toString index) ^ " \n")
+	in
+		Ex(
+			T.MEM(
+			T.BINOP(
+				T.PLUS,
+				T.CONST(index * F.wordSize),
+				unEx(exp, level)
+			)
+		)
+		)
+	end
 
   	fun transArrayVar (exp, index, level): exp = 	let
   												val id = #temp (allocTemp level)
@@ -372,9 +377,9 @@ struct
 	  | transOP (A.MinusOp, e1, e2, level)	 = Ex(T.BINOP(T.MINUS, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.TimesOp, e1, e2, level)	 = Ex(T.BINOP(T.MUL, unEx(e1, level), unEx(e2, level)))
 	  | transOP (A.DivideOp, e1, e2, level)  = Ex(T.BINOP(T.DIV, unEx(e1, level), unEx(e2, level)))
-	  | transOP (A.EqOp, Ex(T.NAME n1), Ex(T.NAME n2), level)	= Ex(T.CALL(T.NAME(Temp.namedlabel("stringEqual")), [loadString n1, loadString n2]))
-	  | transOP (A.EqOp, e1, Ex(T.NAME n), level)			= Ex(T.CALL(T.NAME(Temp.namedlabel("stringEqual")), [unEx(e1, level), loadString n]))
-	  | transOP (A.EqOp, Ex(T.NAME n), e2, level)			= Ex(T.CALL(T.NAME(Temp.namedlabel("stringEqual")), [unEx(e2, level), loadString n]))
+	  | transOP (A.EqOp, Ex(T.NAME n1), Ex(T.NAME n2), level)	= Ex(T.CALL(T.NAME(Temp.namedlabel("tig_stringEqual")), [loadString n1, loadString n2]))
+	  | transOP (A.EqOp, e1, Ex(T.NAME n), level)			= Ex(T.CALL(T.NAME(Temp.namedlabel("tig_stringEqual")), [unEx(e1, level), loadString n]))
+	  | transOP (A.EqOp, Ex(T.NAME n), e2, level)			= Ex(T.CALL(T.NAME(Temp.namedlabel("tig_stringEqual")), [unEx(e2, level), loadString n]))
 	  | transOP (A.EqOp, e1, e2, level) 	 = transRel(T.EQ, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
 	  | transOP (A.NeqOp, e1, e2, level) 	 = transRel(T.NE, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
 	  | transOP (A.LtOp, e1, e2, level) 	 = transRel(T.LT, unEx(e1, level), unEx(e2, level), T.CONST 1, T.CONST 0)
@@ -387,8 +392,25 @@ struct
 	  | transSeq ([], level) = Ex(T.CONST(0))
 	fun transLet (d::decs, body, level) = Ex(T.ESEQ(unNx(d), unEx(transLet(decs, body, level), level)))
 	  | transLet ([], body, level) = Ex(unEx(body, level))
-	fun transRec (lst, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("allocRecord")), (map (fn a => unEx(a, level)) lst)))
-	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
+
+	fun addRecVal level (a::[], i) = T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.V0, T.CONST (i * 4))), unEx(a, level))
+	  | addRecVal level (a::l, i) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.V0, T.CONST (i * 4))), unEx(a, level)), addRecVal level (l, i + 1))
+
+	fun transRec (lst, level) =
+		let
+			val result = Temp.newtemp ()
+		in
+			Ex (
+				T.ESEQ (
+					T.MOVE ( T.TEMP result, T.CALL(T.NAME(Temp.namedlabel("tig_allocRecord")), [T.CONST (List.length(lst) * 4)])),
+					T.ESEQ (
+							addRecVal level (lst, 0),
+							T.TEMP result
+						)
+					)
+				)
+		end
+	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("tig_initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
 

@@ -97,9 +97,14 @@ struct
 
 	fun coalesce ((g1, g2, cm, tm), t1, t2) =
 		let
+<<<<<<< HEAD
 			val _ = print ("coelescing nodes: " ^ (Temp.makestring t1) ^ "and" ^ (Temp.makestring t2) ^ "\n")
 			val newInterSuccs = NS.difference (NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1)))), NS.singleton t1)
 			val newInterPreds = NS.difference (NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1)))), NS.singleton t1)
+=======
+			val newInterSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1))))
+			val newInterPreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1))))
+>>>>>>> 8bdd6e59dd9112026d4715552e5bc35553774034
 			val newInterEdges = (map (fn t => (t1, t)) (NS.listItems newInterSuccs))@(map (fn t => (t, t1)) (NS.listItems newInterPreds))
 
 			val newMoveSuccs = NS.difference (NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g2, t2))), NS.addList (NS.empty, G.succs (G.getNode (g2, t1)))), NS.singleton t1)
@@ -139,7 +144,6 @@ struct
 
     fun potentialSpill graph =
 		let
-			val _ = print "SPILL!"
 			val n = pickSpill graph
 		in
 			POTSPILL(removeNode(graph, n), n)
@@ -173,13 +177,13 @@ struct
 								val y = interDegree (g, t)
 							  in
 							  	if y < List.length(MIPSFrame.usableRegs)
-								then (print  ("Simplifying node: " ^ (Temp.makestring t) ^ "  which has interdegree " ^ (Int.toString y) ^  " and color " ^ (printColor (g, t)) ^ "\n"); SOME(t))
+								then SOME(t)
 								else help (l)
 							  end
 			 | help ([]) = NONE
 
 			 fun checkColored (t::l) = (case checkColor (g, t) of
-										   COLOR(_) => (print ("This is alredy colored: " ^ (Temp.makestring t) ^ "\n"); checkColored(l))
+										   COLOR(_) => checkColored(l)
 										 | BLANK => false)
 			   | checkColored ([]) = true
 
@@ -277,7 +281,7 @@ struct
 			fun findLast t =
 				case TM.find (tm, t) of
 					SOME(temp) => if temp = t then t else findLast temp
-				  | NONE => (print "cant find temp in coelesce map"; t)
+				  | NONE => t
 			fun findColor t =
 				case TM.find (cm, findLast t) of
 				SOME(c) => c
@@ -288,8 +292,6 @@ struct
 
     fun graphColor interGraph =
         let
-			val _ = printColors interGraph
-
 			(*)
             fun trySimplify interGraph = case nextToSimplify interGraph of
                                             SOME(SOME(n)) => simplify (interGraph, n)
@@ -323,7 +325,6 @@ struct
                         SIMPLIFY(g, n)      => let
                                                   val iGraph = color g
                                                   val (graph, c) = addColoredNode (interGraph, iGraph, n)
-												  val _ = print  ("Just colored node: " ^ (Temp.makestring n) ^ "\n")
                                                 in
                                                     graph
                                                 end
@@ -335,7 +336,7 @@ struct
                                                 in
                                                     graph
                                                 end
-					  | DONE(g) => ( print "Things are already colored!\n"; g)
+					  | DONE(g) => g
 
                 else (G.empty, G.empty, TM.empty, TM.empty)
 
@@ -357,7 +358,7 @@ struct
 
 	fun tempToReg tempToColorMap t = case TM.find (tempToColorMap, t) of
 										SOME(c) => ( case c of
-														COLOR(r) => (print ("Turning REGISTER: " ^ (Temp.makestring t) ^ " into " ^ (Temp.makestring t) ^ "\n"); r)
-													  | BLANK    => (print ("temp: " ^ (Temp.makestring t) ^ " is blank?\n"); F.FP))
-									  | NONE => (print ("temp: " ^ (Temp.makestring t) ^ " not found in temp->color map\n"); F.FP)
+														COLOR(r) => r
+													  | BLANK    =>F.FP)
+									  | NONE => F.FP
 end

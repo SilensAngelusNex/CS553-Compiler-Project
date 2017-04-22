@@ -30,7 +30,6 @@ struct
 	  | traverseExp (env, d, A.WhileExp {test=e1, body=e2, pos=_}) = (traverseExp(env, d, e1); traverseExp(env, d, e2))
 	  | traverseExp (env, d, A.ForExp {var=n, escape=e, lo=e1, hi=e2, body=e3, pos=_}) = (traverseExp(env, d, e1); traverseExp(env, d, e2); traverseExp(Symbol.enter (env, n, (d, e)), d, e3))
 	  | traverseExp (env, d, A.LetExp {decs=decs, body=e, pos=_}) = let
-	  				val _ = print "hello"
 	  																val env = foldl (fn (dec, newEnv) => traverseDec (newEnv, d, dec)) env decs
 	  															  in
 																  	traverseExp (env, d, e)
