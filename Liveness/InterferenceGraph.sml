@@ -97,14 +97,8 @@ struct
 
 	fun coalesce ((g1, g2, cm, tm), t1, t2) =
 		let
-<<<<<<< HEAD
-			val _ = print ("coelescing nodes: " ^ (Temp.makestring t1) ^ "and" ^ (Temp.makestring t2) ^ "\n")
 			val newInterSuccs = NS.difference (NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1)))), NS.singleton t1)
 			val newInterPreds = NS.difference (NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1)))), NS.singleton t1)
-=======
-			val newInterSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1))))
-			val newInterPreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1))))
->>>>>>> 8bdd6e59dd9112026d4715552e5bc35553774034
 			val newInterEdges = (map (fn t => (t1, t)) (NS.listItems newInterSuccs))@(map (fn t => (t, t1)) (NS.listItems newInterPreds))
 
 			val newMoveSuccs = NS.difference (NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g2, t2))), NS.addList (NS.empty, G.succs (G.getNode (g2, t1)))), NS.singleton t1)
