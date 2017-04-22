@@ -94,7 +94,7 @@ struct
                     })
               | munchStm(T.MOVE(T.MEM(e1), e2)) =
                 emit(A.OPER {
-                        assem="\tsw\t's1, 0('s0)\n" ,
+                        assem="\tsw\t\t's1, 0('s0)\n" ,
                         src=[munchExp e1, munchExp e2],
                         dst=[],
                         jump=NONE
@@ -948,6 +948,12 @@ struct
                                         dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
                                         jump=SOME([l])
                                     });
+								emit(A.OPER {
+                                        assem="\tmove\t'd0, 's0\n",
+                                        src=[Frame.V0],
+                                        dst=[r],
+                                        jump=NONE
+                                    });
 								postCall ())
 							)
 			  | munchExp(T.CALL(T.TEMP(t), args)) =
@@ -960,6 +966,12 @@ struct
 									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
 									  	jump=SOME([])
 									});
+								emit(A.OPER {
+                                        assem="\tmove\t'd0, 's0\n",
+                                        src=[Frame.V0],
+                                        dst=[r],
+                                        jump=NONE
+                                    });
 								postCall ())
 							)
 			  | munchExp(T.CALL(e1, args)) =
@@ -972,6 +984,12 @@ struct
 									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
 									  	jump=SOME([])
 									});
+								emit(A.OPER {
+                                        assem="\tmove\t'd0, 's0\n",
+                                        src=[Frame.V0],
+                                        dst=[r],
+                                        jump=NONE
+                                    });
 								postCall ())
 							)
 

@@ -37,8 +37,7 @@ struct
 			val _ = I.printColorMap tempToColorMap
 			val getRegFunc = I.tempToReg tempToColorMap
 			val instrus' = allocRegs getRegFunc instrus
-			(*val result = removeRedundantMove instrus'*)
-			val result = instrus'
+			val result = removeRedundantMove instrus'
 		in
 			result
 		end
