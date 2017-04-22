@@ -8,7 +8,7 @@ structure Main = struct
 
     (*	fun getsome (SOME x) = x	*)
 
-    fun emitproc out instrs = app (fn i => TextIO.output(out, Assem.format(F.tempName) i)) instrs;
+    fun emitproc out instrs = app (fn i => TextIO.output(TextIO.stdOut, Assem.format(F.tempName) i)) instrs;
 
     fun processFrag out (F.STRING(lab,s), instrs) = (TextIO.output (out, F.string(lab, s)); instrs) (* should emit? *)
       | processFrag out(F.PROC{body,frame}, instrs) =
@@ -44,17 +44,14 @@ structure Main = struct
         let
             val absyn = Parse.parse filename
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
-            val _ = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
             val instrs = (foldl (processFrag assemOut) [] frags)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
-			val _ = Live.show (TextIO.stdOut, graph)
             val interGraph = Live.makeInterference graph
             val instrs = RegAlloc.regAlloc (instrs, interGraph)
-            (*	val _ = copyTextFile("sysspim.s", assemOut)	*)
-            (*	val _ = copyTextFile("runtimele.s", assemOut)	*)
+            (*val _ = copyTextFile("sysspim.s", assemOut)
+            val _ = copyTextFile("runtimele.s", assemOut)*)
         in
-			(*Live.show (TextIO.stdOut, graph);*)
             emitproc assemOut instrs
         end)
 

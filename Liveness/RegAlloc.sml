@@ -28,13 +28,12 @@ struct
 
 	fun removeRedundantMove (A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp}::instrus) = A.OPER{assem=a, dst=dstLst, src=srcLst, jump=jmp}::(removeRedundantMove instrus)
 	  | removeRedundantMove (A.LABEL{assem=a, lab=label}::instrus) = A.LABEL{assem=a, lab=label}::(removeRedundantMove instrus)
-	  | removeRedundantMove (A.MOVE{assem=a, dst=dst, src=src}::instrus) = if (print ((Temp.makestring dst) ^ " <-- " ^ (Temp.makestring src) ^ "\n"); dst = src) then (removeRedundantMove instrus) else A.MOVE{assem=a, dst=dst, src=src}::(removeRedundantMove instrus)
+	  | removeRedundantMove (A.MOVE{assem=a, dst=dst, src=src}::instrus) = if dst = src then (removeRedundantMove instrus) else A.MOVE{assem=a, dst=dst, src=src}::(removeRedundantMove instrus)
 	  | removeRedundantMove [] = []
 
 	fun regAlloc (instrus, intergraph) =
 		let
 			val tempToColorMap = I.graphColor intergraph
-			val _ = I.printColorMap tempToColorMap
 			val getRegFunc = I.tempToReg tempToColorMap
 			val instrus' = allocRegs getRegFunc instrus
 			val result = removeRedundantMove instrus'

@@ -130,10 +130,6 @@ struct
 	  | unCx(Cx(f), level) = f
 
 	fun transRecordVar (exp, index, level) =
-
-	let
-		val _ = print ("\nINDEX:" ^ (Int.toString index) ^ " \n")
-	in
 		Ex(
 			T.MEM(
 			T.BINOP(
@@ -143,7 +139,6 @@ struct
 			)
 		)
 		)
-	end
 
   	fun transArrayVar (exp, index, level): exp = 	let
   												val id = #temp (allocTemp level)

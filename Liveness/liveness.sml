@@ -156,7 +156,6 @@ struct
 			val graph = instr2graph instrs
 			val graph' = dataAnalysis graph
 		in
-			show (TextIO.stdOut, graph');
 			graph'
 		end
 
