@@ -97,13 +97,13 @@ struct
 
 	fun coalesce ((g1, g2, cm, tm), t1, t2) =
 		let
-			val _ = print ("coelescing nodes: " ^ (Temp.makestring t1) ^ "and" ^ (Temp.makestring t1) ^ "\n")
-			val newInterSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1))))
-			val newInterPreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1))))
+			val _ = print ("coelescing nodes: " ^ (Temp.makestring t1) ^ "and" ^ (Temp.makestring t2) ^ "\n")
+			val newInterSuccs = NS.difference (NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g1, t2))), NS.addList (NS.empty, G.succs (G.getNode (g1, t1)))), NS.singleton t1)
+			val newInterPreds = NS.difference (NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g1, t2))), NS.addList (NS.empty, G.preds (G.getNode (g1, t1)))), NS.singleton t1)
 			val newInterEdges = (map (fn t => (t1, t)) (NS.listItems newInterSuccs))@(map (fn t => (t, t1)) (NS.listItems newInterPreds))
 
-			val newMoveSuccs = NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g2, t2))), NS.addList (NS.empty, G.succs (G.getNode (g2, t1))))
-			val newMovePreds = NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g2, t2))), NS.addList (NS.empty, G.preds (G.getNode (g2, t1))))
+			val newMoveSuccs = NS.difference (NS.difference (NS.addList (NS.empty, G.succs (G.getNode (g2, t2))), NS.addList (NS.empty, G.succs (G.getNode (g2, t1)))), NS.singleton t1)
+			val newMovePreds = NS.difference (NS.difference (NS.addList (NS.empty, G.preds (G.getNode (g2, t2))), NS.addList (NS.empty, G.preds (G.getNode (g2, t1)))), NS.singleton t1)
 			val newMoveEdges = (map (fn t => (t1, t)) (NS.listItems newMoveSuccs))@(map (fn t => (t, t1)) (NS.listItems newMovePreds))
 
 			val graph = removeNode ((g1, g2, cm, tm), t2)
@@ -197,6 +197,7 @@ struct
 		let
 			val n1 = G.getNode (g1, t1)
 			val n2 = G.getNode (g1, t2)
+			val _ = print  ("Checking nodes: " ^ (Temp.makestring t1) ^ " and " ^ (Temp.makestring t2) ^ "\n")
 			val adj = NS.listItems ((NS.addList ((NS.addList (NS.empty, (G.succs n1))), (G.succs n2))))
 			val sig_deg = List.length F.usableRegs
 			val degree = foldl (fn (t, i) => if G.degree (G.getNode (g1, t)) >= sig_deg then i + 1 else i) 0 adj
@@ -327,7 +328,7 @@ struct
                                                     graph
                                                 end
                       | COALESCE(g, n1, n2) => color g
-                      | UNFREEZE(g, n)      => color g
+                      | UNFREEZE(g, n)      => (print  ("Just unfroze node: " ^ (Temp.makestring n) ^ "\n"); color g)
                       | POTSPILL(g, n)      => let
                                                     val iGraph = color g
                                                     val (graph, c) = addColoredNode (interGraph, g, n)

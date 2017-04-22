@@ -28,7 +28,7 @@ structure Main = struct
             handle e => (TextIO.closeOut out; raise e)
         end
 
-    fun compile filename = withOpenFile (filename ^ ".g") (fn graphOut => withOpenFile (filename ^ ".s") (fn assemOut =>
+    fun compile filename = withOpenFile (filename ^ ".s") (fn assemOut =>
         let
             val absyn = Parse.parse filename
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
@@ -42,6 +42,6 @@ structure Main = struct
         in
 			(*Live.show (TextIO.stdOut, graph);*)
             emitproc assemOut instrs
-        end))
+        end)
 
 end

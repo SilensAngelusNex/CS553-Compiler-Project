@@ -99,6 +99,69 @@ struct
                         dst=[],
                         jump=NONE
                     })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.TEMP j))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, 0('s0)\n" ,
+                        src=[j],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.CONST n))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString n) ^ "('s0)\n",
+                        src=[Frame.R0],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.BINOP (T.PLUS, T.TEMP j, T.CONST n)))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString n) ^ "('s0)\n",
+                        src=[j],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.BINOP (T.PLUS, e2, T.CONST n)))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString n) ^ "('s0)\n",
+                        src=[munchExp e2],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.BINOP (T.PLUS, T.CONST n, T.TEMP j)))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString n) ^ "('s0)\n",
+                        src=[j],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.BINOP (T.PLUS, T.CONST n, e2)))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString n) ^ "('s0)\n",
+                        src=[munchExp e2],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.BINOP (T.MINUS, T.TEMP j, T.CONST n)))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString (~n)) ^ "('s0)\n",
+                        src=[j],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(T.BINOP (T.MINUS, e2, T.CONST n)))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, " ^ (intToString (~n)) ^ "('s0)\n",
+                        src=[munchExp e2],
+                        dst=[i],
+                        jump=NONE
+                    })
+              | munchStm(T.MOVE(T.TEMP i, T.MEM(e2))) =
+                emit(A.OPER {
+                        assem="\tlw\t\t'd0, 0('s0)\n" ,
+                        src=[munchExp e2],
+                        dst=[i],
+                        jump=NONE
+                    })
               | munchStm(T.MOVE(T.TEMP i, T.NAME(l))) =
                 emit(A.OPER {
                         assem="\tla\t\t'd0, " ^ l ^ "\n" ,

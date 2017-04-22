@@ -1,7 +1,6 @@
-L32:		.asciiz		"str2"
-L31:		.asciiz		" "
-L30:		.asciiz		"str"
-L29:
+L24:		.asciiz		"str2"
+L23:		.asciiz		"str"
+L22:
 	move	$fp, $sp
 	sw		$a0, 0($fp)
 	move	$v1, $a1
@@ -23,10 +22,9 @@ L29:
 	move	$a0, $v0
 	addi	$v0, $v1, 1
 	move	$a1, $v0
-	jal		L28
+	jal		L21
 
 	move	$v0, $v0
-	li		$v0, 0
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$a0, 0($sp)
@@ -52,8 +50,8 @@ L29:
 	move	$fp, $a0
 	jr		$ra
 
-L33:
-L28:
+L25:
+L21:
 	move	$fp, $sp
 	sw		$a0, 0($fp)
 	move	$v1, $a1
@@ -71,13 +69,12 @@ L28:
 	addi	$v0, $sp, -36
 	move	$sp, $v0
 	lw		$v0, 0($fp)
-	la		$a2, L30
+	la		$a2, L23
 	move	$a0, $v0
 	move	$a1, $v1
-	jal		L29
+	jal		L22
 
 	move	$v0, $v0
-	la		$v0, L31
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$a0, 0($sp)
@@ -103,17 +100,17 @@ L28:
 	move	$fp, $a0
 	jr		$ra
 
-L34:
+L26:
 tig_main:
 	move	$v0, $fp
-	la		$v1, L32
+	la		$v1, L24
 	move	$a0, $v0
 	li		$v0, 0
 	move	$a1, $v0
 	move	$a2, $v1
-	jal		L29
+	jal		L22
 
 	move	$v0, $v0
 	jr		$ra
 
-L35:
+L27:

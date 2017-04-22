@@ -1,6 +1,6 @@
 Frag:
 SEQ(
-	LABEL L13,
+	LABEL L10,
 	SEQ(
 		SEQ(
 			MOVE(
@@ -16,17 +16,21 @@ SEQ(
 						TEMP t108),
 					SEQ(
 						MOVE(
-							TEMP t160,
+							TEMP t141,
 							TEMP t109),
 						SEQ(
 							MOVE(
-								TEMP t161,
+								TEMP t143,
 								TEMP t110),
-							MOVE(
-								TEMP t105,
-								BINOP(PLUS,
+							SEQ(
+								MOVE(
+									TEMP t144,
+									TEMP t111),
+								MOVE(
 									TEMP t105,
-									CONST 4))))),
+									BINOP(PLUS,
+										TEMP t105,
+										CONST 4)))))),
 				SEQ(
 					SEQ(
 						MOVE(
@@ -98,9 +102,69 @@ SEQ(
 		SEQ(
 			MOVE(
 				TEMP t102,
-				BINOP(MINUS,
-					TEMP t160,
-					TEMP t161)),
+				ESEQ(
+					SEQ(
+						SEQ(
+							MOVE(
+								TEMP t143,
+								ESEQ(
+									SEQ(
+										CJUMP(EQ,
+											TEMP t141,
+											CONST 0,
+											L11,L12),
+										SEQ(
+											SEQ(
+												LABEL L11,
+												SEQ(
+													MOVE(
+														TEMP t142,
+														CONST 1),
+													JUMP(
+														NAME L13))),
+											SEQ(
+												LABEL L12,
+												SEQ(
+													MOVE(
+														TEMP t142,
+														CONST 0),
+													JUMP(
+														NAME L13))))),
+									ESEQ(
+										LABEL L13,
+										TEMP t142))),
+							CJUMP(NE,
+								TEMP t143,
+								CONST 0,
+								L14,L15)),
+						SEQ(
+							SEQ(
+								LABEL L14,
+								SEQ(
+									MOVE(
+										TEMP t144,
+										CONST 1),
+									JUMP(
+										NAME L16))),
+							SEQ(
+								LABEL L15,
+								SEQ(
+									MOVE(
+										TEMP t144,
+										BINOP(MUL,
+											TEMP t141,
+											CALL(
+												NAME L10,
+													MEM(
+														TEMP t106),
+													BINOP(MINUS,
+														TEMP t141,
+														CONST 1)))),
+									JUMP(
+										NAME L16))))),
+					ESEQ(
+						LABEL L16,
+						TEMP t144))),
 			SEQ(
 				SEQ(
 					SEQ(
@@ -190,10 +254,9 @@ SEQ(
 		MOVE(
 			TEMP t102,
 			CALL(
-				NAME L13,
+				NAME L10,
 					TEMP t106,
-					CONST 3,
-					CONST 4))),
+					CONST 10))),
 	JUMP(
 		TEMP t107))
 
