@@ -48,11 +48,11 @@ structure Main = struct
             val instrs = (foldl (processFrag assemOut) [] frags)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
-			(*val _ = Live.show (TextIO.stdOut, graph)*)
+			val _ = Live.show (TextIO.stdOut, graph)
             val interGraph = Live.makeInterference graph
             val instrs = RegAlloc.regAlloc (instrs, interGraph)
-            val _ = copyTextFile("sysspim.s", assemOut)
-            val _ = copyTextFile("runtimele.s", assemOut)
+            (*	val _ = copyTextFile("sysspim.s", assemOut)	*)
+            (*	val _ = copyTextFile("runtimele.s", assemOut)	*)
         in
 			(*Live.show (TextIO.stdOut, graph);*)
             emitproc assemOut instrs

@@ -195,7 +195,7 @@ struct
 		let
 			val n1 = G.getNode (g1, t1)
 			val n2 = G.getNode (g1, t2)
-			val _ = print  ("Checking nodes: " ^ (Temp.makestring t1) ^ " and " ^ (Temp.makestring t2) ^ "\n")
+			(*	val _ = print  ("Checking nodes: " ^ (Temp.makestring t1) ^ " and " ^ (Temp.makestring t2) ^ "\n")	*)
 			val adj = NS.listItems ((NS.addList ((NS.addList (NS.empty, (G.succs n1))), (G.succs n2))))
 			val sig_deg = List.length F.usableRegs
 			val degree = foldl (fn (t, i) => if G.degree (G.getNode (g1, t)) >= sig_deg then i + 1 else i) 0 adj
@@ -240,6 +240,8 @@ struct
 		end
 
 
+	exception NoSuchNode of K.ord_key
+
 	fun getNodesColor (m, nID) = case TM.find (m, nID) of
 									SOME(c) => c
 									| NONE => BLANK
@@ -257,7 +259,7 @@ struct
 				in
 					((g1, g2, TM.insert (cm, nID, c), tm), c)
 				end
-			else ((g1, g2, TM.insert (cm, nID, BLANK), tm), BLANK)
+			else raise NoSuchNode (nID)
 		end
 
 	fun addColoredNode (originalInterGraph, newInterG, nID): graph * color =
@@ -267,7 +269,7 @@ struct
 			val g' = foldl (fn (t, g) => addInter(g, t, nID)) interG (predecessors (originalInterGraph, nID))
 			val (g'', color) = getColor (g', nID)
 		in
-			 (g'', color) (* Can actually spill !!! have to actually add to graph*)
+			 (g'', color) (* Can actually spill !!! have to actually add to graph *)
 		end
 
 	fun actualColorMap (cm, tm) =
@@ -319,14 +321,16 @@ struct
                         SIMPLIFY(g, n)      => let
                                                   val iGraph = color g
                                                   val (graph, c) = addColoredNode (interGraph, iGraph, n)
+												  val _ = print ("Simplified:\t" ^ (Temp.makestring n) ^ "\n")
                                                 in
                                                     graph
                                                 end
-                      | COALESCE(g, n1, n2) => color g
-                      | UNFREEZE(g, n)      => (print  ("Just unfroze node: " ^ (Temp.makestring n) ^ "\n"); color g)
+                      | COALESCE(g, n1, n2) => (print  ("Coalesced:\t" ^ (Temp.makestring n1) ^ " <-- " ^ (Temp.makestring n2) ^ "\n"); color g)
+                      | UNFREEZE(g, n)      => (print  ("Unfroze:\t" ^ (Temp.makestring n) ^ "\n"); color g)
                       | POTSPILL(g, n)      => let
                                                     val iGraph = color g
                                                     val (graph, c) = addColoredNode (interGraph, g, n)
+													val _ = print ("Spilled:\t" ^ (Temp.makestring n) ^ "\n")
                                                 in
                                                     graph
                                                 end
@@ -344,7 +348,7 @@ struct
     fun colorToString (COLOR(t)) = "COLOR:\t" ^ (Temp.makestring (t))
 	  | colorToString (BLANK) = "BLANK"
 
-	fun getColor ((g1, g2, cm, tm), t) =
+	fun getPrintColor ((g1, g2, cm, tm), t) =
 		case TM.find (cm, t) of
 			SOME(COLOR(i)) => COLOR(i)
 		  | SOME(BLANK) => BLANK

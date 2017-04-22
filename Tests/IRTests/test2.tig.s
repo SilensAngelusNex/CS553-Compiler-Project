@@ -1,8 +1,8 @@
 tig_main:
 	li		$a0, 40
 	li		$a1, 0
-	jal		initArray
+	jal		tig_initArray
 
 	jr		$ra
 
-L12:
+L15:

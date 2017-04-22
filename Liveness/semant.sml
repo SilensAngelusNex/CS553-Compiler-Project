@@ -99,8 +99,8 @@ struct
 		case #ty left of
 			Types.INT => {exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT}
 		  | Types.STRING => (	case oper of
-			  						A.EqOp => {exp=Translate.transCall ("stringEqual", [#exp left, #exp right], NONE, level), ty=Types.INT}
-		  						  | A.NeqOp => {exp=Translate.transOP (A.NeqOp, Translate.transInt 0, Translate.transCall ("stringEqual", [#exp left, #exp right], NONE, level), level), ty=Types.INT}
+			  						A.EqOp => {exp=Translate.transCall ("tig_stringEqual", [#exp left, #exp right], NONE, level), ty=Types.INT}
+		  						  | A.NeqOp => {exp=Translate.transOP (A.NeqOp, Translate.transInt 0, Translate.transCall ("tig_stringEqual", [#exp left, #exp right], NONE, level), level), ty=Types.INT}
 							      | _ => (ErrorMsg.error pos ("Operator not defined for type string."); {exp=Translate.transNil (), ty=Types.UNDEFINED}))
 		  | _ => {exp=(Translate.transOP (oper, #exp left, #exp right, level)), ty=Types.INT})
 
@@ -431,8 +431,9 @@ struct
 																													  														val (venv', tenv') = (Symbol.beginScope venv, Symbol.beginScope tenv)
 																																											val (accesses, _) = Translate.getLevelInfo level
 																																											val venv'' = foldl (fn (({name=s, ty=ty, escape=esc}, a), t) => Symbol.enter (t, s, ENV.VarEntry{access=a, ty=ty})) venv' (ListPair.zip (paramList, accesses))
+																																											val formals = Translate.getFormals level
 																													  														val {exp=exp,ty=ty1} = transExp (level, venv'', tenv') body
-																																											val result = Translate.transBody (exp, level)
+																																											val result = Translate.transBody (exp, formals, level)
 
 																																											val _ = Translate.procEntryExit {level=level, body=result}
 																																										in

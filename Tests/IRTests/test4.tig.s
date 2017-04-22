@@ -1,8 +1,6 @@
-L10:
+L57:
 	move	$fp, $sp
 	sw		$a0, 0($fp)
-	move	$v0, $a2
-	move	$v0, $a3
 	addi	$v0, $sp, 4
 	move	$sp, $v0
 	sw		$s0, 0($sp)
@@ -16,24 +14,23 @@ L10:
 	sw		$ra, -32($sp)
 	addi	$v0, $sp, -36
 	move	$sp, $v0
-	beq		$a1, $zero, L11
-	j		L12
-L12:
+	beq		$a1, $zero, L58
+	j		L59
+L59:
 	li		$v0, 0
-L13:
-	beq		$v0, $zero, L15
-	j		 L14
-L15:
+L60:
+	beq		$v0, $zero, L62
+	j		 L61
+L62:
 	move	$v1, $a1
 	lw		$a0, 0($fp)
 	addi	$v0, $a1, -1
 	move	$a1, $v0
-	jal		L10
+	jal		L57
 
-	move	$v0, $v0
 	mul		$v1, $v0
 	mflo	$v0
-L16:
+L63:
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -49,22 +46,21 @@ L16:
 	lw		$fp, 0($fp)
 	jr		$ra
 
-L11:
+L58:
 	li		$v0, 1
-	j		L13
+	j		L60
 
-L14:
+L61:
 	li		$v0, 1
-	j		L16
+	j		L63
 
-L17:
+L64:
 tig_main:
 	move	$a0, $fp
 	li		$v0, 10
 	move	$a1, $v0
-	jal		L10
+	jal		L57
 
-	move	$v0, $v0
 	jr		$ra
 
-L18:
+L65:

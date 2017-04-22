@@ -1,37 +1,32 @@
 tig_main:
-	addi	t255, t100, 40
-	add		t108, t255, $r0
-	addi	t256, t100, 0
-	add		t109, t256, $r0
-	jal		initArray
+	li		$v0, 40
+	move	$a0, $v0
+	li		$a1, 0
+	jal		tig_initArray
 
-	add		t251, t254, $r0
-	addi	t257, t100, 2
-	add		t252, t257, $r0
-	mov	t253, t251
-	slt		t258, t252, t100
-	beqz	t258, L46
-	j		L47
-L47:
-	addi	t260, t100, 1
-	add		t108, t260, $r0
+	li		$a1, 2
+	slt		$a0, $a1, $zero
+	beqz	$a0, L10
+	j		L11
+L11:
+	li		$a0, 1
 	jal		exit
 
-L48:
-	addi	t264, t100, 4
-	mul		t252, t264
-	mflo	t263
-	add		t262, t263, t253
-	lw		t261, 0(t262)
-	add		t102, t261, $r0
-	j		L49
+	move	$a0, $v0
+L12:
+	li		$a0, 4
+	mul		$a1, $a0
+	mflo	$a0
+	add		$v0, $a0, $v0
+	lw		$v0, 0($v0)
+	jr		$ra
 
-L46:
-	lw		t266, -4(t253)
-	slt		t265, t252, t266
-	beqz	t265, L50
-	j		L48
-L50:
-	j		L47
+L10:
+	lw		$a0, -4($v0)
+	slt		$a0, $a1, $a0
+	beqz	$a0, L14
+	j		L12
+L14:
+	j		L11
 
-L49:
+L13:

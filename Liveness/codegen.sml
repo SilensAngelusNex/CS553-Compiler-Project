@@ -162,6 +162,13 @@ struct
                         dst=[i],
                         jump=NONE
                     })
+              | munchStm(T.MOVE(T.TEMP i, T.CONST(n))) =
+                emit(A.OPER {
+                        assem="\tli\t\t'd0, " ^ (intToString n) ^ "\n" ,
+                        src=[],
+                        dst=[i],
+                        jump=NONE
+                    })
               | munchStm(T.MOVE(T.TEMP i, T.NAME(l))) =
                 emit(A.OPER {
                         assem="\tla\t\t'd0, " ^ l ^ "\n" ,
@@ -1011,11 +1018,10 @@ struct
                                         dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
                                         jump=SOME([l])
                                     });
-								emit(A.OPER {
+								emit(A.MOVE {
                                         assem="\tmove\t'd0, 's0\n",
-                                        src=[Frame.V0],
-                                        dst=[r],
-                                        jump=NONE
+                                        src=Frame.V0,
+                                        dst=r
                                     });
 								postCall ())
 							)
@@ -1029,11 +1035,10 @@ struct
 									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
 									  	jump=SOME([])
 									});
-								emit(A.OPER {
+								emit(A.MOVE {
                                         assem="\tmove\t'd0, 's0\n",
-                                        src=[Frame.V0],
-                                        dst=[r],
-                                        jump=NONE
+                                        src=Frame.V0,
+                                        dst=r
                                     });
 								postCall ())
 							)
@@ -1047,11 +1052,10 @@ struct
 									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
 									  	jump=SOME([])
 									});
-								emit(A.OPER {
+								emit(A.MOVE {
                                         assem="\tmove\t'd0, 's0\n",
-                                        src=[Frame.V0],
-                                        dst=[r],
-                                        jump=NONE
+                                        src=Frame.V0,
+                                        dst=r
                                     });
 								postCall ())
 							)

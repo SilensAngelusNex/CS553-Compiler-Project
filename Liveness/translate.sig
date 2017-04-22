@@ -14,6 +14,7 @@ sig
 	val getResult : unit -> F.frag list
 	val frag: level * exp -> F.frag
 	val getLevelInfo : level -> access list * Temp.label
+	val getFormals : level -> F.access list
 
 	val transOP : Absyn.oper * exp * exp * level -> exp
 	val transSeq : exp list * level -> exp
@@ -22,8 +23,8 @@ sig
 	val transArray : exp * exp * level -> exp
 	val transAssign : exp * exp * level -> exp
 	val transBreak : Temp.label -> exp
-	val transBody :  exp * level -> exp
-	val transProc :  exp * level -> exp
+	val transBody :  exp * F.access list * level -> exp
+	val transProc :  exp * F.access list * level -> exp
 	val transNil : unit -> exp
 	val transInt : int -> exp
 	val transString : string -> exp

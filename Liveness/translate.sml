@@ -420,9 +420,9 @@ struct
 	  | getLoc 3 = T.TEMP F.A3
 	  | getLoc i = T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(4 * i)))
 
-	fun moveArgs size (i, (F.InReg t)::l) = T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l))
-	  | moveArgs size (i, (F.InFrame j)::l) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l))
-	  | moveArgs size (i, []) = T.MOVE(T.TEMP F.SP, T.BINOP (T.PLUS, T.TEMP F.SP, T.CONST size))
+	fun moveArgs size (i, (F.InReg t)::l) = (print "InReg\n"; T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l)))
+	  | moveArgs size (i, (F.InFrame j)::l) = (print "InFrame\n"; T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.FP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l)))
+	  | moveArgs size (i, []) = T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST size))
 
 	fun toStack (i, t::[]) = T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t)
 	  | toStack (i, t::l) = T.SEQ(T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t), toStack (i + 4, l))
@@ -436,11 +436,11 @@ struct
 	fun saveCallees () = T.SEQ(toStack (0, calleesaves), T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST(4 * (List.length calleesaves)))))
 	fun restoreCallees () = T.SEQ(T.MOVE(T.TEMP F.SP, T.BINOP (T.PLUS, T.TEMP F.SP, T.CONST(4 * (List.length calleesaves)))), fromStack (0, calleesaves))
 
-	fun procEntry frame =
+	fun procEntry (formList, frame) =
 		T.SEQ(
 			T.MOVE(T.TEMP F.FP, T.TEMP F.SP),
 			T.SEQ(
-				moveArgs (F.size frame) (0, F.formals frame),
+				moveArgs (F.size frame) (0, formList),
 				saveCallees ())
 		)
 
@@ -452,47 +452,47 @@ struct
 				T.MOVE(T.TEMP F.FP, T.MEM(T.TEMP F.FP))
 				))
 
+	fun getFormals (L(frame, p, u)) = F.formals frame
 
-
-	fun transBody (exp, L(frame, p, u)) =
+	fun transBody (exp, formList, L(frame, p, u)) =
 		Nx(
 			T.SEQ(
 				T.LABEL(F.label frame),
 				T.SEQ(
-					procEntry frame,
+					procEntry (formList, frame),
 					T.SEQ(
 						unNx(transAssign (Ex(T.TEMP F.V0), exp, L(frame, p, u))),
 						T.SEQ(
 							procExit frame,
 							T.JUMP(T.TEMP (F.RA), []))))))
-	  | transBody (exp, EMPTY) =
+	  | transBody (exp, formList, EMPTY) =
 	  	Nx(
 			T.SEQ(
 				T.LABEL(Temp.newlabel ()),
 				T.SEQ(
-					procEntry (getFrame EMPTY),
+					procEntry (formList, (getFrame EMPTY)),
 					T.SEQ(
 						unNx(transAssign (Ex(T.TEMP F.V0), exp, EMPTY)),
 						T.SEQ(
 							procExit (getFrame EMPTY),
 							T.JUMP(T.TEMP (F.RA), []))))))
-	fun transProc (exp, L(frame, p, u)) =
+	fun transProc (exp, formList, L(frame, p, u)) =
 		Nx(
 			T.SEQ(
 				T.LABEL(F.label frame),
 				T.SEQ(
-					procEntry frame,
+					procEntry (formList, frame),
 					T.SEQ(
 						unNx(exp),
 						T.SEQ(
 							procExit frame,
 							T.JUMP(T.TEMP (F.RA), []))))))
-	  | transProc (exp, EMPTY) =
+	  | transProc (exp, formlist, EMPTY) =
 	  	Nx(
 			T.SEQ(
 				T.LABEL(Temp.newlabel ()),
 				T.SEQ(
-					procEntry (getFrame EMPTY),
+					procEntry (formlist, (getFrame EMPTY)),
 					T.SEQ(
 						 unNx(exp),
 						 T.SEQ(
