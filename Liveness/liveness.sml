@@ -111,8 +111,8 @@ struct
 				then []
 				else (oneLine (F.nodeInfo (F.getNode (graph, i))))@(help graph (i - 1))
 
-			fun printR ((t1, t2, false)::l) = (print ((Temp.makestring t1) ^ " <-> " ^ (Temp.makestring t1) ^ "\n"); printR l)
-			  | printR ((t1, t2, true)::l) = (print ((Temp.makestring t1) ^ " <-- " ^ (Temp.makestring t1) ^ "\n"); printR l)
+			fun printR ((t1, t2, false)::l) = printR l
+			  | printR ((t1, t2, true)::l) = printR l
 			  | printR [] = ()
 			val result = help graph ((F.size graph) - 1)
 		in

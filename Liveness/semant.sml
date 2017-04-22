@@ -41,12 +41,12 @@ struct
 		| isSubtype (_, Types.UNDEFINED, pos) = true
 		| isSubtype (a, b, pos) = if a = b then true else false
 
-	fun findHelp e ((a, b)::l, i) = (case e = a of
-		  					  true => SOME(b, i + 1)
-							 | false => findHelp e (l, (i + 1)))
+	fun findHelp e ((a, b)::l, i) = (print a; (case e = a of
+		  					  true => SOME(b, i - 1)
+							 | false => findHelp e (l, (i - 1))))
 	  | findHelp e ([], i) = NONE
 
-	fun find e l = findHelp e (l, 0)
+	fun find e l = findHelp e (l, List.length(l))
 
 	(* Converts fields to (Symbol.symbol * ty) list *)
 

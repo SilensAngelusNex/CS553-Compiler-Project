@@ -28,17 +28,31 @@ structure Main = struct
             handle e => (TextIO.closeOut out; raise e)
         end
 
+    fun copyTextFile(infile: string, outs) =
+        let
+            val ins = TextIO.openIn infile
+
+            fun helper(copt: char option) =
+              case copt of
+                   NONE => (TextIO.closeIn ins)
+                 | SOME(c) => (TextIO.output1(outs,c); helper(TextIO.input1 ins))
+        in
+            helper(TextIO.input1 ins)
+        end
+
     fun compile filename = withOpenFile (filename ^ ".g") (fn graphOut => withOpenFile (filename ^ ".s") (fn assemOut =>
         let
             val absyn = Parse.parse filename
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
-            val x = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
+            val _ = print ("frags length: " ^ (Int.toString (List.length (frags))) ^"\n")
             val instrs = (foldl (processFrag assemOut) [] frags)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
-			val _ = Live.show (TextIO.stdOut, graph)
+			(*val _ = Live.show (TextIO.stdOut, graph)*)
             val interGraph = Live.makeInterference graph
             val instrs = RegAlloc.regAlloc (instrs, interGraph)
+            val _ = copyTextFile("sysspim.s", assemOut)
+            val _ = copyTextFile("runtimele.s", assemOut)
         in
 			(*Live.show (TextIO.stdOut, graph);*)
             emitproc assemOut instrs
