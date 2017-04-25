@@ -1,4 +1,4 @@
-L848:
+L0:
 	move	$fp, $sp
 	sw		$a0, 0($fp)
 	addi	$v0, $sp, -4
@@ -17,14 +17,14 @@ L848:
 	lw		$v1, 0($a1)
 	lw		$v0, 0($a2)
 	slt		$v0, $v1, $v0
-	beqz	$v0, L850
-	j		L849
-L850:
+	beqz	$v0, L2
+	j		L1
+L2:
 	li		$v0, 0
-L851:
-	beq		$v0, $zero, L853
-	j		 L852
-L853:
+L3:
+	beq		$v0, $zero, L5
+	j		 L4
+L5:
 	li		$a0, 8
 	jal		tig_allocRecord
 
@@ -35,11 +35,11 @@ L853:
 	move	$v1, $v0
 	lw		$a0, 0($fp)
 	lw		$a2, 4($a2)
-	jal		L848
+	jal		L0
 
 	sw		$v0, 0($v1)
 	move	$v0, $v1
-L854:
+L6:
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -55,11 +55,11 @@ L854:
 	lw		$fp, 0($fp)
 	jr		$ra
 
-L849:
+L1:
 	li		$v0, 1
-	j		L851
+	j		L3
 
-L852:
+L4:
 	li		$a0, 8
 	jal		tig_allocRecord
 
@@ -70,13 +70,13 @@ L852:
 	move	$v1, $v0
 	lw		$a0, 0($fp)
 	lw		$a1, 4($a1)
-	jal		L848
+	jal		L0
 
 	sw		$v0, 0($v1)
 	move	$v0, $v1
-	j		L854
+	j		L6
 
-L855:
+L7:
 tig_main:
 	move	$fp, $sp
 	sw		$a0, 0($fp)
@@ -96,7 +96,7 @@ tig_main:
 	move	$a0, $fp
 	li		$a1, 0
 	li		$a2, 0
-	jal		L848
+	jal		L0
 
 	li		$v0, 0
 	addi	$a0, $sp, 36
@@ -114,4 +114,4 @@ tig_main:
 	lw		$fp, 0($fp)
 	jr		$ra
 
-L856:
+L8:

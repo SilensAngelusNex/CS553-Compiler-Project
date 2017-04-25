@@ -407,7 +407,20 @@ struct
 					)
 				)
 		end
-	fun transArray (size, init, level) = Ex(T.CALL(T.NAME(Temp.namedlabel("tig_initArray")), [T.BINOP(T.MUL, unEx(size, level), T.CONST(F.wordSize)), unEx(init, level)]))
+	fun transArray (size, init, level) =
+	let
+		val t = T.TEMP (Temp.newtemp ())
+		val size = unEx(size, level)
+	in
+		Ex(T.ESEQ(
+				T.SEQ(
+					T.MOVE(t, T.CALL(
+								T.NAME(Temp.namedlabel("tig_initArray")),
+								[T.BINOP(T.MUL, T.BINOP(T.PLUS, size, T.CONST 1), T.CONST(F.wordSize)), unEx(init, level)])),
+					T.MOVE(T.MEM(t), size)),
+				T.BINOP(T.PLUS, t, T.CONST(F.wordSize))))
+	end
+
 	fun transAssign (var, exp, level) = Nx(T.MOVE (unEx(var, level) , unEx(exp, level)))
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
 
