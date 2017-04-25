@@ -79,9 +79,9 @@ struct
                         jump=NONE
                     });
 				emit(A.OPER{
-                        assem="\tsw\t\t'd1, 0('s1)\n" ,
-                        src=[munchExp e1],
-                        dst=[],
+                        assem="\tsw\t\t's0, 0('d0)\n" ,
+                        src=[t],
+                        dst=[munchExp e1],
                         jump=NONE
                     })
                 end

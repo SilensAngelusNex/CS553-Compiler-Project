@@ -15,6 +15,7 @@ struct
 	type access = level * F.access
 
 	val outermost = L(F.newFrame {name=Temp.namedlabel "tig_main", formals=[true]}, EMPTY, ref ())
+	fun clearOutermost () = case outermost of L(f, _, _) => (F.clearFormals (f, [true]); ()) | EMPTY => ()
 
 	fun getFrame (L(f, _, _)) = f
 	  | getFrame EMPTY = getFrame outermost
@@ -24,7 +25,7 @@ struct
 
 	val fragList: F.frag list ref = ref []
 
-	fun getResult () = let val result = !fragList in fragList := []; result end
+	fun getResult () = let val result = !fragList in fragList := []; clearOutermost (); result end
 
 	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (removeFirst (F.formals frame)), (F.label frame))
 	  | getLevelInfo EMPTY = ([], Temp.newlabel ())
@@ -87,9 +88,9 @@ struct
 	fun unEx (Ex(e), level) = e
 	  | unEx (Nx(g), level) = T.ESEQ(g, T.CONST 0)
 	  | unEx (Cx(f), level) = let
-					  		val r = #temp (allocTemp (level)) (*register*)
-					        val l1 = Temp.newlabel() (*label*)
-					        val l2 = Temp.newlabel() (*label*)
+					  		val r = Temp.newtemp () (*register*)
+					        val l1 = Temp.newlabel () (*label*)
+					        val l2 = Temp.newlabel () (*label*)
 					        val b = f (l1, l2)
 					    in
 					        T.ESEQ(
@@ -390,6 +391,7 @@ struct
 
 	fun addRecVal level (a::[], i) = T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.V0, T.CONST (i * 4))), unEx(a, level))
 	  | addRecVal level (a::l, i) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.V0, T.CONST (i * 4))), unEx(a, level)), addRecVal level (l, i + 1))
+	  | addRecVal level ([], i) = T.EXP(T.CONST 0)
 
 	fun transRec (lst, level) =
 		let
@@ -448,6 +450,7 @@ struct
 				))
 
 	fun getFormals (L(frame, p, u)) = F.formals frame
+	  | getFormals (EMPTY) = []
 
 	fun transBody (exp, formList, L(frame, p, u)) =
 		Nx(

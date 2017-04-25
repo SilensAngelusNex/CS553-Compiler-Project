@@ -21,7 +21,7 @@ structure Assem = struct
 		    (explode(saytemp(List.nth(src,ord i - ord #"0"))) @ f rest)
 		  | f( #"'":: #"d":: i:: rest) =
 		    (explode(saytemp(List.nth(dst,ord i - ord #"0"))) @ f rest)
-		  | f( #"'":: #"j":: i:: rest) =(explode(saylab(List.nth(jump,ord i - ord #"0"))) @ f rest)
+		  | f( #"'":: #"j":: i:: rest) = (explode(saylab(List.nth(jump,ord i - ord #"0"))) @ f rest)
 		  | f( #"'":: #"`":: rest) = #"'" :: f rest
 		  | f( #"'":: _ :: rest) = ErrorMsg.impossible "bad Assem format"
 		  | f(c :: rest) = (c :: f rest)

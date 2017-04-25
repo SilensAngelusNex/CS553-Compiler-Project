@@ -60,12 +60,11 @@ struct
 
 	fun externalCall (s, args) = Tree.CALL(Tree.NAME(Temp.namedlabel s), args)
 
-	fun exp (InFrame(k)) exp = (print ("INFRAME: " ^ (Int.toString k) ^ "\n") ;Tree.MEM(Tree.BINOP(Tree.MINUS, exp, Tree.CONST(k))))
-	  | exp (InReg(t)) _ = (print ("InReg: " ^ (Temp.makestring t) ^ "\n");Tree.TEMP(t))
+	fun exp (InFrame(k)) exp = Tree.MEM(Tree.BINOP(Tree.MINUS, exp, Tree.CONST(k)))
+	  | exp (InReg(t)) _ = Tree.TEMP(t)
 
 	fun formals (_, a, _): access list = !a
 	fun size (_, _, a): int = !a * 4
-
 
 	fun allocTemp (_, alist, _) = let
 											val result = Temp.newtemp ()
@@ -99,6 +98,8 @@ struct
 
 	fun allocLocals f (i, b::l) = (allocLocal f b; allocLocals f (i + 1, l))
 	  | allocLocals f (i, [])   = f
+
+	fun clearFormals ((n, a, s), l) = (a := []; s := 0; allocLocals (n, a, s) (0, l))
 
 	fun newFrame {name=name, formals=blist} = let
 												  val f = (name, ref [], ref 0)

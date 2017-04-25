@@ -34,6 +34,7 @@ sig
 	val newFrame  : {name: Temp.label, formals: bool list} -> frame
 	val formals : frame -> access list
 	val size : frame -> int
+	val clearFormals : frame * bool list -> frame
 	val allocTemp : frame -> Temp.temp
 	val allocLocal : frame -> bool -> access
 	val externalCall : string * Tree.exp list -> Tree.exp
