@@ -4,3 +4,4 @@ Parser/.cm
 Type\ Checker/.cm
 Instruction Selection/.cm
 IR/.cm
+Liveness/.cm
