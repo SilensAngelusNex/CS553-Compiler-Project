@@ -505,9 +505,36 @@ struct
 
 	fun treeExp a = unEx a
 
-	fun frag (L(frame, a, u), Ex(exp)) = F.PROC{body=T.SEQ(T.SEQ(T.LABEL(F.label frame), T.MOVE(T.TEMP (F.V0), exp)), T.JUMP(T.TEMP(F.RA), [])), frame=frame}
-	  | frag (L(frame, a, u), Nx(stm)) = F.PROC{body=T.SEQ(T.SEQ(T.LABEL(F.label frame), stm), T.JUMP(T.TEMP(F.RA), [])), frame=frame}
-	  | frag (L(frame, a, u), Cx(cond)) = F.PROC{body=T.SEQ(T.SEQ(T.LABEL(F.label frame), T.MOVE(T.TEMP (F.V0), unEx(Cx(cond), L(frame, a, u)))), T.JUMP(T.TEMP(F.RA), [])), frame=frame}
-	  | frag (EMPTY, exp) = frag (outermost, exp)
+	fun frag (L(frame, a, u), formList, Ex(exp)) = F.PROC{body=
+		T.SEQ(
+			T.LABEL(F.label frame),
+			T.SEQ(
+				procEntry (formList, frame),
+				T.SEQ(
+					T.MOVE(T.TEMP (F.V0), exp),
+					T.SEQ(
+						procExit frame,
+						T.JUMP(T.TEMP(F.RA), []))))), frame=frame}
+	  | frag (L(frame, a, u), formList, Nx(stm)) = F.PROC{body=
+		T.SEQ(
+			T.LABEL(F.label frame),
+			T.SEQ(
+				procEntry (formList, frame),
+				T.SEQ(
+					stm,
+					T.SEQ(
+						procExit frame,
+						T.JUMP(T.TEMP(F.RA), []))))), frame=frame}
+	  | frag (L(frame, a, u), formList, Cx(cond)) = F.PROC{body=
+		T.SEQ(
+			T.LABEL(F.label frame),
+			T.SEQ(
+				procEntry (formList, frame),
+				T.SEQ(
+					T.MOVE(T.TEMP (F.V0), unEx(Cx(cond), L(frame, a, u))),
+					T.SEQ(
+						procExit frame,
+						T.JUMP(T.TEMP(F.RA), []))))), frame=frame}
+	  | frag (EMPTY, formList, exp) = frag (outermost, formList, exp)
 
 end

@@ -97,8 +97,7 @@ struct
 			result
 		end
 
-	fun allocLocals f (i, b::l) = (print (Bool.toString b); (allocLocal f b; allocLocals f (i + 1, l)))
-
+	fun allocLocals f (i, b::l) = (allocLocal f b; allocLocals f (i + 1, l))
 	  | allocLocals f (i, [])   = f
 
 	fun newFrame {name=name, formals=blist} = let

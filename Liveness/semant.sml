@@ -452,7 +452,7 @@ struct
 							val level =  Translate.outermost
 							val main =  (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
 							val frags = Translate.getResult ()
-							val frags = frags@[Translate.frag(level, main)]
+							val frags = frags@[Translate.frag(level, Translate.getFormals level, main)]
 							val out = TextIO.openOut "results.txt"
 						in
 							Printtree.printfrags(out, frags);

@@ -12,7 +12,7 @@ sig
 	val procEntryExit : {level: level, body: exp} -> unit
 	structure F : FRAME
 	val getResult : unit -> F.frag list
-	val frag: level * exp -> F.frag
+	val frag: level * F.access list * exp -> F.frag
 	val getLevelInfo : level -> access list * Temp.label
 	val getFormals : level -> F.access list
 
