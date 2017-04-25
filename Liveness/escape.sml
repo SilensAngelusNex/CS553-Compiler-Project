@@ -13,7 +13,7 @@ struct
 
 	fun traverseVar (env, d, A.SimpleVar(n, pos)) =  (case Symbol.look (env, n) of
 													SOME (depth, b) => 	(if depth > d
-																		then (print ((Int.toString depth) ^ " " ^ (Int.toString d) ^ "\n"); b := true)
+																		then b := true
 																		else ())
 													| NONE => ())
 	  | traverseVar (env, d, A.FieldVar(v, n, pos)) = traverseVar (env, d, v)
@@ -50,5 +50,5 @@ struct
 																				  traverseExp (env, d, e)
 																				end
 
-	fun findEscape prog = ((print ("finding...\n")); traverseExp (Symbol.beginScope Symbol.empty, 0, prog))
+	fun findEscape prog = traverseExp (Symbol.beginScope Symbol.empty, 0, prog)
 end

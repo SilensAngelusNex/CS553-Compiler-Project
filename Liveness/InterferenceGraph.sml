@@ -213,7 +213,7 @@ struct
 				let
 					val adj = NS.listItems (NS.addList ((NS.addList (NS.empty, (G.succs n1))), (G.preds n1)))
 					fun help2 (t::l) = if heuristic (g1, G.getNodeID n1, t)
-										then (print (Temp.makestring t); SOME(G.getNode(g2, t))) (*this line throws exception when coelesce called first*)
+										then SOME(G.getNode(g2, t)) (*this line throws exception when coelesce called first*)
 										else help2 l
 					  | help2 [] = NONE
 				in
@@ -321,16 +321,14 @@ struct
                         SIMPLIFY(g, n)      => let
                                                   val iGraph = color g
                                                   val (graph, c) = addColoredNode (interGraph, iGraph, n)
-												  val _ = print ("Simplified:\t" ^ (Temp.makestring n) ^ "\n")
                                                 in
                                                     graph
                                                 end
-                      | COALESCE(g, n1, n2) => (print  ("Coalesced:\t" ^ (Temp.makestring n1) ^ " <-- " ^ (Temp.makestring n2) ^ "\n"); color g)
-                      | UNFREEZE(g, n)      => (print  ("Unfroze:\t" ^ (Temp.makestring n) ^ "\n"); color g)
+                      | COALESCE(g, n1, n2) => color g
+                      | UNFREEZE(g, n)      => color g
                       | POTSPILL(g, n)      => let
                                                     val iGraph = color g
                                                     val (graph, c) = addColoredNode (interGraph, g, n)
-													val _ = print ("Spilled:\t" ^ (Temp.makestring n) ^ "\n")
                                                 in
                                                     graph
                                                 end

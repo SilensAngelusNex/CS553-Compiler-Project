@@ -1,2 +1,0 @@
-Skeleton 5
-d2f7d"ENV"d"Int"Cd"List"d"Temp"d"ListPair"d"String"d"Symbol"Cd"TextIO"d"Printtree"d"Types"d"ErrorMsg"d"Translate"Nad"Semant"jh3ad"A"gp1d"Absyn"ad"M"jè0gp1e"SplayMapFn"ad"S"jÿ‚gp1e"SplaySetFn"gp1c"SemantSig"

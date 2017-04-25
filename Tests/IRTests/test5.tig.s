@@ -10,4 +10,4 @@ tig_main:
 	move	$v0, $a1
 	jr		$ra
 
-L66:
+L10:
