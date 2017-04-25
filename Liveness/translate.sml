@@ -122,7 +122,7 @@ struct
 	fun unCx(Ex(T.CONST (0)), level) = (fn (l1, l2) => T.JUMP(T.NAME(l2), [l2]))
 	  | unCx(Ex(T.CONST (_)), level) = (fn (l1, l2) => T.JUMP(T.NAME(l1), [l1]))
 	  | unCx(Ex(e), level) = let
-	  						val t1 = T.TEMP(#temp (allocTemp level))
+	  						val t1 = T.TEMP(Temp.newtemp ())
 	  					in
 							(fn (l1, l2) => T.SEQ(T.MOVE(t1, e),  T.CJUMP(T.NE, t1, T.CONST(0), l1, l2)))
 						end
@@ -141,8 +141,8 @@ struct
 		)
 
   	fun transArrayVar (exp, index, level): exp = 	let
-  												val id = #temp (allocTemp level)
-  												val loc = #temp (allocTemp level)
+  												val id = Temp.newtemp ()
+  												val loc = Temp.newtemp ()
   												val pass = Temp.newlabel()
   												val exit = Temp.newlabel()
   												val access = Temp.newlabel()
@@ -165,7 +165,7 @@ struct
   															),
   															T.SEQ(
   																T.LABEL(exit),
-  																unNx(Ex(F.externalCall("exit", [T.CONST(1)])))
+  																unNx(Ex(F.externalCall("tig_exit", [T.CONST(1)])))
   															)
   														),
   														T.ESEQ(
@@ -187,7 +187,7 @@ struct
 	        val t = Temp.newlabel()
 	        val f = Temp.newlabel()
 	        val e = Temp.newlabel()
-	        val r = #temp (allocTemp level)
+	        val r = Temp.newtemp ()
 	    in
 			Ex(
 				T.ESEQ(
@@ -224,7 +224,7 @@ struct
 		        val i2 = unEx (e2, level)
 		        val t = Temp.newlabel()
 		        val e = Temp.newlabel()
-		        val r = #temp (allocTemp level)
+		        val r = Temp.newtemp ()
 		    in
 				Ex(
 		        T.ESEQ(
@@ -276,8 +276,8 @@ struct
 									val i1 = unNx body
 									val i2 = unEx (hi, level)
 									val i3 = unEx (lo, level)
-									val h = #temp (allocTemp level)
-									val l = #temp (allocTemp level)
+									val h = Temp.newtemp ()
+									val l = Temp.newtemp ()
 									val cond = Temp.newlabel()
 									val body = Temp.newlabel()
 								 in

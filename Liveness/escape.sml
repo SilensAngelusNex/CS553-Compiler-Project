@@ -12,9 +12,9 @@ struct
 
 
 	fun traverseVar (env, d, A.SimpleVar(n, pos)) =  (case Symbol.look (env, n) of
-													SOME (depth, b) => 	(if depth > d
-																		then b := true
-																		else ())
+													SOME (depth, b) => 	(if depth < d
+																		then (print ("This escapes! " ^ n ^ " " ^ (Int.toString d) ^ " " ^ (Int.toString depth) ^ "\n");b := true)
+																		else (print ("This does not! " ^ n ^ " " ^ (Int.toString d) ^ " " ^ (Int.toString depth) ^ "\n")))
 													| NONE => ())
 	  | traverseVar (env, d, A.FieldVar(v, n, pos)) = traverseVar (env, d, v)
 	  | traverseVar (env, d, A.SubscriptVar(v, e, pos)) = (traverseExp (env, d, e); traverseVar (env, d, v))

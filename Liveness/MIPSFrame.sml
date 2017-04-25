@@ -60,8 +60,8 @@ struct
 
 	fun externalCall (s, args) = Tree.CALL(Tree.NAME(Temp.namedlabel s), args)
 
-	fun exp (InFrame(k)) exp = Tree.MEM(Tree.BINOP(Tree.PLUS, exp, Tree.CONST(k)))
-	  | exp (InReg(t)) _ = Tree.TEMP(t)
+	fun exp (InFrame(k)) exp = (print ("INFRAME: " ^ (Int.toString k) ^ "\n") ;Tree.MEM(Tree.BINOP(Tree.MINUS, exp, Tree.CONST(k))))
+	  | exp (InReg(t)) _ = (print ("InReg: " ^ (Temp.makestring t) ^ "\n");Tree.TEMP(t))
 
 	fun formals (_, a, _): access list = !a
 	fun size (_, _, a): int = !a * 4

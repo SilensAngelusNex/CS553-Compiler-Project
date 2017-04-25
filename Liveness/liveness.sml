@@ -17,7 +17,7 @@ struct
 
     val emptyGraph = I.registersOnly (* foldl (fn (t, g) => I.addUnusableTemp (g, t)) I.empty I.F.unusableRegs *)
 
-    val labelSet = foldl (fn (l, s) => LS.add (s, l)) LS.empty ["tig_initArray", "tig_stringEqual", "tig_allocRecord", "tig_exit"]
+    val labelSet = foldl (fn (l, s) => LS.add (s, l)) LS.empty ["tig_print", "tig_flush", "tig_getchar", "tig_ord", "tig_chr", "tig_size", "tig_substring", "tig_concat", "tig_not", "tig_exit", "tig_initArray", "tig_initRecord"]
 
     fun updateGraph instrs (i, g, m) = if i < List.length instrs
                                      then
