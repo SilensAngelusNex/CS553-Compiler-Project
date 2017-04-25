@@ -146,7 +146,7 @@ struct
   															),
   															T.SEQ(
   																T.LABEL(exit),
-  																unNx(Ex(F.externalCall("exit", [T.CONST(1)])))
+  																unNx(Ex(F.externalCall("tig_exit", [T.CONST(1)])))
   															)
   														),
   														T.ESEQ(

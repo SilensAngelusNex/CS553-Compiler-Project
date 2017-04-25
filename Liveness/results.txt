@@ -1,2358 +1,1314 @@
-String Frag:	" "
+String Frag:	"
+"
 
 String Frag:	"
 "
 
-String Frag:	"0"
+String Frag:	" ."
 
-String Frag:	"-"
-
-String Frag:	"0"
-
-String Frag:	"0"
-
-String Frag:	"
-"
-
-String Frag:	" "
-
-String Frag:	"9"
-
-String Frag:	"0"
+String Frag:	" O"
 
 Frag:
 SEQ(
-	LABEL L184,
+	LABEL L858,
 	SEQ(
 		SEQ(
 			MOVE(
-				TEMP t382,
-				TEMP t381),
+				TEMP t106,
+				TEMP t105),
 			SEQ(
 				SEQ(
 					MOVE(
 						MEM(
 							BINOP(MINUS,
-								TEMP t382,
+								TEMP t106,
 								CONST 0)),
-						TEMP t384),
-					SEQ(
-						MOVE(
-							TEMP t654,
-							TEMP t385),
-						MOVE(
-							TEMP t381,
-							BINOP(MINUS,
-								TEMP t381,
-								CONST 4)))),
+						TEMP t108),
+					MOVE(
+						TEMP t105,
+						BINOP(MINUS,
+							TEMP t105,
+							CONST 12))),
 				SEQ(
 					SEQ(
 						MOVE(
 							MEM(
 								BINOP(MINUS,
-									TEMP t381,
+									TEMP t105,
 									CONST 0)),
-							TEMP t398),
+							TEMP t122),
 						SEQ(
 							MOVE(
 								MEM(
 									BINOP(MINUS,
-										TEMP t381,
+										TEMP t105,
 										CONST 4)),
-								TEMP t399),
+								TEMP t123),
 							SEQ(
 								MOVE(
 									MEM(
 										BINOP(MINUS,
-											TEMP t381,
+											TEMP t105,
 											CONST 8)),
-									TEMP t400),
+									TEMP t124),
 								SEQ(
 									MOVE(
 										MEM(
 											BINOP(MINUS,
-												TEMP t381,
+												TEMP t105,
 												CONST 12)),
-										TEMP t401),
+										TEMP t125),
 									SEQ(
 										MOVE(
 											MEM(
 												BINOP(MINUS,
-													TEMP t381,
+													TEMP t105,
 													CONST 16)),
-											TEMP t402),
+											TEMP t126),
 										SEQ(
 											MOVE(
 												MEM(
 													BINOP(MINUS,
-														TEMP t381,
+														TEMP t105,
 														CONST 20)),
-												TEMP t403),
+												TEMP t127),
 											SEQ(
 												MOVE(
 													MEM(
 														BINOP(MINUS,
-															TEMP t381,
+															TEMP t105,
 															CONST 24)),
-													TEMP t404),
+													TEMP t128),
 												SEQ(
 													MOVE(
 														MEM(
 															BINOP(MINUS,
-																TEMP t381,
+																TEMP t105,
 																CONST 28)),
-														TEMP t405),
+														TEMP t129),
 													MOVE(
 														MEM(
 															BINOP(MINUS,
-																TEMP t381,
+																TEMP t105,
 																CONST 32)),
-														TEMP t383))))))))),
+														TEMP t107))))))))),
 					MOVE(
-						TEMP t381,
+						TEMP t105,
 						BINOP(MINUS,
-							TEMP t381,
+							TEMP t105,
 							CONST 36))))),
 		SEQ(
 			MOVE(
-				TEMP t378,
+				TEMP t102,
 				ESEQ(
 					SEQ(
 						SEQ(
 							MOVE(
-								TEMP t659,
-								ESEQ(
-									SEQ(
-										CJUMP(GE,
-											CALL(
-												NAME tig_ord,
-													MEM(
-														MEM(
-															TEMP t382)),
-													MEM(
-														BINOP(MINUS,
-															MEM(
-																MEM(
-																	TEMP t382)),
-															CONST 4))),
-											CALL(
-												NAME tig_ord,
-													MEM(
-														MEM(
-															TEMP t382)),
-													ESEQ(
-														MOVE(
-															TEMP t655,
-															NAME L185),
-														TEMP t655)),
-											L186,L187),
-										SEQ(
-											SEQ(
-												LABEL L186,
-												SEQ(
-													MOVE(
-														TEMP t656,
-														CONST 1),
-													JUMP(
-														NAME L188))),
-											SEQ(
-												LABEL L187,
-												SEQ(
-													MOVE(
-														TEMP t656,
-														CONST 0),
-													JUMP(
-														NAME L188))))),
-									ESEQ(
-										LABEL L188,
-										TEMP t656))),
-							CJUMP(NE,
-								TEMP t659,
-								CONST 0,
-								L193,L194)),
-						SEQ(
-							SEQ(
-								LABEL L193,
-								SEQ(
-									MOVE(
-										TEMP t660,
-										ESEQ(
-											SEQ(
-												CJUMP(LE,
-													CALL(
-														NAME tig_ord,
-															MEM(
-																MEM(
-																	TEMP t382)),
-															MEM(
-																BINOP(MINUS,
-																	MEM(
-																		MEM(
-																			TEMP t382)),
-																	CONST 4))),
-													CALL(
-														NAME tig_ord,
-															MEM(
-																MEM(
-																	TEMP t382)),
-															ESEQ(
-																MOVE(
-																	TEMP t657,
-																	NAME L189),
-																TEMP t657)),
-													L190,L191),
-												SEQ(
-													SEQ(
-														LABEL L190,
-														SEQ(
-															MOVE(
-																TEMP t658,
-																CONST 1),
-															JUMP(
-																NAME L192))),
-													SEQ(
-														LABEL L191,
-														SEQ(
-															MOVE(
-																TEMP t658,
-																CONST 0),
-															JUMP(
-																NAME L192))))),
-											ESEQ(
-												LABEL L192,
-												TEMP t658))),
-									JUMP(
-										NAME L195))),
-							SEQ(
-								LABEL L194,
-								SEQ(
-									MOVE(
-										TEMP t660,
-										CONST 0),
-									JUMP(
-										NAME L195))))),
-					ESEQ(
-						LABEL L195,
-						TEMP t660))),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L183,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 4))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
+								TEMP t2445,
 								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
 									MEM(
 										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
 											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					SEQ(
-						SEQ(
-							SEQ(
-								LABEL L202,
-								SEQ(
-									MOVE(
-										TEMP t665,
-										ESEQ(
-											SEQ(
-												SEQ(
-													MOVE(
-														TEMP t663,
-														CALL(
-															NAME tig_stringEqual,
-																TEMP t382,
-																MEM(
-																	BINOP(MINUS,
-																		MEM(
-																			MEM(
-																				TEMP t382)),
-																		CONST 4)),
-																ESEQ(
-																	MOVE(
-																		TEMP t661,
-																		NAME L196),
-																	TEMP t661))),
-													CJUMP(NE,
-														TEMP t663,
-														CONST 0,
-														L198,L199)),
-												SEQ(
-													SEQ(
-														LABEL L198,
-														SEQ(
-															MOVE(
-																TEMP t664,
-																CONST 1),
-															JUMP(
-																NAME L200))),
-													SEQ(
-														LABEL L199,
-														SEQ(
-															MOVE(
-																TEMP t664,
-																CALL(
-																	NAME tig_stringEqual,
-																		TEMP t382,
-																		MEM(
-																			BINOP(MINUS,
-																				MEM(
-																					MEM(
-																						TEMP t382)),
-																				CONST 4)),
-																		ESEQ(
-																			MOVE(
-																				TEMP t662,
-																				NAME L197),
-																			TEMP t662))),
-															JUMP(
-																NAME L200))))),
-											ESEQ(
-												LABEL L200,
-												TEMP t664))),
-									CJUMP(NE,
-										TEMP t665,
-										CONST 0,
-										L203,L201))),
-							SEQ(
-								LABEL L203,
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												MEM(
-													MEM(
-														TEMP t382)),
-												CONST 4)),
-										CALL(
-											NAME tig_getchar,
-												MEM(
-													MEM(
-														TEMP t382)))),
-									JUMP(
-										NAME L202)))),
-						LABEL L201),
-					CONST 0)),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L182,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					SEQ(
-						MOVE(
-							TEMP t652,
-							TEMP t385),
-						MOVE(
-							TEMP t381,
-							BINOP(MINUS,
-								TEMP t381,
-								CONST 4)))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					MOVE(
-						TEMP t653,
-						CONST 0),
-					ESEQ(
-						EXP(
-							CALL(
-								NAME L183,
-									TEMP t382)),
-						ESEQ(
-							MOVE(
-								MEM(
-									BINOP(PLUS,
-										CONST 0,
-										TEMP t652)),
-								CALL(
-									NAME L184,
-										TEMP t382,
-										MEM(
-											BINOP(MINUS,
-												MEM(
-													TEMP t382),
-												CONST 4)))),
-							ESEQ(
-								SEQ(
-									SEQ(
-										SEQ(
-											LABEL L206,
-											SEQ(
-												MOVE(
-													TEMP t667,
-													CALL(
-														NAME L184,
-															TEMP t382,
-															MEM(
-																BINOP(MINUS,
-																	MEM(
-																		TEMP t382),
-																	CONST 4)))),
-												CJUMP(NE,
-													TEMP t667,
-													CONST 0,
-													L207,L204))),
-										SEQ(
-											LABEL L207,
-											SEQ(
-												EXP(
-													ESEQ(
-														MOVE(
-															TEMP t653,
-															BINOP(MINUS,
-																BINOP(PLUS,
-																	BINOP(MUL,
-																		TEMP t653,
-																		CONST 10),
-																	CALL(
-																		NAME tig_ord,
-																			MEM(
-																				TEMP t382),
-																			MEM(
-																				BINOP(MINUS,
-																					MEM(
-																						TEMP t382),
-																					CONST 4)))),
-																CALL(
-																	NAME tig_ord,
-																		MEM(
-																			TEMP t382),
-																		ESEQ(
-																			MOVE(
-																				TEMP t666,
-																				NAME L205),
-																			TEMP t666)))),
-														ESEQ(
-															MOVE(
-																MEM(
-																	BINOP(MINUS,
-																		MEM(
-																			TEMP t382),
-																		CONST 4)),
-																CALL(
-																	NAME tig_getchar,
-																		MEM(
-																			TEMP t382))),
-															CONST 0))),
-												JUMP(
-													NAME L206)))),
-									LABEL L204),
-								TEMP t653))))),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L211,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 4))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					MOVE(
-						TEMP t674,
-						CALL(
-							NAME L182,
-								MEM(
-									TEMP t382),
-								TEMP t673)),
-					ESEQ(
-						MOVE(
-							TEMP t673,
-							ESEQ(
-								MOVE(
-									TEMP t672,
-									CALL(
-										NAME tig_allocRecord,
+												TEMP t106),
 											CONST 4)),
-								ESEQ(
-									MOVE(
-										MEM(
-											BINOP(PLUS,
-												TEMP t378,
-												CONST 0)),
-										CONST 0),
-									TEMP t672))),
-						ESEQ(
+									CONST 1)),
+							MOVE(
+								TEMP t2446,
+								CONST 0)),
+						SEQ(
 							SEQ(
 								SEQ(
-									MOVE(
-										TEMP t676,
-										MEM(
-											BINOP(PLUS,
-												CONST 0,
-												TEMP t673))),
-									CJUMP(NE,
-										TEMP t676,
-										CONST 0,
-										L212,L213)),
+									LABEL L875,
+									CJUMP(LT,
+										TEMP t2446,
+										TEMP t2445,
+										L876,L859)),
 								SEQ(
+									LABEL L876,
 									SEQ(
-										LABEL L212,
+										MOVE(
+											TEMP t2446,
+											BINOP(PLUS,
+												TEMP t2446,
+												CONST 1)),
 										SEQ(
-											MOVE(
-												TEMP t677,
+											EXP(
 												ESEQ(
-													MOVE(
-														TEMP t675,
-														CALL(
-															NAME tig_allocRecord,
-																CONST 8)),
-													ESEQ(
+													SEQ(
 														SEQ(
 															MOVE(
-																MEM(
-																	BINOP(PLUS,
-																		TEMP t378,
-																		CONST 0)),
-																TEMP t674),
-															MOVE(
-																MEM(
-																	BINOP(PLUS,
-																		TEMP t378,
-																		CONST 4)),
-																CALL(
-																	NAME L211,
-																		MEM(
-																			TEMP t382)))),
-														TEMP t675))),
-											JUMP(
-												NAME L214))),
-									SEQ(
-										LABEL L213,
-										SEQ(
-											MOVE(
-												TEMP t677,
-												CONST 0),
-											JUMP(
-												NAME L214))))),
-							ESEQ(
-								LABEL L214,
-								TEMP t677))))),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
+																TEMP t2442,
 																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L210,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					SEQ(
-						MOVE(
-							TEMP t670,
-							TEMP t385),
-						SEQ(
-							MOVE(
-								TEMP t671,
-								TEMP t386),
-							MOVE(
-								TEMP t381,
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 4))))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					SEQ(
-						SEQ(
-							MOVE(
-								TEMP t687,
-								ESEQ(
-									SEQ(
-										CJUMP(EQ,
-											TEMP t670,
-											CONST 0,
-											L215,L216),
-										SEQ(
-											SEQ(
-												LABEL L215,
-												SEQ(
-													MOVE(
-														TEMP t678,
-														CONST 1),
-													JUMP(
-														NAME L217))),
-											SEQ(
-												LABEL L216,
-												SEQ(
-													MOVE(
-														TEMP t678,
-														CONST 0),
-													JUMP(
-														NAME L217))))),
-									ESEQ(
-										LABEL L217,
-										TEMP t678))),
-							CJUMP(NE,
-								TEMP t687,
-								CONST 0,
-								L230,L231)),
-						SEQ(
-							SEQ(
-								LABEL L230,
-								SEQ(
-									MOVE(
-										TEMP t688,
-										TEMP t671),
-									JUMP(
-										NAME L232))),
-							SEQ(
-								LABEL L231,
-								SEQ(
-									MOVE(
-										TEMP t688,
-										ESEQ(
-											SEQ(
-												SEQ(
-													MOVE(
-														TEMP t685,
-														ESEQ(
-															SEQ(
-																CJUMP(EQ,
-																	TEMP t671,
-																	CONST 0,
-																	L218,L219),
-																SEQ(
-																	SEQ(
-																		LABEL L218,
-																		SEQ(
-																			MOVE(
-																				TEMP t679,
-																				CONST 1),
-																			JUMP(
-																				NAME L220))),
-																	SEQ(
-																		LABEL L219,
-																		SEQ(
-																			MOVE(
-																				TEMP t679,
-																				CONST 0),
-																			JUMP(
-																				NAME L220))))),
-															ESEQ(
-																LABEL L220,
-																TEMP t679))),
-													CJUMP(NE,
-														TEMP t685,
-														CONST 0,
-														L227,L228)),
-												SEQ(
-													SEQ(
-														LABEL L227,
-														SEQ(
-															MOVE(
-																TEMP t686,
-																TEMP t670),
-															JUMP(
-																NAME L229))),
-													SEQ(
-														LABEL L228,
-														SEQ(
-															MOVE(
-																TEMP t686,
-																ESEQ(
-																	SEQ(
-																		SEQ(
-																			MOVE(
-																				TEMP t683,
-																				ESEQ(
-																					SEQ(
-																						CJUMP(LT,
-																							MEM(
-																								BINOP(PLUS,
-																									CONST 0,
-																									TEMP t670)),
-																							MEM(
-																								BINOP(PLUS,
-																									CONST 0,
-																									TEMP t671)),
-																							L221,L222),
-																						SEQ(
-																							SEQ(
-																								LABEL L221,
-																								SEQ(
-																									MOVE(
-																										TEMP t680,
-																										CONST 1),
-																									JUMP(
-																										NAME L223))),
-																							SEQ(
-																								LABEL L222,
-																								SEQ(
-																									MOVE(
-																										TEMP t680,
-																										CONST 0),
-																									JUMP(
-																										NAME L223))))),
-																					ESEQ(
-																						LABEL L223,
-																						TEMP t680))),
-																			CJUMP(NE,
-																				TEMP t683,
-																				CONST 0,
-																				L224,L225)),
-																		SEQ(
-																			SEQ(
-																				LABEL L224,
-																				SEQ(
-																					MOVE(
-																						TEMP t684,
-																						ESEQ(
-																							MOVE(
-																								TEMP t681,
-																								CALL(
-																									NAME tig_allocRecord,
-																										CONST 8)),
-																							ESEQ(
-																								SEQ(
-																									MOVE(
-																										MEM(
-																											BINOP(PLUS,
-																												TEMP t378,
-																												CONST 0)),
-																										MEM(
-																											BINOP(PLUS,
-																												CONST 0,
-																												TEMP t670))),
-																									MOVE(
-																										MEM(
-																											BINOP(PLUS,
-																												TEMP t378,
-																												CONST 4)),
-																										CALL(
-																											NAME L210,
-																												MEM(
-																													TEMP t382),
-																												MEM(
-																													BINOP(PLUS,
-																														CONST 4,
-																														TEMP t670)),
-																												TEMP t671))),
-																								TEMP t681))),
-																					JUMP(
-																						NAME L226))),
-																			SEQ(
-																				LABEL L225,
-																				SEQ(
-																					MOVE(
-																						TEMP t684,
-																						ESEQ(
-																							MOVE(
-																								TEMP t682,
-																								CALL(
-																									NAME tig_allocRecord,
-																										CONST 8)),
-																							ESEQ(
-																								SEQ(
-																									MOVE(
-																										MEM(
-																											BINOP(PLUS,
-																												TEMP t378,
-																												CONST 0)),
-																										MEM(
-																											BINOP(PLUS,
-																												CONST 0,
-																												TEMP t671))),
-																									MOVE(
-																										MEM(
-																											BINOP(PLUS,
-																												TEMP t378,
-																												CONST 4)),
-																										CALL(
-																											NAME L210,
-																												MEM(
-																													TEMP t382),
-																												TEMP t670,
-																												MEM(
-																													BINOP(PLUS,
-																														CONST 4,
-																														TEMP t671))))),
-																								TEMP t682))),
-																					JUMP(
-																						NAME L226))))),
-																	ESEQ(
-																		LABEL L226,
-																		TEMP t684))),
-															JUMP(
-																NAME L229))))),
-											ESEQ(
-												LABEL L229,
-												TEMP t686))),
-									JUMP(
-										NAME L232))))),
-					ESEQ(
-						LABEL L232,
-						TEMP t688))),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L233,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					SEQ(
-						MOVE(
-							TEMP t689,
-							TEMP t385),
-						MOVE(
-							TEMP t381,
-							BINOP(MINUS,
-								TEMP t381,
-								CONST 4)))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					SEQ(
-						SEQ(
-							MOVE(
-								TEMP t692,
-								ESEQ(
-									SEQ(
-										CJUMP(GT,
-											TEMP t689,
-											CONST 0,
-											L234,L235),
-										SEQ(
-											SEQ(
-												LABEL L234,
-												SEQ(
-													MOVE(
-														TEMP t690,
-														CONST 1),
-													JUMP(
-														NAME L236))),
-											SEQ(
-												LABEL L235,
-												SEQ(
-													MOVE(
-														TEMP t690,
-														CONST 0),
-													JUMP(
-														NAME L236))))),
-									ESEQ(
-										LABEL L236,
-										TEMP t690))),
-							CJUMP(NE,
-								TEMP t692,
-								CONST 0,
-								L238,L239)),
-						SEQ(
-							LABEL L238,
-							SEQ(
-								MOVE(
-									TEMP t693,
-									ESEQ(
-										EXP(
-											CALL(
-												NAME L233,
-													MEM(
-														TEMP t382),
-													BINOP(DIV,
-														TEMP t689,
-														CONST 10))),
-										CALL(
-											NAME tig_print,
-												MEM(
-													MEM(
-														TEMP t382)),
-												CALL(
-													NAME tig_chr,
-														MEM(
-															MEM(
-																TEMP t382)),
-														BINOP(PLUS,
-															BINOP(MINUS,
-																TEMP t689,
-																BINOP(MUL,
-																	BINOP(DIV,
-																		TEMP t689,
-																		CONST 10),
-																	CONST 10)),
-															CALL(
-																NAME tig_ord,
 																	MEM(
-																		MEM(
-																			TEMP t382)),
-																	ESEQ(
-																		MOVE(
-																			TEMP t691,
-																			NAME L237),
-																		TEMP t691))))))),
-								JUMP(
-									NAME L239)))),
-					ESEQ(
-						LABEL L239,
-						TEMP t693))),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L209,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					SEQ(
-						MOVE(
-							TEMP t669,
-							TEMP t385),
-						MOVE(
-							TEMP t381,
-							BINOP(MINUS,
-								TEMP t381,
-								CONST 4)))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					SEQ(
-						SEQ(
-							MOVE(
-								TEMP t700,
-								ESEQ(
-									SEQ(
-										CJUMP(LT,
-											TEMP t669,
-											CONST 0,
-											L240,L241),
-										SEQ(
-											SEQ(
-												LABEL L240,
-												SEQ(
-													MOVE(
-														TEMP t694,
-														CONST 1),
-													JUMP(
-														NAME L242))),
-											SEQ(
-												LABEL L241,
-												SEQ(
-													MOVE(
-														TEMP t694,
-														CONST 0),
-													JUMP(
-														NAME L242))))),
-									ESEQ(
-										LABEL L242,
-										TEMP t694))),
-							CJUMP(NE,
-								TEMP t700,
-								CONST 0,
-								L251,L252)),
-						SEQ(
-							SEQ(
-								LABEL L251,
-								SEQ(
-									MOVE(
-										TEMP t701,
-										ESEQ(
-											EXP(
-												CALL(
-													NAME tig_print,
-														MEM(
-															TEMP t382),
-														ESEQ(
+																		BINOP(MINUS,
+																			MEM(
+																				TEMP t106),
+																			CONST 4)),
+																	CONST 1)),
 															MOVE(
-																TEMP t695,
-																NAME L243),
-															TEMP t695))),
-											CALL(
-												NAME L233,
-													TEMP t382,
-													BINOP(MINUS,
-														CONST 0,
-														TEMP t669)))),
-									JUMP(
-										NAME L253))),
-							SEQ(
-								LABEL L252,
-								SEQ(
-									MOVE(
-										TEMP t701,
-										ESEQ(
-											SEQ(
-												SEQ(
-													MOVE(
-														TEMP t698,
-														ESEQ(
+																TEMP t2443,
+																CONST 0)),
+														SEQ(
 															SEQ(
-																CJUMP(GT,
-																	TEMP t669,
-																	CONST 0,
-																	L244,L245),
 																SEQ(
+																	LABEL L872,
+																	CJUMP(LT,
+																		TEMP t2443,
+																		TEMP t2442,
+																		L873,L860)),
+																SEQ(
+																	LABEL L873,
 																	SEQ(
-																		LABEL L244,
+																		MOVE(
+																			TEMP t2443,
+																			BINOP(PLUS,
+																				TEMP t2443,
+																				CONST 1)),
 																		SEQ(
-																			MOVE(
-																				TEMP t696,
-																				CONST 1),
+																			EXP(
+																				CALL(
+																					NAME tig_print,
+																						MEM(
+																							TEMP t106),
+																						ESEQ(
+																							SEQ(
+																								SEQ(
+																									MOVE(
+																										TEMP t2440,
+																										ESEQ(
+																											SEQ(
+																												CJUMP(EQ,
+																													ESEQ(
+																														SEQ(
+																															SEQ(
+																																SEQ(
+																																	MOVE(
+																																		TEMP t2435,
+																																		MEM(
+																																			BINOP(MINUS,
+																																				TEMP t106,
+																																				CONST 4))),
+																																	MOVE(
+																																		TEMP t2436,
+																																		MEM(
+																																			BINOP(MINUS,
+																																				MEM(
+																																					TEMP t106),
+																																				CONST 12)))),
+																																SEQ(
+																																	CJUMP(GE,
+																																		TEMP t2435,
+																																		CONST 0,
+																																		L861,L862),
+																																	SEQ(
+																																		LABEL L861,
+																																		CJUMP(LT,
+																																			TEMP t2435,
+																																			MEM(
+																																				BINOP(MINUS,
+																																					TEMP t2436,
+																																					CONST 4)),
+																																			L863,L862)))),
+																															SEQ(
+																																LABEL L862,
+																																EXP(
+																																	CALL(
+																																		NAME tig_exit,
+																																			CONST 1)))),
+																														ESEQ(
+																															LABEL L863,
+																															MEM(
+																																BINOP(PLUS,
+																																	BINOP(MUL,
+																																		TEMP t2435,
+																																		CONST 4),
+																																	TEMP t2436)))),
+																													MEM(
+																														BINOP(MINUS,
+																															TEMP t106,
+																															CONST 8)),
+																													L864,L865),
+																												SEQ(
+																													SEQ(
+																														LABEL L864,
+																														SEQ(
+																															MOVE(
+																																TEMP t2437,
+																																CONST 1),
+																															JUMP(
+																																NAME L866))),
+																													SEQ(
+																														LABEL L865,
+																														SEQ(
+																															MOVE(
+																																TEMP t2437,
+																																CONST 0),
+																															JUMP(
+																																NAME L866))))),
+																											ESEQ(
+																												LABEL L866,
+																												TEMP t2437))),
+																									CJUMP(NE,
+																										TEMP t2440,
+																										CONST 0,
+																										L869,L870)),
+																								SEQ(
+																									SEQ(
+																										LABEL L869,
+																										SEQ(
+																											MOVE(
+																												TEMP t2441,
+																												ESEQ(
+																													MOVE(
+																														TEMP t2438,
+																														NAME L867),
+																													TEMP t2438)),
+																											JUMP(
+																												NAME L871))),
+																									SEQ(
+																										LABEL L870,
+																										SEQ(
+																											MOVE(
+																												TEMP t2441,
+																												ESEQ(
+																													MOVE(
+																														TEMP t2439,
+																														NAME L868),
+																													TEMP t2439)),
+																											JUMP(
+																												NAME L871))))),
+																							ESEQ(
+																								LABEL L871,
+																								TEMP t2441)))),
 																			JUMP(
-																				NAME L246))),
-																	SEQ(
-																		LABEL L245,
-																		SEQ(
-																			MOVE(
-																				TEMP t696,
-																				CONST 0),
-																			JUMP(
-																				NAME L246))))),
-															ESEQ(
-																LABEL L246,
-																TEMP t696))),
-													CJUMP(NE,
-														TEMP t698,
-														CONST 0,
-														L248,L249)),
-												SEQ(
-													SEQ(
-														LABEL L248,
-														SEQ(
-															MOVE(
-																TEMP t699,
-																CALL(
-																	NAME L233,
-																		TEMP t382,
-																		TEMP t669)),
-															JUMP(
-																NAME L250))),
-													SEQ(
-														LABEL L249,
-														SEQ(
-															MOVE(
-																TEMP t699,
-																CALL(
-																	NAME tig_print,
-																		MEM(
-																			TEMP t382),
-																		ESEQ(
-																			MOVE(
-																				TEMP t697,
-																				NAME L247),
-																			TEMP t697))),
-															JUMP(
-																NAME L250))))),
-											ESEQ(
-												LABEL L250,
-												TEMP t699))),
-									JUMP(
-										NAME L253))))),
-					ESEQ(
-						LABEL L253,
-						TEMP t701))),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t381,
-							BINOP(PLUS,
-								TEMP t381,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t398,
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t399,
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t400,
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t401,
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t402,
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t403,
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t404,
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t405,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 28))),
-														MOVE(
-															TEMP t383,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t381,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t381,
-							TEMP t382),
-						MOVE(
-							TEMP t382,
-							MEM(
-								TEMP t382)))),
-				JUMP(
-					TEMP t383)))))
-
-
-Frag:
-SEQ(
-	LABEL L208,
-	SEQ(
-		SEQ(
-			MOVE(
-				TEMP t382,
-				TEMP t381),
-			SEQ(
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t382,
-								CONST 0)),
-						TEMP t384),
-					SEQ(
-						MOVE(
-							TEMP t668,
-							TEMP t385),
-						MOVE(
-							TEMP t381,
-							BINOP(MINUS,
-								TEMP t381,
-								CONST 4)))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t381,
-									CONST 0)),
-							TEMP t398),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t381,
-										CONST 4)),
-								TEMP t399),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t381,
-											CONST 8)),
-									TEMP t400),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t381,
-												CONST 12)),
-										TEMP t401),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t381,
-													CONST 16)),
-											TEMP t402),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t381,
-														CONST 20)),
-												TEMP t403),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t381,
-															CONST 24)),
-													TEMP t404),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 28)),
-														TEMP t405),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t381,
-																CONST 32)),
-														TEMP t383))))))))),
-					MOVE(
-						TEMP t381,
-						BINOP(MINUS,
-							TEMP t381,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t378,
-				ESEQ(
-					SEQ(
-						SEQ(
-							MOVE(
-								TEMP t705,
-								ESEQ(
-									SEQ(
-										CJUMP(EQ,
-											TEMP t668,
-											CONST 0,
-											L254,L255),
-										SEQ(
-											SEQ(
-												LABEL L254,
-												SEQ(
-													MOVE(
-														TEMP t702,
-														CONST 1),
-													JUMP(
-														NAME L256))),
-											SEQ(
-												LABEL L255,
-												SEQ(
-													MOVE(
-														TEMP t702,
-														CONST 0),
-													JUMP(
-														NAME L256))))),
-									ESEQ(
-										LABEL L256,
-										TEMP t702))),
-							CJUMP(NE,
-								TEMP t705,
-								CONST 0,
-								L259,L260)),
-						SEQ(
-							SEQ(
-								LABEL L259,
-								SEQ(
-									MOVE(
-										TEMP t706,
-										CALL(
-											NAME tig_print,
-												MEM(
-													TEMP t382),
-												ESEQ(
-													MOVE(
-														TEMP t703,
-														NAME L257),
-													TEMP t703))),
-									JUMP(
-										NAME L261))),
-							SEQ(
-								LABEL L260,
-								SEQ(
-									MOVE(
-										TEMP t706,
-										ESEQ(
-											EXP(
-												CALL(
-													NAME L209,
-														MEM(
-															TEMP t382),
-														MEM(
-															BINOP(PLUS,
-																CONST 0,
-																TEMP t668)))),
-											ESEQ(
-												EXP(
+																				NAME L872))))),
+															LABEL L860)),
 													CALL(
 														NAME tig_print,
 															MEM(
-																TEMP t382),
+																TEMP t106),
 															ESEQ(
 																MOVE(
-																	TEMP t704,
-																	NAME L258),
-																TEMP t704))),
-												CALL(
-													NAME L208,
-														MEM(
-															TEMP t382),
-														MEM(
-															BINOP(PLUS,
-																CONST 4,
-																TEMP t668)))))),
-									JUMP(
-										NAME L261))))),
-					ESEQ(
-						LABEL L261,
-						TEMP t706))),
+																	TEMP t2444,
+																	NAME L874),
+																TEMP t2444)))),
+											JUMP(
+												NAME L875))))),
+							LABEL L859)),
+					CALL(
+						NAME tig_print,
+							MEM(
+								TEMP t106),
+							ESEQ(
+								MOVE(
+									TEMP t2447,
+									NAME L877),
+								TEMP t2447)))),
 			SEQ(
 				SEQ(
 					SEQ(
 						MOVE(
-							TEMP t381,
+							TEMP t105,
 							BINOP(PLUS,
-								TEMP t381,
+								TEMP t105,
 								CONST 36)),
 						SEQ(
 							MOVE(
-								TEMP t398,
+								TEMP t122,
 								MEM(
 									BINOP(MINUS,
-										TEMP t381,
+										TEMP t105,
 										CONST 0))),
 							SEQ(
 								MOVE(
-									TEMP t399,
+									TEMP t123,
 									MEM(
 										BINOP(MINUS,
-											TEMP t381,
+											TEMP t105,
 											CONST 4))),
 								SEQ(
 									MOVE(
-										TEMP t400,
+										TEMP t124,
 										MEM(
 											BINOP(MINUS,
-												TEMP t381,
+												TEMP t105,
 												CONST 8))),
 									SEQ(
 										MOVE(
-											TEMP t401,
+											TEMP t125,
 											MEM(
 												BINOP(MINUS,
-													TEMP t381,
+													TEMP t105,
 													CONST 12))),
 										SEQ(
 											MOVE(
-												TEMP t402,
+												TEMP t126,
 												MEM(
 													BINOP(MINUS,
-														TEMP t381,
+														TEMP t105,
 														CONST 16))),
 											SEQ(
 												MOVE(
-													TEMP t403,
+													TEMP t127,
 													MEM(
 														BINOP(MINUS,
-															TEMP t381,
+															TEMP t105,
 															CONST 20))),
 												SEQ(
 													MOVE(
-														TEMP t404,
+														TEMP t128,
 														MEM(
 															BINOP(MINUS,
-																TEMP t381,
+																TEMP t105,
 																CONST 24))),
 													SEQ(
 														MOVE(
-															TEMP t405,
+															TEMP t129,
 															MEM(
 																BINOP(MINUS,
-																	TEMP t381,
+																	TEMP t105,
 																	CONST 28))),
 														MOVE(
-															TEMP t383,
+															TEMP t107,
 															MEM(
 																BINOP(MINUS,
-																	TEMP t381,
+																	TEMP t105,
 																	CONST 32)))))))))))),
 					SEQ(
 						MOVE(
-							TEMP t381,
-							TEMP t382),
+							TEMP t105,
+							TEMP t106),
 						MOVE(
-							TEMP t382,
+							TEMP t106,
 							MEM(
-								TEMP t382)))),
+								TEMP t106)))),
 				JUMP(
-					TEMP t383)))))
+					TEMP t107)))))
+
+
+Frag:
+SEQ(
+	LABEL L857,
+	SEQ(
+		SEQ(
+			MOVE(
+				TEMP t106,
+				TEMP t105),
+			SEQ(
+				SEQ(
+					MOVE(
+						MEM(
+							BINOP(MINUS,
+								TEMP t106,
+								CONST 0)),
+						TEMP t108),
+					SEQ(
+						MOVE(
+							TEMP t2434,
+							TEMP t109),
+						MOVE(
+							TEMP t105,
+							BINOP(MINUS,
+								TEMP t105,
+								CONST 8)))),
+				SEQ(
+					SEQ(
+						MOVE(
+							MEM(
+								BINOP(MINUS,
+									TEMP t105,
+									CONST 0)),
+							TEMP t122),
+						SEQ(
+							MOVE(
+								MEM(
+									BINOP(MINUS,
+										TEMP t105,
+										CONST 4)),
+								TEMP t123),
+							SEQ(
+								MOVE(
+									MEM(
+										BINOP(MINUS,
+											TEMP t105,
+											CONST 8)),
+									TEMP t124),
+								SEQ(
+									MOVE(
+										MEM(
+											BINOP(MINUS,
+												TEMP t105,
+												CONST 12)),
+										TEMP t125),
+									SEQ(
+										MOVE(
+											MEM(
+												BINOP(MINUS,
+													TEMP t105,
+													CONST 16)),
+											TEMP t126),
+										SEQ(
+											MOVE(
+												MEM(
+													BINOP(MINUS,
+														TEMP t105,
+														CONST 20)),
+												TEMP t127),
+											SEQ(
+												MOVE(
+													MEM(
+														BINOP(MINUS,
+															TEMP t105,
+															CONST 24)),
+													TEMP t128),
+												SEQ(
+													MOVE(
+														MEM(
+															BINOP(MINUS,
+																TEMP t105,
+																CONST 28)),
+														TEMP t129),
+													MOVE(
+														MEM(
+															BINOP(MINUS,
+																TEMP t105,
+																CONST 32)),
+														TEMP t107))))))))),
+					MOVE(
+						TEMP t105,
+						BINOP(MINUS,
+							TEMP t105,
+							CONST 36))))),
+		SEQ(
+			MOVE(
+				TEMP t102,
+				ESEQ(
+					SEQ(
+						SEQ(
+							MOVE(
+								TEMP t2480,
+								ESEQ(
+									SEQ(
+										CJUMP(EQ,
+											TEMP t2434,
+											MEM(
+												BINOP(MINUS,
+													MEM(
+														TEMP t106),
+													CONST 4)),
+											L878,L879),
+										SEQ(
+											SEQ(
+												LABEL L878,
+												SEQ(
+													MOVE(
+														TEMP t2448,
+														CONST 1),
+													JUMP(
+														NAME L880))),
+											SEQ(
+												LABEL L879,
+												SEQ(
+													MOVE(
+														TEMP t2448,
+														CONST 0),
+													JUMP(
+														NAME L880))))),
+									ESEQ(
+										LABEL L880,
+										TEMP t2448))),
+							CJUMP(NE,
+								TEMP t2480,
+								CONST 0,
+								L931,L932)),
+						SEQ(
+							SEQ(
+								LABEL L931,
+								SEQ(
+									MOVE(
+										TEMP t2481,
+										CALL(
+											NAME L858,
+												MEM(
+													TEMP t106))),
+									JUMP(
+										NAME L933))),
+							SEQ(
+								LABEL L932,
+								SEQ(
+									MOVE(
+										TEMP t2481,
+										ESEQ(
+											SEQ(
+												SEQ(
+													MOVE(
+														TEMP t2478,
+														BINOP(MINUS,
+															MEM(
+																BINOP(MINUS,
+																	MEM(
+																		TEMP t106),
+																	CONST 4)),
+															CONST 1)),
+													MOVE(
+														TEMP t2479,
+														CONST 0)),
+												SEQ(
+													SEQ(
+														SEQ(
+															LABEL L929,
+															CJUMP(LT,
+																TEMP t2479,
+																TEMP t2478,
+																L930,L881)),
+														SEQ(
+															LABEL L930,
+															SEQ(
+																MOVE(
+																	TEMP t2479,
+																	BINOP(PLUS,
+																		TEMP t2479,
+																		CONST 1)),
+																SEQ(
+																	EXP(
+																		ESEQ(
+																			SEQ(
+																				SEQ(
+																					MOVE(
+																						TEMP t2476,
+																						ESEQ(
+																							SEQ(
+																								SEQ(
+																									MOVE(
+																										TEMP t2460,
+																										ESEQ(
+																											SEQ(
+																												SEQ(
+																													MOVE(
+																														TEMP t2455,
+																														ESEQ(
+																															SEQ(
+																																CJUMP(EQ,
+																																	ESEQ(
+																																		SEQ(
+																																			SEQ(
+																																				SEQ(
+																																					MOVE(
+																																						TEMP t2449,
+																																						MEM(
+																																							BINOP(MINUS,
+																																								TEMP t106,
+																																								CONST 4))),
+																																					MOVE(
+																																						TEMP t2450,
+																																						MEM(
+																																							BINOP(MINUS,
+																																								MEM(
+																																									TEMP t106),
+																																								CONST 8)))),
+																																				SEQ(
+																																					CJUMP(GE,
+																																						TEMP t2449,
+																																						CONST 0,
+																																						L882,L883),
+																																					SEQ(
+																																						LABEL L882,
+																																						CJUMP(LT,
+																																							TEMP t2449,
+																																							MEM(
+																																								BINOP(MINUS,
+																																									TEMP t2450,
+																																									CONST 4)),
+																																							L884,L883)))),
+																																			SEQ(
+																																				LABEL L883,
+																																				EXP(
+																																					CALL(
+																																						NAME tig_exit,
+																																							CONST 1)))),
+																																		ESEQ(
+																																			LABEL L884,
+																																			MEM(
+																																				BINOP(PLUS,
+																																					BINOP(MUL,
+																																						TEMP t2449,
+																																						CONST 4),
+																																					TEMP t2450)))),
+																																	CONST 0,
+																																	L885,L886),
+																																SEQ(
+																																	SEQ(
+																																		LABEL L885,
+																																		SEQ(
+																																			MOVE(
+																																				TEMP t2451,
+																																				CONST 1),
+																																			JUMP(
+																																				NAME L887))),
+																																	SEQ(
+																																		LABEL L886,
+																																		SEQ(
+																																			MOVE(
+																																				TEMP t2451,
+																																				CONST 0),
+																																			JUMP(
+																																				NAME L887))))),
+																															ESEQ(
+																																LABEL L887,
+																																TEMP t2451))),
+																													CJUMP(NE,
+																														TEMP t2455,
+																														CONST 0,
+																														L894,L895)),
+																												SEQ(
+																													SEQ(
+																														LABEL L894,
+																														SEQ(
+																															MOVE(
+																																TEMP t2456,
+																																ESEQ(
+																																	SEQ(
+																																		CJUMP(EQ,
+																																			ESEQ(
+																																				SEQ(
+																																					SEQ(
+																																						SEQ(
+																																							MOVE(
+																																								TEMP t2452,
+																																								BINOP(PLUS,
+																																									MEM(
+																																										BINOP(MINUS,
+																																											TEMP t106,
+																																											CONST 4)),
+																																									TEMP t2434)),
+																																							MOVE(
+																																								TEMP t2453,
+																																								MEM(
+																																									BINOP(MINUS,
+																																										MEM(
+																																											TEMP t106),
+																																										CONST 16)))),
+																																						SEQ(
+																																							CJUMP(GE,
+																																								TEMP t2452,
+																																								CONST 0,
+																																								L888,L889),
+																																							SEQ(
+																																								LABEL L888,
+																																								CJUMP(LT,
+																																									TEMP t2452,
+																																									MEM(
+																																										BINOP(MINUS,
+																																											TEMP t2453,
+																																											CONST 4)),
+																																									L890,L889)))),
+																																					SEQ(
+																																						LABEL L889,
+																																						EXP(
+																																							CALL(
+																																								NAME tig_exit,
+																																									CONST 1)))),
+																																				ESEQ(
+																																					LABEL L890,
+																																					MEM(
+																																						BINOP(PLUS,
+																																							BINOP(MUL,
+																																								TEMP t2452,
+																																								CONST 4),
+																																							TEMP t2453)))),
+																																			CONST 0,
+																																			L891,L892),
+																																		SEQ(
+																																			SEQ(
+																																				LABEL L891,
+																																				SEQ(
+																																					MOVE(
+																																						TEMP t2454,
+																																						CONST 1),
+																																					JUMP(
+																																						NAME L893))),
+																																			SEQ(
+																																				LABEL L892,
+																																				SEQ(
+																																					MOVE(
+																																						TEMP t2454,
+																																						CONST 0),
+																																					JUMP(
+																																						NAME L893))))),
+																																	ESEQ(
+																																		LABEL L893,
+																																		TEMP t2454))),
+																															JUMP(
+																																NAME L896))),
+																													SEQ(
+																														LABEL L895,
+																														SEQ(
+																															MOVE(
+																																TEMP t2456,
+																																CONST 0),
+																															JUMP(
+																																NAME L896))))),
+																											ESEQ(
+																												LABEL L896,
+																												TEMP t2456))),
+																									CJUMP(NE,
+																										TEMP t2460,
+																										CONST 0,
+																										L903,L904)),
+																								SEQ(
+																									SEQ(
+																										LABEL L903,
+																										SEQ(
+																											MOVE(
+																												TEMP t2461,
+																												ESEQ(
+																													SEQ(
+																														CJUMP(EQ,
+																															ESEQ(
+																																SEQ(
+																																	SEQ(
+																																		SEQ(
+																																			MOVE(
+																																				TEMP t2457,
+																																				BINOP(MINUS,
+																																					BINOP(PLUS,
+																																						MEM(
+																																							BINOP(MINUS,
+																																								TEMP t106,
+																																								CONST 4)),
+																																						CONST 7),
+																																					TEMP t2434)),
+																																			MOVE(
+																																				TEMP t2458,
+																																				MEM(
+																																					BINOP(MINUS,
+																																						MEM(
+																																							TEMP t106),
+																																						CONST 20)))),
+																																		SEQ(
+																																			CJUMP(GE,
+																																				TEMP t2457,
+																																				CONST 0,
+																																				L897,L898),
+																																			SEQ(
+																																				LABEL L897,
+																																				CJUMP(LT,
+																																					TEMP t2457,
+																																					MEM(
+																																						BINOP(MINUS,
+																																							TEMP t2458,
+																																							CONST 4)),
+																																					L899,L898)))),
+																																	SEQ(
+																																		LABEL L898,
+																																		EXP(
+																																			CALL(
+																																				NAME tig_exit,
+																																					CONST 1)))),
+																																ESEQ(
+																																	LABEL L899,
+																																	MEM(
+																																		BINOP(PLUS,
+																																			BINOP(MUL,
+																																				TEMP t2457,
+																																				CONST 4),
+																																			TEMP t2458)))),
+																															CONST 0,
+																															L900,L901),
+																														SEQ(
+																															SEQ(
+																																LABEL L900,
+																																SEQ(
+																																	MOVE(
+																																		TEMP t2459,
+																																		CONST 1),
+																																	JUMP(
+																																		NAME L902))),
+																															SEQ(
+																																LABEL L901,
+																																SEQ(
+																																	MOVE(
+																																		TEMP t2459,
+																																		CONST 0),
+																																	JUMP(
+																																		NAME L902))))),
+																													ESEQ(
+																														LABEL L902,
+																														TEMP t2459))),
+																											JUMP(
+																												NAME L905))),
+																									SEQ(
+																										LABEL L904,
+																										SEQ(
+																											MOVE(
+																												TEMP t2461,
+																												CONST 0),
+																											JUMP(
+																												NAME L905))))),
+																							ESEQ(
+																								LABEL L905,
+																								TEMP t2461))),
+																					CJUMP(NE,
+																						TEMP t2476,
+																						CONST 0,
+																						L927,L928)),
+																				SEQ(
+																					LABEL L927,
+																					SEQ(
+																						MOVE(
+																							TEMP t2477,
+																							ESEQ(
+																								MOVE(
+																									ESEQ(
+																										SEQ(
+																											SEQ(
+																												SEQ(
+																													MOVE(
+																														TEMP t2462,
+																														MEM(
+																															BINOP(MINUS,
+																																TEMP t106,
+																																CONST 4))),
+																													MOVE(
+																														TEMP t2463,
+																														MEM(
+																															BINOP(MINUS,
+																																MEM(
+																																	TEMP t106),
+																																CONST 8)))),
+																												SEQ(
+																													CJUMP(GE,
+																														TEMP t2462,
+																														CONST 0,
+																														L906,L907),
+																													SEQ(
+																														LABEL L906,
+																														CJUMP(LT,
+																															TEMP t2462,
+																															MEM(
+																																BINOP(MINUS,
+																																	TEMP t2463,
+																																	CONST 4)),
+																															L908,L907)))),
+																											SEQ(
+																												LABEL L907,
+																												EXP(
+																													CALL(
+																														NAME tig_exit,
+																															CONST 1)))),
+																										ESEQ(
+																											LABEL L908,
+																											MEM(
+																												BINOP(PLUS,
+																													BINOP(MUL,
+																														TEMP t2462,
+																														CONST 4),
+																													TEMP t2463)))),
+																									CONST 1),
+																								ESEQ(
+																									MOVE(
+																										ESEQ(
+																											SEQ(
+																												SEQ(
+																													SEQ(
+																														MOVE(
+																															TEMP t2464,
+																															BINOP(PLUS,
+																																MEM(
+																																	BINOP(MINUS,
+																																		TEMP t106,
+																																		CONST 4)),
+																																TEMP t2434)),
+																														MOVE(
+																															TEMP t2465,
+																															MEM(
+																																BINOP(MINUS,
+																																	MEM(
+																																		TEMP t106),
+																																	CONST 16)))),
+																													SEQ(
+																														CJUMP(GE,
+																															TEMP t2464,
+																															CONST 0,
+																															L909,L910),
+																														SEQ(
+																															LABEL L909,
+																															CJUMP(LT,
+																																TEMP t2464,
+																																MEM(
+																																	BINOP(MINUS,
+																																		TEMP t2465,
+																																		CONST 4)),
+																																L911,L910)))),
+																												SEQ(
+																													LABEL L910,
+																													EXP(
+																														CALL(
+																															NAME tig_exit,
+																																CONST 1)))),
+																											ESEQ(
+																												LABEL L911,
+																												MEM(
+																													BINOP(PLUS,
+																														BINOP(MUL,
+																															TEMP t2464,
+																															CONST 4),
+																														TEMP t2465)))),
+																										CONST 1),
+																									ESEQ(
+																										MOVE(
+																											ESEQ(
+																												SEQ(
+																													SEQ(
+																														SEQ(
+																															MOVE(
+																																TEMP t2466,
+																																BINOP(MINUS,
+																																	BINOP(PLUS,
+																																		MEM(
+																																			BINOP(MINUS,
+																																				TEMP t106,
+																																				CONST 4)),
+																																		CONST 7),
+																																	TEMP t2434)),
+																															MOVE(
+																																TEMP t2467,
+																																MEM(
+																																	BINOP(MINUS,
+																																		MEM(
+																																			TEMP t106),
+																																		CONST 20)))),
+																														SEQ(
+																															CJUMP(GE,
+																																TEMP t2466,
+																																CONST 0,
+																																L912,L913),
+																															SEQ(
+																																LABEL L912,
+																																CJUMP(LT,
+																																	TEMP t2466,
+																																	MEM(
+																																		BINOP(MINUS,
+																																			TEMP t2467,
+																																			CONST 4)),
+																																	L914,L913)))),
+																													SEQ(
+																														LABEL L913,
+																														EXP(
+																															CALL(
+																																NAME tig_exit,
+																																	CONST 1)))),
+																												ESEQ(
+																													LABEL L914,
+																													MEM(
+																														BINOP(PLUS,
+																															BINOP(MUL,
+																																TEMP t2466,
+																																CONST 4),
+																															TEMP t2467)))),
+																											CONST 1),
+																										ESEQ(
+																											MOVE(
+																												ESEQ(
+																													SEQ(
+																														SEQ(
+																															SEQ(
+																																MOVE(
+																																	TEMP t2468,
+																																	TEMP t2434),
+																																MOVE(
+																																	TEMP t2469,
+																																	MEM(
+																																		BINOP(MINUS,
+																																			MEM(
+																																				TEMP t106),
+																																			CONST 12)))),
+																															SEQ(
+																																CJUMP(GE,
+																																	TEMP t2468,
+																																	CONST 0,
+																																	L915,L916),
+																																SEQ(
+																																	LABEL L915,
+																																	CJUMP(LT,
+																																		TEMP t2468,
+																																		MEM(
+																																			BINOP(MINUS,
+																																				TEMP t2469,
+																																				CONST 4)),
+																																		L917,L916)))),
+																														SEQ(
+																															LABEL L916,
+																															EXP(
+																																CALL(
+																																	NAME tig_exit,
+																																		CONST 1)))),
+																													ESEQ(
+																														LABEL L917,
+																														MEM(
+																															BINOP(PLUS,
+																																BINOP(MUL,
+																																	TEMP t2468,
+																																	CONST 4),
+																																TEMP t2469)))),
+																												MEM(
+																													BINOP(MINUS,
+																														TEMP t106,
+																														CONST 4))),
+																											ESEQ(
+																												EXP(
+																													CALL(
+																														NAME L857,
+																															MEM(
+																																TEMP t106),
+																															BINOP(PLUS,
+																																TEMP t2434,
+																																CONST 1))),
+																												ESEQ(
+																													MOVE(
+																														ESEQ(
+																															SEQ(
+																																SEQ(
+																																	SEQ(
+																																		MOVE(
+																																			TEMP t2470,
+																																			MEM(
+																																				BINOP(MINUS,
+																																					TEMP t106,
+																																					CONST 4))),
+																																		MOVE(
+																																			TEMP t2471,
+																																			MEM(
+																																				BINOP(MINUS,
+																																					MEM(
+																																						TEMP t106),
+																																					CONST 8)))),
+																																	SEQ(
+																																		CJUMP(GE,
+																																			TEMP t2470,
+																																			CONST 0,
+																																			L918,L919),
+																																		SEQ(
+																																			LABEL L918,
+																																			CJUMP(LT,
+																																				TEMP t2470,
+																																				MEM(
+																																					BINOP(MINUS,
+																																						TEMP t2471,
+																																						CONST 4)),
+																																				L920,L919)))),
+																																SEQ(
+																																	LABEL L919,
+																																	EXP(
+																																		CALL(
+																																			NAME tig_exit,
+																																				CONST 1)))),
+																															ESEQ(
+																																LABEL L920,
+																																MEM(
+																																	BINOP(PLUS,
+																																		BINOP(MUL,
+																																			TEMP t2470,
+																																			CONST 4),
+																																		TEMP t2471)))),
+																														CONST 0),
+																													ESEQ(
+																														MOVE(
+																															ESEQ(
+																																SEQ(
+																																	SEQ(
+																																		SEQ(
+																																			MOVE(
+																																				TEMP t2472,
+																																				BINOP(PLUS,
+																																					MEM(
+																																						BINOP(MINUS,
+																																							TEMP t106,
+																																							CONST 4)),
+																																					TEMP t2434)),
+																																			MOVE(
+																																				TEMP t2473,
+																																				MEM(
+																																					BINOP(MINUS,
+																																						MEM(
+																																							TEMP t106),
+																																						CONST 16)))),
+																																		SEQ(
+																																			CJUMP(GE,
+																																				TEMP t2472,
+																																				CONST 0,
+																																				L921,L922),
+																																			SEQ(
+																																				LABEL L921,
+																																				CJUMP(LT,
+																																					TEMP t2472,
+																																					MEM(
+																																						BINOP(MINUS,
+																																							TEMP t2473,
+																																							CONST 4)),
+																																					L923,L922)))),
+																																	SEQ(
+																																		LABEL L922,
+																																		EXP(
+																																			CALL(
+																																				NAME tig_exit,
+																																					CONST 1)))),
+																																ESEQ(
+																																	LABEL L923,
+																																	MEM(
+																																		BINOP(PLUS,
+																																			BINOP(MUL,
+																																				TEMP t2472,
+																																				CONST 4),
+																																			TEMP t2473)))),
+																															CONST 0),
+																														ESEQ(
+																															MOVE(
+																																ESEQ(
+																																	SEQ(
+																																		SEQ(
+																																			SEQ(
+																																				MOVE(
+																																					TEMP t2474,
+																																					BINOP(MINUS,
+																																						BINOP(PLUS,
+																																							MEM(
+																																								BINOP(MINUS,
+																																									TEMP t106,
+																																									CONST 4)),
+																																							CONST 7),
+																																						TEMP t2434)),
+																																				MOVE(
+																																					TEMP t2475,
+																																					MEM(
+																																						BINOP(MINUS,
+																																							MEM(
+																																								TEMP t106),
+																																							CONST 20)))),
+																																			SEQ(
+																																				CJUMP(GE,
+																																					TEMP t2474,
+																																					CONST 0,
+																																					L924,L925),
+																																				SEQ(
+																																					LABEL L924,
+																																					CJUMP(LT,
+																																						TEMP t2474,
+																																						MEM(
+																																							BINOP(MINUS,
+																																								TEMP t2475,
+																																								CONST 4)),
+																																						L926,L925)))),
+																																		SEQ(
+																																			LABEL L925,
+																																			EXP(
+																																				CALL(
+																																					NAME tig_exit,
+																																						CONST 1)))),
+																																	ESEQ(
+																																		LABEL L926,
+																																		MEM(
+																																			BINOP(PLUS,
+																																				BINOP(MUL,
+																																					TEMP t2474,
+																																					CONST 4),
+																																				TEMP t2475)))),
+																																CONST 0),
+																															CONST 0))))))))),
+																						JUMP(
+																							NAME L928)))),
+																			ESEQ(
+																				LABEL L928,
+																				TEMP t2477))),
+																	JUMP(
+																		NAME L929))))),
+													LABEL L881)),
+											CONST 0)),
+									JUMP(
+										NAME L933))))),
+					ESEQ(
+						LABEL L933,
+						TEMP t2481))),
+			SEQ(
+				SEQ(
+					SEQ(
+						MOVE(
+							TEMP t105,
+							BINOP(PLUS,
+								TEMP t105,
+								CONST 36)),
+						SEQ(
+							MOVE(
+								TEMP t122,
+								MEM(
+									BINOP(MINUS,
+										TEMP t105,
+										CONST 0))),
+							SEQ(
+								MOVE(
+									TEMP t123,
+									MEM(
+										BINOP(MINUS,
+											TEMP t105,
+											CONST 4))),
+								SEQ(
+									MOVE(
+										TEMP t124,
+										MEM(
+											BINOP(MINUS,
+												TEMP t105,
+												CONST 8))),
+									SEQ(
+										MOVE(
+											TEMP t125,
+											MEM(
+												BINOP(MINUS,
+													TEMP t105,
+													CONST 12))),
+										SEQ(
+											MOVE(
+												TEMP t126,
+												MEM(
+													BINOP(MINUS,
+														TEMP t105,
+														CONST 16))),
+											SEQ(
+												MOVE(
+													TEMP t127,
+													MEM(
+														BINOP(MINUS,
+															TEMP t105,
+															CONST 20))),
+												SEQ(
+													MOVE(
+														TEMP t128,
+														MEM(
+															BINOP(MINUS,
+																TEMP t105,
+																CONST 24))),
+													SEQ(
+														MOVE(
+															TEMP t129,
+															MEM(
+																BINOP(MINUS,
+																	TEMP t105,
+																	CONST 28))),
+														MOVE(
+															TEMP t107,
+															MEM(
+																BINOP(MINUS,
+																	TEMP t105,
+																	CONST 32)))))))))))),
+					SEQ(
+						MOVE(
+							TEMP t105,
+							TEMP t106),
+						MOVE(
+							TEMP t106,
+							MEM(
+								TEMP t106)))),
+				JUMP(
+					TEMP t107)))))
 
 
 Frag:
@@ -2361,209 +1317,256 @@ SEQ(
 	SEQ(
 		SEQ(
 			MOVE(
-				TEMP t382,
-				TEMP t381),
+				TEMP t106,
+				TEMP t105),
 			SEQ(
 				SEQ(
 					MOVE(
 						MEM(
 							BINOP(MINUS,
-								TEMP t382,
+								TEMP t106,
 								CONST 0)),
-						TEMP t384),
+						TEMP t108),
 					MOVE(
-						TEMP t381,
+						TEMP t105,
 						BINOP(MINUS,
-							TEMP t381,
+							TEMP t105,
 							CONST 4))),
 				SEQ(
 					SEQ(
 						MOVE(
 							MEM(
 								BINOP(MINUS,
-									TEMP t381,
+									TEMP t105,
 									CONST 0)),
-							TEMP t398),
+							TEMP t122),
 						SEQ(
 							MOVE(
 								MEM(
 									BINOP(MINUS,
-										TEMP t381,
+										TEMP t105,
 										CONST 4)),
-								TEMP t399),
+								TEMP t123),
 							SEQ(
 								MOVE(
 									MEM(
 										BINOP(MINUS,
-											TEMP t381,
+											TEMP t105,
 											CONST 8)),
-									TEMP t400),
+									TEMP t124),
 								SEQ(
 									MOVE(
 										MEM(
 											BINOP(MINUS,
-												TEMP t381,
+												TEMP t105,
 												CONST 12)),
-										TEMP t401),
+										TEMP t125),
 									SEQ(
 										MOVE(
 											MEM(
 												BINOP(MINUS,
-													TEMP t381,
+													TEMP t105,
 													CONST 16)),
-											TEMP t402),
+											TEMP t126),
 										SEQ(
 											MOVE(
 												MEM(
 													BINOP(MINUS,
-														TEMP t381,
+														TEMP t105,
 														CONST 20)),
-												TEMP t403),
+												TEMP t127),
 											SEQ(
 												MOVE(
 													MEM(
 														BINOP(MINUS,
-															TEMP t381,
+															TEMP t105,
 															CONST 24)),
-													TEMP t404),
+													TEMP t128),
 												SEQ(
 													MOVE(
 														MEM(
 															BINOP(MINUS,
-																TEMP t381,
+																TEMP t105,
 																CONST 28)),
-														TEMP t405),
+														TEMP t129),
 													MOVE(
 														MEM(
 															BINOP(MINUS,
-																TEMP t381,
+																TEMP t105,
 																CONST 32)),
-														TEMP t383))))))))),
+														TEMP t107))))))))),
 					MOVE(
-						TEMP t381,
+						TEMP t105,
 						BINOP(MINUS,
-							TEMP t381,
+							TEMP t105,
 							CONST 36))))),
 		SEQ(
 			MOVE(
-				TEMP t378,
+				TEMP t102,
 				ESEQ(
 					MOVE(
-						TEMP t708,
-						ESEQ(
-							MOVE(
-								MEM(
+						MEM(
+							BINOP(MINUS,
+								TEMP t106,
+								CONST 20)),
+						CALL(
+							NAME tig_initArray,
+								BINOP(MUL,
 									BINOP(MINUS,
-										TEMP t382,
-										CONST 4)),
-								CALL(
-									NAME tig_getchar,
-										TEMP t382)),
-							CALL(
-								NAME L211,
-									TEMP t382))),
+										BINOP(PLUS,
+											MEM(
+												BINOP(MINUS,
+													TEMP t106,
+													CONST 4)),
+											MEM(
+												BINOP(MINUS,
+													TEMP t106,
+													CONST 4))),
+										CONST 1),
+									CONST 4),
+								CONST 0)),
 					ESEQ(
 						MOVE(
-							TEMP t707,
+							MEM(
+								BINOP(MINUS,
+									TEMP t106,
+									CONST 16)),
 							CALL(
-								NAME L211,
-									TEMP t382)),
+								NAME tig_initArray,
+									BINOP(MUL,
+										BINOP(MINUS,
+											BINOP(PLUS,
+												MEM(
+													BINOP(MINUS,
+														TEMP t106,
+														CONST 4)),
+												MEM(
+													BINOP(MINUS,
+														TEMP t106,
+														CONST 4))),
+											CONST 1),
+										CONST 4),
+									CONST 0)),
 						ESEQ(
 							MOVE(
 								MEM(
 									BINOP(MINUS,
-										TEMP t382,
-										CONST 4)),
+										TEMP t106,
+										CONST 12)),
 								CALL(
-									NAME tig_getchar,
-										TEMP t382)),
-							CALL(
-								NAME L208,
-									TEMP t382,
+									NAME tig_initArray,
+										BINOP(MUL,
+											MEM(
+												BINOP(MINUS,
+													TEMP t106,
+													CONST 4)),
+											CONST 4),
+										CONST 0)),
+							ESEQ(
+								MOVE(
+									MEM(
+										BINOP(MINUS,
+											TEMP t106,
+											CONST 8)),
 									CALL(
-										NAME L210,
-											TEMP t382,
-											TEMP t707,
-											TEMP t708)))))),
+										NAME tig_initArray,
+											BINOP(MUL,
+												MEM(
+													BINOP(MINUS,
+														TEMP t106,
+														CONST 4)),
+												CONST 4),
+											CONST 0)),
+								ESEQ(
+									MOVE(
+										MEM(
+											BINOP(MINUS,
+												TEMP t106,
+												CONST 4)),
+										CONST 8),
+									CALL(
+										NAME L857,
+											TEMP t106,
+											CONST 0))))))),
 			SEQ(
 				SEQ(
 					SEQ(
 						MOVE(
-							TEMP t381,
+							TEMP t105,
 							BINOP(PLUS,
-								TEMP t381,
+								TEMP t105,
 								CONST 36)),
 						SEQ(
 							MOVE(
-								TEMP t398,
+								TEMP t122,
 								MEM(
 									BINOP(MINUS,
-										TEMP t381,
+										TEMP t105,
 										CONST 0))),
 							SEQ(
 								MOVE(
-									TEMP t399,
+									TEMP t123,
 									MEM(
 										BINOP(MINUS,
-											TEMP t381,
+											TEMP t105,
 											CONST 4))),
 								SEQ(
 									MOVE(
-										TEMP t400,
+										TEMP t124,
 										MEM(
 											BINOP(MINUS,
-												TEMP t381,
+												TEMP t105,
 												CONST 8))),
 									SEQ(
 										MOVE(
-											TEMP t401,
+											TEMP t125,
 											MEM(
 												BINOP(MINUS,
-													TEMP t381,
+													TEMP t105,
 													CONST 12))),
 										SEQ(
 											MOVE(
-												TEMP t402,
+												TEMP t126,
 												MEM(
 													BINOP(MINUS,
-														TEMP t381,
+														TEMP t105,
 														CONST 16))),
 											SEQ(
 												MOVE(
-													TEMP t403,
+													TEMP t127,
 													MEM(
 														BINOP(MINUS,
-															TEMP t381,
+															TEMP t105,
 															CONST 20))),
 												SEQ(
 													MOVE(
-														TEMP t404,
+														TEMP t128,
 														MEM(
 															BINOP(MINUS,
-																TEMP t381,
+																TEMP t105,
 																CONST 24))),
 													SEQ(
 														MOVE(
-															TEMP t405,
+															TEMP t129,
 															MEM(
 																BINOP(MINUS,
-																	TEMP t381,
+																	TEMP t105,
 																	CONST 28))),
 														MOVE(
-															TEMP t383,
+															TEMP t107,
 															MEM(
 																BINOP(MINUS,
-																	TEMP t381,
+																	TEMP t105,
 																	CONST 32)))))))))))),
 					SEQ(
 						MOVE(
-							TEMP t381,
-							TEMP t382),
+							TEMP t105,
+							TEMP t106),
 						MOVE(
-							TEMP t382,
+							TEMP t106,
 							MEM(
-								TEMP t382)))),
+								TEMP t106)))),
 				JUMP(
-					TEMP t383)))))
+					TEMP t107)))))
 
 

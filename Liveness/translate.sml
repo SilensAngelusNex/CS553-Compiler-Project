@@ -417,8 +417,8 @@ struct
 	  | getLoc 3 = T.TEMP F.A3
 	  | getLoc i = T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(4 * i)))
 
-	fun moveArgs size (i, (F.InReg t)::l) = (print "InReg\n"; T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l)))
-	  | moveArgs size (i, (F.InFrame j)::l) = (print "InFrame\n"; T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.FP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l)))
+	fun moveArgs size (i, (F.InReg t)::l) = T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l))
+	  | moveArgs size (i, (F.InFrame j)::l) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.FP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l))
 	  | moveArgs size (i, []) = T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST size))
 
 	fun toStack (i, t::[]) = T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t)

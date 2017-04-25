@@ -182,13 +182,13 @@ struct
 			   | checkColored ([]) = true
 
 			  val keyl = keyList g
-
+			  val result = case help keyl of
+			  				SOME(x) => SOME(SOME(x))
+			  				| NONE => if checkColored(keyl)
+			  						  then SOME(NONE)
+			  						  else NONE
 		in
-			case help keyl of
-				SOME(x) => SOME(SOME(x))
-				| NONE => if checkColored(keyl)
-						  then SOME(NONE)
-						  else NONE
+			result
 		end
 
 	fun heuristic (g1, t1, t2) =
@@ -262,11 +262,21 @@ struct
 			else raise NoSuchNode (nID)
 		end
 
+	fun updatedNode (n, (_, _, _, tm)) =
+		let
+			fun findLast t =
+				case TM.find (tm, t) of
+					SOME(temp) => if temp = t then t else findLast temp
+				  | NONE => t
+		in
+			findLast n
+		end
+
 	fun addColoredNode (originalInterGraph, newInterG, nID): graph * color =
 		let
 			val interG = addTemp(newInterG, nID)
-			val interG = foldl (fn (t, g) => addInter(g, t, nID)) interG (successors (originalInterGraph, nID))
-			val g' = foldl (fn (t, g) => addInter(g, t, nID)) interG (predecessors (originalInterGraph, nID))
+			val interG = foldl (fn (t, g) => addInter(g, t, nID)) interG (map (fn n => updatedNode(n, newInterG)) (successors (originalInterGraph, nID)))
+			val g' = foldl (fn (t, g) => addInter(g, t, nID)) interG (map (fn n => updatedNode(n, newInterG)) (predecessors (originalInterGraph, nID)))
 			val (g'', color) = getColor (g', nID)
 		in
 			 (g'', color) (* Can actually spill !!! have to actually add to graph *)
@@ -330,16 +340,17 @@ struct
                                                     val iGraph = color g
                                                     val (graph, c) = addColoredNode (interGraph, g, n)
                                                 in
-                                                    graph
+													graph
                                                 end
 					  | DONE(g) => g
 
                 else (G.empty, G.empty, TM.empty, TM.empty)
 
             val graph = color interGraph
+			val result = case graph of
+			 			(_, _, cm, tm) => actualColorMap (cm, tm)
         in
-            case graph of
-			 (_, _, cm, tm) => actualColorMap (cm, tm)
+			result
         end
 
 
