@@ -66,7 +66,6 @@ struct
 	fun formals (_, a, _): access list = !a
 	fun size (_, _, a): int = !a * 4
 
-
 	fun allocTemp (_, alist, _) = let
 											val result = Temp.newtemp ()
 										in
@@ -99,6 +98,8 @@ struct
 
 	fun allocLocals f (i, b::l) = (allocLocal f b; allocLocals f (i + 1, l))
 	  | allocLocals f (i, [])   = f
+
+	fun clearFormals ((n, a, s), l) = (a := []; s := 0; allocLocals (n, a, s) (0, l))
 
 	fun newFrame {name=name, formals=blist} = let
 												  val f = (name, ref [], ref 0)

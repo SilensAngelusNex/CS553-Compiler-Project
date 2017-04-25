@@ -1,5 +1,5 @@
 let
-	function f(a:int, b:int):int = a - b
+	val x: int := 3
 in
-	f(3, 4)
+	x
 end

@@ -15,10 +15,11 @@ struct
 	type access = level * F.access
 
 	val outermost = L(F.newFrame {name=Temp.namedlabel "tig_main", formals=[true]}, EMPTY, ref ())
+	fun clearOutermost = case outermost of L(f, _, _) => clearFormals (f, [true])
 
 	val fragList: F.frag list ref = ref []
 
-	fun getResult () = let val result = !fragList in fragList := []; result end
+	fun getResult () = let val result = !fragList in fragList := []; clearOutermost (); result end
 
 	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (F.formals frame), (F.label frame))
 	  | getLevelInfo EMPTY = ([], Temp.newlabel ())
