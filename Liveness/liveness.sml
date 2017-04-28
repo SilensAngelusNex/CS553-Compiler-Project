@@ -58,21 +58,19 @@ struct
 
 	fun unionIns l = foldl (fn (n, r) => case F.nodeInfo n of (a, def, use, ins, outs, move) => S.union (ins, r)) S.empty l
 
-	fun livenessHelper (graph, id, bool) =
+	fun livenessHelper (graph, node::l, bool) =
 		let
-			val this = F.getNode (graph, id)
-			val (a, def, use, ins, outs, move) = F.nodeInfo this
+			val (a, def, use, ins, outs, move) = F.nodeInfo node
 			val ins' = S.union (use, (S.difference (outs, def)))
-			val out' = unionIns (F.succs' graph this)
-			val graph' = F.changeNodeData (graph, id, (a, def, use, ins', out', move))
+			val out' = unionIns (F.succs' graph node)
+			val graph' = F.changeNodeData (graph, F.getNodeID node, (a, def, use, ins', out', move))
 			val bool' = bool andalso (S.equal (ins, ins') andalso S.equal (outs, out'))
 		in
-			if id <= 0
-			then (graph', bool')
-			else livenessHelper (graph', id - 1, bool')
+			livenessHelper (graph', l, bool')
 		end
+	  | livenessHelper (graph, [], bool) = (graph, bool)
 
-    fun dataAnalysis graph = case livenessHelper (graph, (F.size graph) - 1, true) of
+    fun dataAnalysis graph = case livenessHelper (graph, (F.nodes graph), true) of
 								(g, true)  => g
 							  | (g, false) => dataAnalysis (g)
 
@@ -116,8 +114,8 @@ struct
 				then []
 				else (oneLine (F.nodeInfo (F.getNode (graph, i))))@(help graph (i - 1))
 
-			fun printR ((t1, t2, false)::l) = printR l
-			  | printR ((t1, t2, true)::l) = printR l
+			fun printR ((t1, t2, false)::l) = (print ((Temp.makestring t1) ^ " === " ^ (Temp.makestring t2) ^ "\n"); printR l)
+			  | printR ((t1, t2, true)::l) = (print ((Temp.makestring t1) ^ " --- " ^ (Temp.makestring t2) ^ "\n"); printR l)
 			  | printR [] = ()
 			val result = help graph ((F.size graph) - 1)
 		in
@@ -143,6 +141,10 @@ struct
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) ins;
 					TextIO.output(outstream, "\n\tOuts:\t");
 					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) outs;
+					TextIO.output(outstream, "\n\tUses:\t");
+					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) use;
+					TextIO.output(outstream, "\n\tDefs:\t");
+					S.app (fn (i) => TextIO.output(outstream, (Temp.makestring i) ^ " ")) def;
 					TextIO.output(outstream, "\n")
 				end
 			val ids = List.tabulate(((F.size graph) - 1), (fn i => i))
@@ -155,6 +157,7 @@ struct
 	 	let
 			val graph = instr2graph instrs
 			val graph' = dataAnalysis graph
+			val _ = show (TextIO.stdOut, graph')
 		in
 			graph'
 		end

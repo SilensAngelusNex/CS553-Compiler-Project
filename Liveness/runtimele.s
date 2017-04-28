@@ -1,6 +1,86 @@
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	.globl	consts
+	.data
+	.align 4
+consts:
+	.word	0
+
+	.byte	0x0
+	.space	3
+	.space	2040
+	.globl	empty
+	.align 4
+empty:
+	.word	0
+
+	.byte	0x0
+	.space	3
+	.text
+	.align 4
+	.globl	main
+	.ent	main
+main:
+.LFB5:
+	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
+	.mask	0xd0000000,-16
+	.fmask	0x00000000,0
+	subu	$sp,$sp,64
+.LCFI19:
+	sd	$ra,48($sp)
+.LCFI20:
+	sd	$fp,40($sp)
+.LCFI21:
+.LCFI22:
+	move	$fp,$sp
+.LCFI23:
+	.set	noat
+	.set	at
+	.set	noreorder
+	nop
+	.set	reorder
+	sw	$zero,16($fp)
+.L26:
+	lw	$v0,16($fp)
+	slt	$v1,$v0,256
+	bne	$v1,$zero,.L29
+	b	.L27
+.L29:
+	lw	$v0,16($fp)
+	move	$v1,$v0
+	sll	$v0,$v1,3
+	la	$v1,consts
+	addu	$v0,$v1,$v0
+	li	$v1,1			# 0x1
+	sw	$v1,0($v0)
+	lw	$v0,16($fp)
+	move	$v1,$v0
+	sll	$v0,$v1,3
+	la	$v1,consts
+	addu	$v0,$v0,$v1
+	lbu	$v1,16($fp)
+	sb	$v1,4($v0)
+.L28:
+	lw	$v0,16($fp)
+	addu	$v1,$v0,1
+	sw	$v1,16($fp)
+	b	.L26
+.L27:
+	move	$a0,$zero
+	la	$t9,tig_main
+	jal	$ra,$t9
+	move	$v1,$v0
+	move	$v0,$v1
+	b	.L25
+.L25:
+	move	$sp,$fp
+	ld	$ra,48($sp)
+	ld	$fp,40($sp)
+	addu	$sp,$sp,64
+	j	$ra
+.LFE5:
+	.end	main
 	.align 4
 	.globl	tig_initArray
 	.ent	tig_initArray
@@ -252,86 +332,6 @@ tig_print:
 	j	$ra
 .LFE4:
 	.end	tig_print
-	.globl	consts
-	.data
-	.align 4
-consts:
-	.word	0
-
-	.byte	0x0
-	.space	3
-	.space	2040
-	.globl	empty
-	.align 4
-empty:
-	.word	0
-
-	.byte	0x0
-	.space	3
-	.text
-	.align 4
-	.globl	main
-	.ent	main
-main:
-.LFB5:
-	.frame	$fp,64,$ra		# vars= 16, regs= 3/0, args= 0, extra= 16
-	.mask	0xd0000000,-16
-	.fmask	0x00000000,0
-	subu	$sp,$sp,64
-.LCFI19:
-	sd	$ra,48($sp)
-.LCFI20:
-	sd	$fp,40($sp)
-.LCFI21:
-.LCFI22:
-	move	$fp,$sp
-.LCFI23:
-	.set	noat
-	.set	at
-	.set	noreorder
-	nop
-	.set	reorder
-	sw	$zero,16($fp)
-.L26:
-	lw	$v0,16($fp)
-	slt	$v1,$v0,256
-	bne	$v1,$zero,.L29
-	b	.L27
-.L29:
-	lw	$v0,16($fp)
-	move	$v1,$v0
-	sll	$v0,$v1,3
-	la	$v1,consts
-	addu	$v0,$v1,$v0
-	li	$v1,1			# 0x1
-	sw	$v1,0($v0)
-	lw	$v0,16($fp)
-	move	$v1,$v0
-	sll	$v0,$v1,3
-	la	$v1,consts
-	addu	$v0,$v0,$v1
-	lbu	$v1,16($fp)
-	sb	$v1,4($v0)
-.L28:
-	lw	$v0,16($fp)
-	addu	$v1,$v0,1
-	sw	$v1,16($fp)
-	b	.L26
-.L27:
-	move	$a0,$zero
-	la	$t9,tig_main
-	jal	$ra,$t9
-	move	$v1,$v0
-	move	$v0,$v1
-	b	.L25
-.L25:
-	move	$sp,$fp
-	ld	$ra,48($sp)
-	ld	$fp,40($sp)
-	addu	$sp,$sp,64
-	j	$ra
-.LFE5:
-	.end	main
 	.align 4
 	.globl	tig_ord
 	.ent	tig_ord

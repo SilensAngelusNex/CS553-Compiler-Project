@@ -26,12 +26,24 @@ struct
                                 t
                                 end
 
-			fun preCall () = () (* Emit some things? Push live callersaves onto stack. *)
-            fun postCall () = () (* Emit some things? Pop live callersaves from stack. *)
+
+			fun preCall (l) = (
+				emit(A.OPER {
+						assem="",
+						src=[],
+						dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
+						jump=SOME([l])
+					})) (* Emit some things? Push live callersaves onto stack. *)
+            fun postCall (l) = (
+				emit(A.LABEL {
+						assem="",
+						lab=l
+					})) (* Emit some things? Pop live callersaves from stack. *)
 			fun prologue () = () (* Emit some things? Push calleesaves onto stack if we use them. *)
             fun epilogue () = () (* Emit some things? Push calleesaves from stack if we used them. *)
 
-            fun munchStm(T.SEQ(a,b)): unit = (munchStm a; munchStm b)
+            fun munchStm(T.SEQ(a, T.EXP(T.CONST i))): unit = munchStm a
+			  | munchStm(T.SEQ(a, b)): unit = (munchStm a; munchStm b)
               | munchStm(T.EXP(m1)) = (munchExp m1; ())
               | munchStm(T.LABEL lab) = emit (A.LABEL{assem=lab ^ ":\n", lab=lab})
               | munchStm(T.MOVE(T.TEMP i, T.TEMP j)) =
@@ -821,7 +833,7 @@ struct
               | munchExp(T.BINOP(T.MUL, e1, e2)) =
                     result (
                         fn r => emit(A.OPER {
-                                                 assem="\tmul\t\t's0, 's1\n\tmflo\t'd0\n",
+                                                 assem="\tmult\t's0, 's1\n\tmflo\t'd0\n",
                                                  src=[munchExp e1, munchExp e2],
                                                  dst=[r],
                                                  jump=NONE
@@ -1008,57 +1020,72 @@ struct
                                                  })
                         )
               | munchExp(T.ESEQ(stm1, e1)) = (munchStm stm1; munchExp e1)
-              | munchExp(T.CALL(T.NAME(l), args)) =
+              | munchExp(T.CALL(T.NAME(func), args)) =
+			  	let
+					val args = munchArgs(0, args)
+					val l = Temp.newlabel ()
+				in
                     result (
                         fn r => (
-								preCall ();
+								preCall (l);
 								emit(A.OPER {
                                         assem="\tjal\t\t'j0\n\n",
-                                        src=munchArgs(0, args),
+                                        src=args,
                                         dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
-                                        jump=SOME([l])
+                                        jump=SOME([func])
                                     });
+								postCall (l);
 								emit(A.MOVE {
-                                        assem="\tmove\t'd0, 's0\n",
-                                        src=Frame.V0,
-                                        dst=r
-                                    });
-								postCall ())
+										assem="\tmove\t'd0, 's0\n",
+										src=Frame.V0,
+										dst=r
+									}))
 							)
+				end
 			  | munchExp(T.CALL(T.TEMP(t), args)) =
+			  	let
+					val args = t::munchArgs(0, args)
+					val l = Temp.newlabel ()
+				in
 				  result (
 					  	fn r => (
-							  	preCall ();
+							  	preCall (l);
 							  	emit(A.OPER {
 									  	assem="\tjalr\t\t's0\n\n",
-									  	src=t::munchArgs(0, args),
+									  	src=args,
 									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
 									  	jump=SOME([])
 									});
+								postCall (l);
 								emit(A.MOVE {
                                         assem="\tmove\t'd0, 's0\n",
                                         src=Frame.V0,
                                         dst=r
-                                    });
-								postCall ())
+                                    }))
 							)
+				end
 			  | munchExp(T.CALL(e1, args)) =
+				let
+					val args = (munchExp e1)::munchArgs(0, args)
+					val l = Temp.newlabel ()
+				in
 				  result (
 					  	fn r => (
-							  	preCall ();
+							  	preCall (l);
 							  	emit(A.OPER {
 									  	assem="\tjalr\t\t's0\n\n",
-									  	src=(munchExp e1)::munchArgs(0, args),
+									  	src=args,
 									  	dst=[Frame.V0, Frame.V1, Frame.A0, Frame.A1, Frame.A2, Frame.A3]@(Frame.getTemps Frame.callersaves),
 									  	jump=SOME([])
 									});
+								postCall (l);
 								emit(A.MOVE {
                                         assem="\tmove\t'd0, 's0\n",
                                         src=Frame.V0,
                                         dst=r
-                                    });
-								postCall ())
+                                    }))
 							)
+				end
 
 
             and munchArgs(0, arg::args) = (munchStm(T.MOVE(T.TEMP Frame.A0, arg)); Frame.A0)::munchArgs (1, args)

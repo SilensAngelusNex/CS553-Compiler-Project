@@ -44,14 +44,16 @@ structure Main = struct
         let
             val absyn = Parse.parse filename
             val frags = (FindEscape.findEscape absyn; Semant.transProg absyn)
+			val _ = case frags of F.STRING(_, _)::_ => TextIO.output (assemOut, "\t.data\n") | _ => ()
             val instrs = (foldl (processFrag assemOut) [] frags)
             val _ = withOpenFile (filename ^ ".t") (fn out => emitproc out instrs)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
+			(*	val _ = Live.show (TextIO.stdOut, graph)	*)
             val interGraph = Live.makeInterference graph
             val instrs = RegAlloc.regAlloc (instrs, interGraph)
-            (*val _ = copyTextFile("sysspim.s", assemOut)
-            val _ = copyTextFile("runtimele.s", assemOut)*)
+			val _ = copyTextFile("runtimele.s", assemOut)
+            val _ = copyTextFile("sysspim.s", assemOut)
         in
             emitproc assemOut instrs
         end)

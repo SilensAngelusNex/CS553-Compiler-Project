@@ -27,11 +27,11 @@ struct
 
 	fun getResult () = let val result = !fragList in fragList := []; clearOutermost (); result end
 
-	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (removeFirst (F.formals frame)), (F.label frame))
+	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (removeFirst (removeFirst (F.formals frame))), (F.label frame))
 	  | getLevelInfo EMPTY = ([], Temp.newlabel ())
 
 	fun newLevel {parent=parent, name=name, formals=formals} = let
-																	val n = F.newFrame {name=name, formals=true::formals}
+																	val n = F.newFrame {name=name, formals=true::true::formals}
 															   in
 															   		L(n, parent, ref ())
 															   end
@@ -416,7 +416,7 @@ struct
 				T.SEQ(
 					T.MOVE(t, T.CALL(
 								T.NAME(Temp.namedlabel("tig_initArray")),
-								[T.BINOP(T.MUL, T.BINOP(T.PLUS, size, T.CONST 1), T.CONST(F.wordSize)), unEx(init, level)])),
+								[T.BINOP(T.PLUS, size, T.CONST 1), unEx(init, level)])),
 					T.MOVE(T.MEM(t), size)),
 				T.BINOP(T.PLUS, t, T.CONST(F.wordSize))))
 	end
@@ -425,14 +425,15 @@ struct
 	fun transBreak (label) = Nx(T.JUMP(T.NAME(label), [label]))
 
 	fun getLoc 0 = T.TEMP F.A0
-	  | getLoc 1 = T.TEMP F.A1
-	  | getLoc 2 = T.TEMP F.A2
-	  | getLoc 3 = T.TEMP F.A3
+	  | getLoc 1 = T.TEMP F.FP
+	  | getLoc 2 = T.TEMP F.A1
+	  | getLoc 3 = T.TEMP F.A2
+	  | getLoc 4 = T.TEMP F.A3
 	  | getLoc i = T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(4 * i)))
 
 	fun moveArgs size (i, (F.InReg t)::l) = T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l))
-	  | moveArgs size (i, (F.InFrame j)::l) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.FP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l))
-	  | moveArgs size (i, []) = T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST size))
+	  | moveArgs size (i, (F.InFrame j)::l) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l))
+	  | moveArgs size (i, []) = T.EXP(T.CONST 0)
 
 	fun toStack (i, t::[]) = T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t)
 	  | toStack (i, t::l) = T.SEQ(T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t), toStack (i + 4, l))
@@ -448,9 +449,12 @@ struct
 
 	fun procEntry (formList, frame) =
 		T.SEQ(
-			T.MOVE(T.TEMP F.FP, T.TEMP F.SP),
+			moveArgs (F.size frame) (0, formList),
 			T.SEQ(
-				moveArgs (F.size frame) (0, formList),
+				T.SEQ(
+					T.MOVE(T.TEMP F.FP, T.TEMP F.SP),
+					T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (F.size frame)))
+					),
 				saveCallees ())
 		)
 
@@ -459,7 +463,7 @@ struct
 			restoreCallees (),
 			T.SEQ(
 				T.MOVE(T.TEMP F.SP, T.TEMP F.FP),
-				T.MOVE(T.TEMP F.FP, T.MEM(T.TEMP F.FP))
+				T.MOVE(T.TEMP F.FP, T.MEM(T.BINOP (T.MINUS, T.TEMP F.FP, T.CONST 4)))
 				))
 
 	fun getFormals (L(frame, p, u)) = F.formals frame
@@ -525,7 +529,7 @@ struct
 					T.MOVE(T.TEMP (F.V0), exp),
 					T.SEQ(
 						procExit frame,
-						T.JUMP(T.TEMP(F.RA), []))))), frame=frame}
+						T.EXP(T.CALL(T.NAME(Temp.namedlabel("tig_exit")), [T.CONST(0)])))))), frame=frame}
 	  | frag (L(frame, a, u), formList, Nx(stm)) = F.PROC{body=
 		T.SEQ(
 			T.LABEL(F.label frame),
@@ -535,7 +539,7 @@ struct
 					stm,
 					T.SEQ(
 						procExit frame,
-						T.JUMP(T.TEMP(F.RA), []))))), frame=frame}
+						T.EXP(T.CALL(T.NAME(Temp.namedlabel("tig_exit")), [T.CONST(0)])))))), frame=frame}
 	  | frag (L(frame, a, u), formList, Cx(cond)) = F.PROC{body=
 		T.SEQ(
 			T.LABEL(F.label frame),
@@ -545,7 +549,7 @@ struct
 					T.MOVE(T.TEMP (F.V0), unEx(Cx(cond), L(frame, a, u))),
 					T.SEQ(
 						procExit frame,
-						T.JUMP(T.TEMP(F.RA), []))))), frame=frame}
+						T.EXP(T.CALL(T.NAME(Temp.namedlabel("tig_exit")), [T.CONST(0)])))))), frame=frame}
 	  | frag (EMPTY, formList, exp) = frag (outermost, formList, exp)
 
 end
