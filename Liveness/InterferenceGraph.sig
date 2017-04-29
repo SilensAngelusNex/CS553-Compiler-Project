@@ -6,6 +6,8 @@ sig
 	structure TM : ORD_MAP
 	structure F : FRAME
 
+	exception ActualSpill of Temp.temp
+
 	val empty : graph
 	val registersOnly : graph
 	val newColor : unit -> color
@@ -36,4 +38,5 @@ sig
     val graphColor : graph -> color TM.map
 
 	val tempToReg : color TM.map -> Temp.temp -> Temp.temp
+	val printInter : graph -> unit
 end

@@ -1,6 +1,12 @@
+	.data
+L76:		.word		3
+			.asciiz		"red"
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -824,8 +830,9 @@ exit:
 	
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$sp, $sp, -4
+	addi	$sp, $sp, -8
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -836,7 +843,7 @@ tig_main:
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
 	addi	$sp, $sp, -36
-	li		$v0, 0
+	la		$v0, L76
 	addi	$sp, $sp, 36
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
@@ -849,9 +856,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	j		L83
-
-L83:
+L77:

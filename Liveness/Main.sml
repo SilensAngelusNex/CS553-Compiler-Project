@@ -49,8 +49,8 @@ structure Main = struct
             val _ = withOpenFile (filename ^ ".t") (fn out => emitproc out instrs)
             val graph = Live.instr2graph instrs
 			val graph = Live.dataAnalysis graph
-			(*	val _ = Live.show (TextIO.stdOut, graph)	*)
             val interGraph = Live.makeInterference graph
+			(*	val _ = InterferenceGraph.printInter interGraph	*)
             val instrs = RegAlloc.regAlloc (instrs, interGraph)
 			val _ = copyTextFile("runtimele.s", assemOut)
             val _ = copyTextFile("sysspim.s", assemOut)

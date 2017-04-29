@@ -5,6 +5,8 @@ struct
 	datatype color = COLOR of Temp.temp
 				   | BLANK
 
+	exception ActualSpill of Temp.temp
+
 	fun compare (COLOR(t1), COLOR(t2)) = Temp.compare(t1, t2)
 	  | compare (_, _) = LESS
 
@@ -217,7 +219,7 @@ struct
 										else help2 l
 					  | help2 [] = NONE
 				in
-					if List.length adj > 0 then (case help2 adj of SOME(n2) =>SOME(G.getNodeID n1, G.getNodeID n2) | NONE => NONE) else help l
+					case help2 adj of SOME(n2) =>SOME(G.getNodeID n1, G.getNodeID n2) | NONE => help l
 				end
 			  | help [] = NONE
 			  val result = help nodes
@@ -259,7 +261,7 @@ struct
 				in
 					((g1, g2, TM.insert (cm, nID, c), tm), c)
 				end
-			else raise NoSuchNode (nID)
+			else raise ActualSpill (nID)
 		end
 
 	fun updatedNode (n, (_, _, _, tm)) =
@@ -298,7 +300,7 @@ struct
 
     fun graphColor interGraph =
         let
-			(*)
+			(*
             fun trySimplify interGraph = case nextToSimplify interGraph of
                                             SOME(SOME(n)) => simplify (interGraph, n)
 										  | SOME(NONE) => DONE(interGraph)
@@ -329,16 +331,18 @@ struct
                 then
                     case tryCoalesce interGraph of
                         SIMPLIFY(g, n)      => let
+												  (*val _ = print ("simplify: " ^ (Temp.makestring n) ^ "\n")*)
                                                   val iGraph = color g
                                                   val (graph, c) = addColoredNode (interGraph, iGraph, n)
                                                 in
                                                     graph
                                                 end
-                      | COALESCE(g, n1, n2) => color g
-                      | UNFREEZE(g, n)      => color g
+                      | COALESCE(g, n1, n2) => color g (*	(print ("coalesce: " ^ (Temp.makestring n1) ^ " " ^ (Temp.makestring n2) ^ "\n"); color g)	*)
+                      | UNFREEZE(g, n)      => color g (*	(print ("unfreeze: " ^ (Temp.makestring n) ^ "\n"); color g) *)
                       | POTSPILL(g, n)      => let
+					  								(*	val _ = print ("spill: " ^ (Temp.makestring n) ^ "\n")	*)
                                                     val iGraph = color g
-                                                    val (graph, c) = addColoredNode (interGraph, g, n)
+                                                    val (graph, c) = addColoredNode (interGraph, iGraph, n)
                                                 in
 													graph
                                                 end
@@ -368,4 +372,6 @@ struct
 														COLOR(r) => r
 													  | BLANK    =>F.FP)
 									  | NONE => F.FP
+
+	fun printInter ((g1, g2, cm, tm): graph) = ((G.printGraph (fn (t, ()) => Temp.makestring t) g1); (G.printGraph (fn (t, ()) => Temp.makestring t) g2))
 end

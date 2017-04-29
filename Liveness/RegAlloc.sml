@@ -33,6 +33,7 @@ struct
 
 	fun regAlloc (instrus, intergraph) =
 		let
+
 			val tempToColorMap = I.graphColor intergraph
 			val getRegFunc = I.tempToReg tempToColorMap
 			val instrus' = allocRegs getRegFunc instrus

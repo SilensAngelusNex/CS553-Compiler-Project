@@ -38,7 +38,7 @@ struct
 	fun tempName t = case TM.find(tempMap, t) of
 							SOME(n) => n
 							| NONE => Temp.makestring t
- 	fun string (lab, str) = lab ^ ":" ^ "\t\t.asciiz\t\t" ^ "\"" ^ str ^ "\"\n"
+ 	fun string (lab, str) = lab ^ ":" ^ "\t\t.word\t\t" ^ (Int.toString (String.size str)) ^ "\n\t\t\t.asciiz\t\t" ^ "\"" ^ str ^ "\"\n"
 
 	val R0 = case List.nth (specialregs, 0) of (temp, name) => temp
 	val AT = case List.nth (specialregs, 1) of (temp, name) => temp

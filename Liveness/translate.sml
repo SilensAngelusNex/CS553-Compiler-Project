@@ -14,8 +14,8 @@ struct
 
 	type access = level * F.access
 
-	val outermost = L(F.newFrame {name=Temp.namedlabel "tig_main", formals=[true]}, EMPTY, ref ())
-	fun clearOutermost () = case outermost of L(f, _, _) => (F.clearFormals (f, [true]); ()) | EMPTY => ()
+	val outermost = L(F.newFrame {name=Temp.namedlabel "tig_main", formals=[true, true]}, EMPTY, ref ())
+	fun clearOutermost () = case outermost of L(f, _, _) => (F.clearFormals (f, [true, true]); ()) | EMPTY => ()
 
 	fun getFrame (L(f, _, _)) = f
 	  | getFrame EMPTY = getFrame outermost
@@ -328,8 +328,19 @@ struct
 							fragList := F.STRING(lab, s)::(!fragList);
 							Ex(loadString lab)
 						end
-	fun transCall (l, args, SOME(callee), caller) = Ex(T.CALL (T.NAME l, (callStaticLink (caller, callee, (T.TEMP F.FP)))::(map (fn a => unEx(a, caller)) args)))
-	  | transCall (l, args, NONE, caller) = Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, caller)) args)))
+
+	structure S = SplaySetFn(struct type ord_key = string val compare = String.compare end)
+	val builtInFunctions = foldl (fn (s, set) => S.add(set, s)) S.empty ["tig_print", "tig_flush", "tig_getchar", "tig_ord", "tig_chr", "tig_size", "tig_substring", "tig_concat", "tig_not", "tig_exit"]
+
+	fun isBuiltIn s = S.member(builtInFunctions, s)
+	fun transCall (l, args, SOME(callee), caller) = if isBuiltIn l
+													then Ex(T.CALL (T.NAME l, (map (fn a => unEx(a, caller)) args)))
+													else Ex(T.CALL (T.NAME l, (callStaticLink (caller, callee, (T.TEMP F.FP)))::(map (fn a => unEx(a, caller)) args)))
+	  | transCall (l, args, NONE, caller) = if isBuiltIn l
+	  										then Ex(T.CALL (T.NAME l, (map (fn a => unEx(a, caller)) args)))
+											else Ex(T.CALL (T.NAME l, (T.TEMP F.FP)::(map (fn a => unEx(a, caller)) args)))
+
+
 
 	fun transRel (oper, ex1, ex2, resultT, resultF) = let
 														val result = Temp.newtemp ()
@@ -413,11 +424,9 @@ struct
 		val size = unEx(size, level)
 	in
 		Ex(T.ESEQ(
-				T.SEQ(
-					T.MOVE(t, T.CALL(
-								T.NAME(Temp.namedlabel("tig_initArray")),
-								[T.BINOP(T.PLUS, size, T.CONST 1), unEx(init, level)])),
-					T.MOVE(T.MEM(t), size)),
+				T.MOVE(t, T.CALL(
+							T.NAME(Temp.namedlabel("tig_initArray")),
+							[size, unEx(init, level)])),
 				T.BINOP(T.PLUS, t, T.CONST(F.wordSize))))
 	end
 
@@ -431,9 +440,25 @@ struct
 	  | getLoc 4 = T.TEMP F.A3
 	  | getLoc i = T.MEM (T.BINOP (T.PLUS, T.TEMP F.FP, T.CONST(4 * i)))
 
-	fun moveArgs size (i, (F.InReg t)::l) = T.SEQ(T.MOVE (T.TEMP t, getLoc i), moveArgs size ((i + 1), l))
-	  | moveArgs size (i, (F.InFrame j)::l) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST(j))), getLoc i), moveArgs size ((i + 1), l))
-	  | moveArgs size (i, []) = T.EXP(T.CONST 0)
+	fun moveArgs size (i, (F.InReg _)::l) =
+		let
+			val t = T.TEMP (Temp.newtemp ())
+			val (rest, temps) = (moveArgs size ((i + 1), l))
+		in
+			(T.SEQ(T.MOVE (t, getLoc i), rest), t::temps)
+		end
+	  | moveArgs size (i, (F.InFrame j)::l) =
+	  	let
+			val (rest, temps) = (moveArgs size ((i + 1), l))
+		in
+			(T.SEQ(T.MOVE (T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST(j))), getLoc i), rest), temps)
+		end
+	  | moveArgs size (i, []) = (T.EXP(T.CONST 0), [])
+
+	fun moveArgs2 (i, (F.InReg reg)::l, temp::temps) = T.SEQ(T.MOVE(T.TEMP reg, temp), moveArgs2 (i + 1, l, temps))
+	  | moveArgs2 (i, (F.InReg reg)::l, []) = T.SEQ(T.MOVE(T.TEMP reg, getLoc i), moveArgs2 (i + 1, l, []))
+	  | moveArgs2 (i, (F.InFrame j)::l, temps) = moveArgs2 (i + 1, l, temps)
+	  | moveArgs2 (i, [], _) = T.EXP(T.CONST 0)
 
 	fun toStack (i, t::[]) = T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t)
 	  | toStack (i, t::l) = T.SEQ(T.MOVE(T.MEM (T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (i))), T.TEMP t), toStack (i + 4, l))
@@ -448,15 +473,19 @@ struct
 	fun restoreCallees () = T.SEQ(T.MOVE(T.TEMP F.SP, T.BINOP (T.PLUS, T.TEMP F.SP, T.CONST(4 * (List.length calleesaves)))), fromStack (0, calleesaves))
 
 	fun procEntry (formList, frame) =
-		T.SEQ(
-			moveArgs (F.size frame) (0, formList),
+		let
+			val (moves, tempList) = moveArgs (F.size frame) (0, formList)
+		in
 			T.SEQ(
+				moves,
 				T.SEQ(
-					T.MOVE(T.TEMP F.FP, T.TEMP F.SP),
-					T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (F.size frame)))
-					),
-				saveCallees ())
-		)
+					T.SEQ(
+						T.MOVE(T.TEMP F.FP, T.TEMP F.SP),
+						T.MOVE(T.TEMP F.SP, T.BINOP (T.MINUS, T.TEMP F.SP, T.CONST (F.size frame)))),
+					T.SEQ(
+						saveCallees (),
+						moveArgs2 (0, formList, tempList))))
+		end
 
 	fun procExit frame =
 		T.SEQ(
@@ -529,7 +558,7 @@ struct
 					T.MOVE(T.TEMP (F.V0), exp),
 					T.SEQ(
 						procExit frame,
-						T.EXP(T.CALL(T.NAME(Temp.namedlabel("tig_exit")), [T.CONST(0)])))))), frame=frame}
+						T.JUMP(T.TEMP (F.RA), []))))), frame=frame}
 	  | frag (L(frame, a, u), formList, Nx(stm)) = F.PROC{body=
 		T.SEQ(
 			T.LABEL(F.label frame),
@@ -539,7 +568,7 @@ struct
 					stm,
 					T.SEQ(
 						procExit frame,
-						T.EXP(T.CALL(T.NAME(Temp.namedlabel("tig_exit")), [T.CONST(0)])))))), frame=frame}
+						T.JUMP(T.TEMP (F.RA), []))))), frame=frame}
 	  | frag (L(frame, a, u), formList, Cx(cond)) = F.PROC{body=
 		T.SEQ(
 			T.LABEL(F.label frame),
@@ -549,7 +578,7 @@ struct
 					T.MOVE(T.TEMP (F.V0), unEx(Cx(cond), L(frame, a, u))),
 					T.SEQ(
 						procExit frame,
-						T.EXP(T.CALL(T.NAME(Temp.namedlabel("tig_exit")), [T.CONST(0)])))))), frame=frame}
+						T.JUMP(T.TEMP (F.RA), []))))), frame=frame}
 	  | frag (EMPTY, formList, exp) = frag (outermost, formList, exp)
 
 end

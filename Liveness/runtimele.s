@@ -1,6 +1,9 @@
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4

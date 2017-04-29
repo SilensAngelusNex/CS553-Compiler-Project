@@ -1,7 +1,8 @@
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t304, $sp, -4
+	addi	t304, $sp, -8
 	move	$sp, t304
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
@@ -14,10 +15,10 @@ tig_main:
 	sw		$ra, -32($sp)
 	addi	t305, $sp, -36
 	move	$sp, t305
-	la		t302, L80
+	la		t302, L74
 	move	t303, t302
 	li		t301, 0
-	li		$v0, 0
+	move	$v0, t303
 	addi	t306, $sp, 36
 	move	$sp, t306
 	lw		$s0, 0($sp)
@@ -31,10 +32,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	move	t307, $v0
-	j		L81
-
-L81:
+L75:

@@ -1,6 +1,9 @@
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -824,8 +827,9 @@ exit:
 	
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$sp, $sp, -4
+	addi	$sp, $sp, -8
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -839,12 +843,12 @@ tig_main:
 	li		$a0, 8
 	jal		tig_allocRecord
 
-	move	$a0, $v0
-	li		$v1, 0
-	sw		$v1, 0($v0)
-	li		$v1, 0
-	sw		$v1, 4($v0)
-	move	$v0, $a0
+	move	$a1, $v0
+	li		$a0, 0
+	sw		$a0, 0($v0)
+	li		$a0, 0
+	sw		$a0, 4($v0)
+	move	$v0, $a1
 	addi	$sp, $sp, 36
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
@@ -857,9 +861,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	j		L28
-
-L28:
+L29:

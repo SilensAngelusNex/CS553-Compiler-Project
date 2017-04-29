@@ -1,8 +1,9 @@
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t143, $sp, -4
-	move	$sp, t143
+	addi	t145, $sp, -8
+	move	$sp, t145
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -12,22 +13,34 @@ tig_main:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t144, $sp, -36
-	move	$sp, t144
-	li		t145, 11
-	move	$a0, t145
-	li		$a1, 0
+	addi	t146, $sp, -36
+	move	$sp, t146
+	li		$a0, 10
+	li		$a1, 2
 	jal		tig_initArray
 
-	move	t146, $v0
-	move	t141, t146
-	li		t147, 10
-	sw		t147, 0(t141)
+	move	t147, $v0
+	move	t141, t147
 	addi	t148, t141, 4
 	move	t142, t148
-	move	$v0, t142
-	addi	t149, $sp, 36
-	move	$sp, t149
+	li		t143, 11
+	move	t144, t142
+	slt		t149, t143, $zero
+	beqz	t149, L0
+	j		L1
+L1:
+	li		$a0, 1
+	jal		tig_exit
+
+	move	t150, $v0
+L2:
+	li		t153, 4
+	mult	t143, t153
+	mflo	t152
+	add		t151, t152, t144
+	lw		$v0, 0(t151)
+	addi	t154, $sp, 36
+	move	$sp, t154
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -39,10 +52,14 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
-
-	move	t150, $v0
-	j		L0
+	jr		$ra
 
 L0:
+	lw		t156, -4(t144)
+	slt		t155, t143, t156
+	beqz	t155, L4
+	j		L2
+L4:
+	j		L1
+
+L3:

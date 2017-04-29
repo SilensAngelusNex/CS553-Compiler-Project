@@ -1,6 +1,9 @@
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -822,7 +825,7 @@ exit:
 	li $v0, 10
 	syscall
 	
-L16:
+L18:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$fp, $sp
@@ -839,23 +842,23 @@ L16:
 	sw		$ra, -32($sp)
 	addi	$v0, $sp, -36
 	move	$sp, $v0
-	beq		$a1, $zero, L17
-	j		L18
-L18:
+	beq		$a1, $zero, L19
+	j		L20
+L20:
 	li		$v0, 0
-L19:
-	beq		$v0, $zero, L21
-	j		 L20
 L21:
+	beq		$v0, $zero, L23
+	j		 L22
+L23:
 	move	$s0, $a1
 	lw		$a0, 0($fp)
 	addi	$v0, $a1, -1
 	move	$a1, $v0
-	jal		L16
+	jal		L18
 
 	mult	$s0, $v0
 	mflo	$v0
-L22:
+L24:
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -871,19 +874,20 @@ L22:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L17:
+L19:
 	li		$v0, 1
-	j		L19
+	j		L21
 
-L20:
+L22:
 	li		$v0, 1
-	j		L22
+	j		L24
 
-L23:
+L25:
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$v0, $sp, -4
+	addi	$v0, $sp, -8
 	move	$sp, $v0
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
@@ -898,10 +902,10 @@ tig_main:
 	move	$sp, $v0
 	move	$a0, $fp
 	li		$a1, 10
-	jal		L16
+	jal		L18
 
-	addi	$v0, $sp, 36
-	move	$sp, $v0
+	addi	$a0, $sp, 36
+	move	$sp, $a0
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -913,9 +917,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	j		L25
-
-L25:
+L27:

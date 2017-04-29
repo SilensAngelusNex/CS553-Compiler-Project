@@ -1,8 +1,9 @@
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t176, $sp, -4
-	move	$sp, t176
+	addi	t179, $sp, -8
+	move	$sp, t179
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -12,27 +13,27 @@ tig_main:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t177, $sp, -36
-	move	$sp, t177
+	addi	t180, $sp, -36
+	move	$sp, t180
 	li		$a0, 8
 	jal		tig_allocRecord
 
-	move	t178, $v0
-	move	t171, t178
-	move	t179, $v0
-	move	t174, t179
-	la		t170, L11
-	sw		t170, 0(t174)
-	li		t180, 1000
-	sw		t180, 4($v0)
-	move	t172, t171
-	move	t181, t172
-	move	t175, t181
-	la		t173, L12
-	sw		t173, 0(t175)
-	move	$v0, t172
-	addi	t182, $sp, 36
-	move	$sp, t182
+	move	t181, $v0
+	move	t174, t181
+	move	t182, $v0
+	move	t177, t182
+	la		t173, L14
+	sw		t173, 0(t177)
+	li		t183, 1000
+	sw		t183, 4($v0)
+	move	t175, t174
+	move	t184, t175
+	move	t178, t184
+	la		t176, L15
+	sw		t176, 0(t178)
+	lw		$v0, 4(t175)
+	addi	t185, $sp, 36
+	move	$sp, t185
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -44,10 +45,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	move	t183, $v0
-	j		L13
-
-L13:
+L16:

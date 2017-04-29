@@ -1,9 +1,14 @@
 	.data
-L34:		.asciiz		"str2"
-L33:		.asciiz		"str"
+L34:		.word		4
+			.asciiz		"str2"
+L33:		.word		3
+			.asciiz		"str"
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -828,8 +833,7 @@ exit:
 L32:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	$v1, $a1
-	move	$v0, $a2
+	move	$v1, $a2
 	move	$fp, $sp
 	addi	$v0, $sp, -8
 	move	$sp, $v0
@@ -845,7 +849,7 @@ L32:
 	addi	$v0, $sp, -36
 	move	$sp, $v0
 	lw		$a0, 0($fp)
-	addi	$v0, $v1, 1
+	addi	$v0, $a1, 1
 	move	$a1, $v0
 	jal		L31
 
@@ -868,7 +872,6 @@ L35:
 L31:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	$v1, $a1
 	move	$fp, $sp
 	addi	$v0, $sp, -8
 	move	$sp, $v0
@@ -884,9 +887,9 @@ L31:
 	addi	$v0, $sp, -36
 	move	$sp, $v0
 	lw		$v0, 0($fp)
-	la		$a2, L33
+	la		$v1, L33
 	move	$a0, $v0
-	move	$a1, $v1
+	move	$a2, $v1
 	jal		L32
 
 	addi	$a0, $sp, 36
@@ -907,8 +910,9 @@ L31:
 L37:
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$v0, $sp, -4
+	addi	$v0, $sp, -8
 	move	$sp, $v0
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
@@ -928,8 +932,8 @@ tig_main:
 	move	$a2, $v1
 	jal		L32
 
-	addi	$v0, $sp, 36
-	move	$sp, $v0
+	addi	$a0, $sp, 36
+	move	$sp, $a0
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -941,9 +945,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
-
-	j		L39
+	jr		$ra
 
 L39:

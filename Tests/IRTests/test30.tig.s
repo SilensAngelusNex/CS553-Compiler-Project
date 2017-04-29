@@ -1,6 +1,9 @@
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -824,8 +827,9 @@ exit:
 	
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$sp, $sp, -4
+	addi	$sp, $sp, -8
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -836,24 +840,20 @@ tig_main:
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
 	addi	$sp, $sp, -36
-	li		$v0, 11
-	move	$a0, $v0
-	li		$a1, 0
+	li		$a0, 10
+	li		$a1, 3
 	jal		tig_initArray
 
-	li		$v1, 10
-	sw		$v1, 0($v0)
-	addi	$v0, $v0, 4
+	addi	$s0, $v0, 4
 	li		$s1, 2
-	move	$s0, $v0
 	slt		$v0, $s1, $zero
-	beqz	$v0, L72
-	j		L73
-L73:
+	beqz	$v0, L67
+	j		L68
+L68:
 	li		$a0, 1
 	jal		tig_exit
 
-L74:
+L69:
 	li		$v0, 4
 	mult	$s1, $v0
 	mflo	$v0
@@ -871,17 +871,14 @@ L74:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	j		L75
-
-L72:
+L67:
 	lw		$v0, -4($s0)
 	slt		$v0, $s1, $v0
-	beqz	$v0, L76
-	j		L74
-L76:
-	j		L73
+	beqz	$v0, L71
+	j		L69
+L71:
+	j		L68
 
-L75:
+L70:

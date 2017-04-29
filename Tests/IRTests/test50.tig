@@ -1,5 +1,5 @@
 let
-	val x: int := 3
+	var x: string := "Hello World"
 in
-	x
+	print(x)
 end

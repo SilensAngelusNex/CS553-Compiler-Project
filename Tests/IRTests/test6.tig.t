@@ -1,11 +1,11 @@
 L32:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t211, $a1
-	move	t212, $a2
+	move	t214, $a1
+	move	t215, $a2
 	move	$fp, $sp
-	addi	t215, $sp, -8
-	move	$sp, t215
+	addi	t219, $sp, -8
+	move	$sp, t219
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -15,17 +15,19 @@ L32:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t216, $sp, -36
-	move	$sp, t216
+	addi	t220, $sp, -36
+	move	$sp, t220
+	move	t212, t214
+	move	t213, t215
 	lw		$a0, 0($fp)
-	addi	t217, t211, 1
-	move	$a1, t217
+	addi	t221, t212, 1
+	move	$a1, t221
 	jal		L31
 
-	move	t218, $v0
-	move	$v0, t218
-	addi	t219, $sp, 36
-	move	$sp, t219
+	move	t222, $v0
+	move	$v0, t222
+	addi	t223, $sp, 36
+	move	$sp, t223
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -43,10 +45,10 @@ L35:
 L31:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t210, $a1
+	move	t217, $a1
 	move	$fp, $sp
-	addi	t222, $sp, -8
-	move	$sp, t222
+	addi	t226, $sp, -8
+	move	$sp, t226
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -56,20 +58,21 @@ L31:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t223, $sp, -36
-	move	$sp, t223
-	lw		t221, 0($fp)
-	move	t220, t210
-	la		t213, L33
-	move	$a0, t221
-	move	$a1, t220
-	move	$a2, t213
+	addi	t227, $sp, -36
+	move	$sp, t227
+	move	t211, t217
+	lw		t225, 0($fp)
+	move	t224, t211
+	la		t216, L33
+	move	$a0, t225
+	move	$a1, t224
+	move	$a2, t216
 	jal		L32
 
-	move	t224, $v0
-	move	$v0, t224
-	addi	t225, $sp, 36
-	move	$sp, t225
+	move	t228, $v0
+	move	$v0, t228
+	addi	t229, $sp, 36
+	move	$sp, t229
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -86,9 +89,10 @@ L31:
 L37:
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t227, $sp, -4
-	move	$sp, t227
+	addi	t231, $sp, -8
+	move	$sp, t231
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -98,19 +102,19 @@ tig_main:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t228, $sp, -36
-	move	$sp, t228
-	move	t226, $fp
-	la		t214, L34
-	move	$a0, t226
+	addi	t232, $sp, -36
+	move	$sp, t232
+	move	t230, $fp
+	la		t218, L34
+	move	$a0, t230
 	li		$a1, 0
-	move	$a2, t214
+	move	$a2, t218
 	jal		L32
 
-	move	t229, $v0
-	move	$v0, t229
-	addi	t230, $sp, 36
-	move	$sp, t230
+	move	t233, $v0
+	move	$v0, t233
+	addi	t234, $sp, 36
+	move	$sp, t234
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -122,10 +126,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
-
-	move	t231, $v0
-	j		L39
+	jr		$ra
 
 L39:

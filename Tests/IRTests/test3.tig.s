@@ -1,9 +1,14 @@
 	.data
-L12:		.asciiz		"Somebody"
-L11:		.asciiz		"Nobody"
+L15:		.word		8
+			.asciiz		"Somebody"
+L14:		.word		6
+			.asciiz		"Nobody"
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -827,8 +832,9 @@ exit:
 	
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$sp, $sp, -4
+	addi	$sp, $sp, -8
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -842,16 +848,16 @@ tig_main:
 	li		$a0, 8
 	jal		tig_allocRecord
 
+	move	$a1, $v0
 	move	$a0, $v0
-	move	$v1, $v0
-	la		$a1, L11
-	sw		$a1, 0($v1)
-	li		$v1, 1000
-	sw		$v1, 4($v0)
-	move	$v0, $a0
-	move	$v1, $v0
-	la		$a0, L12
-	sw		$a0, 0($v1)
+	la		$a2, L14
+	sw		$a2, 0($a0)
+	li		$a0, 1000
+	sw		$a0, 4($v0)
+	move	$v0, $a1
+	la		$a0, L15
+	sw		$a0, 0($v0)
+	lw		$v0, 4($a1)
 	addi	$sp, $sp, 36
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
@@ -864,9 +870,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	j		L13
-
-L13:
+L16:

@@ -4,7 +4,8 @@ let
 in
 	let
 		type a = string
+		var x: a := "red"
 	in
-		0
+		x
 	end
 end

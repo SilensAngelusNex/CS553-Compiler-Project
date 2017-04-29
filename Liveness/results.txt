@@ -1,386 +1,4 @@
-Frag:
-SEQ(
-	LABEL L97,
-	SEQ(
-		SEQ(
-			SEQ(
-				MOVE(
-					MEM(
-						BINOP(MINUS,
-							TEMP t105,
-							CONST 0)),
-					TEMP t108),
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t105,
-								CONST 4)),
-						TEMP t106),
-					SEQ(
-						MOVE(
-							TEMP t330,
-							TEMP t109),
-						EXP(
-							CONST 0)))),
-			SEQ(
-				SEQ(
-					MOVE(
-						TEMP t106,
-						TEMP t105),
-					MOVE(
-						TEMP t105,
-						BINOP(MINUS,
-							TEMP t105,
-							CONST 8))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t105,
-									CONST 0)),
-							TEMP t122),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t105,
-										CONST 4)),
-								TEMP t123),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t105,
-											CONST 8)),
-									TEMP t124),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t105,
-												CONST 12)),
-										TEMP t125),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t105,
-													CONST 16)),
-											TEMP t126),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t105,
-														CONST 20)),
-												TEMP t127),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t105,
-															CONST 24)),
-													TEMP t128),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 28)),
-														TEMP t129),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 32)),
-														TEMP t107))))))))),
-					MOVE(
-						TEMP t105,
-						BINOP(MINUS,
-							TEMP t105,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t102,
-				TEMP t330),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t105,
-							BINOP(PLUS,
-								TEMP t105,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t122,
-								MEM(
-									BINOP(MINUS,
-										TEMP t105,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t123,
-									MEM(
-										BINOP(MINUS,
-											TEMP t105,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t124,
-										MEM(
-											BINOP(MINUS,
-												TEMP t105,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t125,
-											MEM(
-												BINOP(MINUS,
-													TEMP t105,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t126,
-												MEM(
-													BINOP(MINUS,
-														TEMP t105,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t127,
-													MEM(
-														BINOP(MINUS,
-															TEMP t105,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t128,
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t129,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t105,
-																	CONST 28))),
-														MOVE(
-															TEMP t107,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t105,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t105,
-							TEMP t106),
-						MOVE(
-							TEMP t106,
-							MEM(
-								BINOP(MINUS,
-									TEMP t106,
-									CONST 4))))),
-				JUMP(
-					TEMP t107)))))
-
-
-Frag:
-SEQ(
-	LABEL L98,
-	SEQ(
-		SEQ(
-			SEQ(
-				MOVE(
-					MEM(
-						BINOP(MINUS,
-							TEMP t105,
-							CONST 0)),
-					TEMP t108),
-				SEQ(
-					MOVE(
-						MEM(
-							BINOP(MINUS,
-								TEMP t105,
-								CONST 4)),
-						TEMP t106),
-					SEQ(
-						MOVE(
-							TEMP t331,
-							TEMP t109),
-						EXP(
-							CONST 0)))),
-			SEQ(
-				SEQ(
-					MOVE(
-						TEMP t106,
-						TEMP t105),
-					MOVE(
-						TEMP t105,
-						BINOP(MINUS,
-							TEMP t105,
-							CONST 8))),
-				SEQ(
-					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t105,
-									CONST 0)),
-							TEMP t122),
-						SEQ(
-							MOVE(
-								MEM(
-									BINOP(MINUS,
-										TEMP t105,
-										CONST 4)),
-								TEMP t123),
-							SEQ(
-								MOVE(
-									MEM(
-										BINOP(MINUS,
-											TEMP t105,
-											CONST 8)),
-									TEMP t124),
-								SEQ(
-									MOVE(
-										MEM(
-											BINOP(MINUS,
-												TEMP t105,
-												CONST 12)),
-										TEMP t125),
-									SEQ(
-										MOVE(
-											MEM(
-												BINOP(MINUS,
-													TEMP t105,
-													CONST 16)),
-											TEMP t126),
-										SEQ(
-											MOVE(
-												MEM(
-													BINOP(MINUS,
-														TEMP t105,
-														CONST 20)),
-												TEMP t127),
-											SEQ(
-												MOVE(
-													MEM(
-														BINOP(MINUS,
-															TEMP t105,
-															CONST 24)),
-													TEMP t128),
-												SEQ(
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 28)),
-														TEMP t129),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 32)),
-														TEMP t107))))))))),
-					MOVE(
-						TEMP t105,
-						BINOP(MINUS,
-							TEMP t105,
-							CONST 36))))),
-		SEQ(
-			MOVE(
-				TEMP t102,
-				BINOP(PLUS,
-					TEMP t331,
-					CONST 1)),
-			SEQ(
-				SEQ(
-					SEQ(
-						MOVE(
-							TEMP t105,
-							BINOP(PLUS,
-								TEMP t105,
-								CONST 36)),
-						SEQ(
-							MOVE(
-								TEMP t122,
-								MEM(
-									BINOP(MINUS,
-										TEMP t105,
-										CONST 0))),
-							SEQ(
-								MOVE(
-									TEMP t123,
-									MEM(
-										BINOP(MINUS,
-											TEMP t105,
-											CONST 4))),
-								SEQ(
-									MOVE(
-										TEMP t124,
-										MEM(
-											BINOP(MINUS,
-												TEMP t105,
-												CONST 8))),
-									SEQ(
-										MOVE(
-											TEMP t125,
-											MEM(
-												BINOP(MINUS,
-													TEMP t105,
-													CONST 12))),
-										SEQ(
-											MOVE(
-												TEMP t126,
-												MEM(
-													BINOP(MINUS,
-														TEMP t105,
-														CONST 16))),
-											SEQ(
-												MOVE(
-													TEMP t127,
-													MEM(
-														BINOP(MINUS,
-															TEMP t105,
-															CONST 20))),
-												SEQ(
-													MOVE(
-														TEMP t128,
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 24))),
-													SEQ(
-														MOVE(
-															TEMP t129,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t105,
-																	CONST 28))),
-														MOVE(
-															TEMP t107,
-															MEM(
-																BINOP(MINUS,
-																	TEMP t105,
-																	CONST 32)))))))))))),
-					SEQ(
-						MOVE(
-							TEMP t105,
-							TEMP t106),
-						MOVE(
-							TEMP t106,
-							MEM(
-								BINOP(MINUS,
-									TEMP t106,
-									CONST 4))))),
-				JUMP(
-					TEMP t107)))))
-
+String Frag:	"Hello World"
 
 Frag:
 SEQ(
@@ -394,8 +12,15 @@ SEQ(
 							TEMP t105,
 							CONST 0)),
 					TEMP t108),
-				EXP(
-					CONST 0)),
+				SEQ(
+					MOVE(
+						MEM(
+							BINOP(MINUS,
+								TEMP t105,
+								CONST 4)),
+						TEMP t106),
+					EXP(
+						CONST 0))),
 			SEQ(
 				SEQ(
 					MOVE(
@@ -405,79 +30,92 @@ SEQ(
 						TEMP t105,
 						BINOP(MINUS,
 							TEMP t105,
-							CONST 4))),
+							CONST 8))),
 				SEQ(
 					SEQ(
-						MOVE(
-							MEM(
-								BINOP(MINUS,
-									TEMP t105,
-									CONST 0)),
-							TEMP t122),
 						SEQ(
 							MOVE(
 								MEM(
 									BINOP(MINUS,
 										TEMP t105,
-										CONST 4)),
-								TEMP t123),
+										CONST 0)),
+								TEMP t122),
 							SEQ(
 								MOVE(
 									MEM(
 										BINOP(MINUS,
 											TEMP t105,
-											CONST 8)),
-									TEMP t124),
+											CONST 4)),
+									TEMP t123),
 								SEQ(
 									MOVE(
 										MEM(
 											BINOP(MINUS,
 												TEMP t105,
-												CONST 12)),
-										TEMP t125),
+												CONST 8)),
+										TEMP t124),
 									SEQ(
 										MOVE(
 											MEM(
 												BINOP(MINUS,
 													TEMP t105,
-													CONST 16)),
-											TEMP t126),
+													CONST 12)),
+											TEMP t125),
 										SEQ(
 											MOVE(
 												MEM(
 													BINOP(MINUS,
 														TEMP t105,
-														CONST 20)),
-												TEMP t127),
+														CONST 16)),
+												TEMP t126),
 											SEQ(
 												MOVE(
 													MEM(
 														BINOP(MINUS,
 															TEMP t105,
-															CONST 24)),
-													TEMP t128),
+															CONST 20)),
+													TEMP t127),
 												SEQ(
 													MOVE(
 														MEM(
 															BINOP(MINUS,
 																TEMP t105,
-																CONST 28)),
-														TEMP t129),
-													MOVE(
-														MEM(
-															BINOP(MINUS,
-																TEMP t105,
-																CONST 32)),
-														TEMP t107))))))))),
-					MOVE(
-						TEMP t105,
-						BINOP(MINUS,
+																CONST 24)),
+														TEMP t128),
+													SEQ(
+														MOVE(
+															MEM(
+																BINOP(MINUS,
+																	TEMP t105,
+																	CONST 28)),
+															TEMP t129),
+														MOVE(
+															MEM(
+																BINOP(MINUS,
+																	TEMP t105,
+																	CONST 32)),
+															TEMP t107))))))))),
+						MOVE(
 							TEMP t105,
-							CONST 36))))),
+							BINOP(MINUS,
+								TEMP t105,
+								CONST 36))),
+					EXP(
+						CONST 0)))),
 		SEQ(
 			MOVE(
 				TEMP t102,
-				CONST 0),
+				ESEQ(
+					MOVE(
+						TEMP t343,
+						ESEQ(
+							MOVE(
+								TEMP t342,
+								NAME L93),
+							TEMP t342)),
+					CALL(
+						NAME tig_print,
+							TEMP t343))),
 			SEQ(
 				SEQ(
 					SEQ(
@@ -558,9 +196,7 @@ SEQ(
 								BINOP(MINUS,
 									TEMP t106,
 									CONST 4))))),
-				EXP(
-					CALL(
-						NAME tig_exit,
-							CONST 0))))))
+				JUMP(
+					TEMP t107)))))
 
 

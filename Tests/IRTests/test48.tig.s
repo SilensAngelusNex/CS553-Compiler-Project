@@ -1,6 +1,9 @@
 	#.file	1 "runtime.c"
 	.option pic2
 	.text
+	jal	main
+	li	$a0, 0
+	jal tig_exit
 	.globl	consts
 	.data
 	.align 4
@@ -822,13 +825,13 @@ exit:
 	li $v0, 10
 	syscall
 	
-L97:
+L87:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	$v0, $a1
+	move	$a0, $a1
 	move	$fp, $sp
-	addi	$a0, $sp, -8
-	move	$sp, $a0
+	addi	$v0, $sp, -8
+	move	$sp, $v0
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -838,8 +841,9 @@ L97:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	$a0, $sp, -36
-	move	$sp, $a0
+	addi	$v0, $sp, -36
+	move	$sp, $v0
+	move	$v0, $a0
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -855,8 +859,8 @@ L97:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L99:
-L98:
+L89:
+L88:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$a0, $a1
@@ -890,11 +894,12 @@ L98:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L100:
+L90:
 tig_main:
 	sw		$a0, 0($sp)
+	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	$v0, $sp, -4
+	addi	$v0, $sp, -8
 	move	$sp, $v0
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
@@ -907,9 +912,12 @@ tig_main:
 	sw		$ra, -32($sp)
 	addi	$v0, $sp, -36
 	move	$sp, $v0
-	li		$v0, 0
-	addi	$v0, $sp, 36
-	move	$sp, $v0
+	move	$a0, $fp
+	li		$a1, 4
+	jal		L88
+
+	addi	$a0, $sp, 36
+	move	$sp, $a0
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -921,9 +929,6 @@ tig_main:
 	lw		$ra, -32($sp)
 	move	$sp, $fp
 	lw		$fp, -4($fp)
-	li		$a0, 0
-	jal		tig_exit
+	jr		$ra
 
-	j		L101
-
-L101:
+L91:
