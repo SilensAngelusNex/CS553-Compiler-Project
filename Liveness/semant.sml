@@ -449,10 +449,13 @@ struct
 	*  								*)
 
 	fun transProg exp = let
-							val level =  Translate.outermost
+							val level = Translate.outermost
+							val formals = Translate.getFormals level
 							val main =  (#exp (transExp (level, ENV.base_venv, ENV.base_tenv) exp))
+							(*	val _ = print (Int.toString (Translate.levelSize level))	*)
+							val mainFrag = Translate.frag(level, formals, main)
 							val frags = Translate.getResult ()
-							val frags = frags@[Translate.frag(level, Translate.getFormals level, main)]
+							val frags = frags@[mainFrag]
 							val out = TextIO.openOut "results.txt"
 						in
 							Printtree.printfrags(out, frags);

@@ -1,25 +1,25 @@
 	.data
-L812:		.word		1
+L284:		.word		1
 			.asciiz		" "
-L811:		.word		1
+L283:		.word		1
 			.asciiz		"
 "
-L801:		.word		1
+L273:		.word		1
 			.asciiz		"0"
-L797:		.word		1
+L269:		.word		1
 			.asciiz		"-"
-L791:		.word		1
+L263:		.word		1
 			.asciiz		"0"
-L759:		.word		1
+L231:		.word		1
 			.asciiz		"0"
-L751:		.word		1
+L223:		.word		1
 			.asciiz		"
 "
-L750:		.word		1
+L222:		.word		1
 			.asciiz		" "
-L743:		.word		1
+L215:		.word		1
 			.asciiz		"9"
-L739:		.word		1
+L211:		.word		1
 			.asciiz		"0"
 	#.file	1 "runtime.c"
 	.option pic2
@@ -848,7 +848,7 @@ exit:
 	li $v0, 10
 	syscall
 	
-L738:
+L210:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$v1, $a1
@@ -872,21 +872,21 @@ L738:
 	jal		tig_ord
 
 	move	$s0, $v0
-	la		$v0, L739
+	la		$v0, L211
 	move	$a0, $v0
 	jal		tig_ord
 
 	slt		$v0, $s0, $v0
-	beqz	$v0, L740
-	j		L741
-L741:
+	beqz	$v0, L212
+	j		L213
+L213:
 	li		$v0, 0
-L742:
-	beq		$v0, $zero, L748
-	j		 L747
-L748:
+L214:
+	beq		$v0, $zero, L220
+	j		 L219
+L220:
 	li		$v0, 0
-L749:
+L221:
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -902,35 +902,35 @@ L749:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L740:
+L212:
 	li		$v0, 1
-	j		L742
+	j		L214
 
-L747:
+L219:
 	lw		$v0, 0($fp)
 	lw		$v0, 0($v0)
 	lw		$a0, -8($v0)
 	jal		tig_ord
 
 	move	$s0, $v0
-	la		$v0, L743
+	la		$v0, L215
 	move	$a0, $v0
 	jal		tig_ord
 
 	slt		$v0, $v0, $s0
-	beqz	$v0, L744
-	j		L745
-L745:
+	beqz	$v0, L216
+	j		L217
+L217:
 	li		$v0, 0
-L746:
-	j		L749
+L218:
+	j		L221
 
-L744:
+L216:
 	li		$v0, 1
-	j		L746
+	j		L218
 
-L816:
-L737:
+L288:
+L209:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$fp, $sp
@@ -947,32 +947,32 @@ L737:
 	sw		$ra, -32($sp)
 	addi	$v0, $sp, -36
 	move	$sp, $v0
-L756:
+L228:
 	move	$v1, $fp
 	lw		$v0, 0($fp)
 	lw		$v0, 0($v0)
 	lw		$v0, -8($v0)
-	la		$a2, L750
+	la		$a2, L222
 	move	$a0, $v1
 	move	$a1, $v0
 	jal		tig_stringEqual
 
-	beq		$v0, $zero, L753
-	j		 L752
-L753:
+	beq		$v0, $zero, L225
+	j		 L224
+L225:
 	move	$v1, $fp
 	lw		$v0, 0($fp)
 	lw		$v0, 0($v0)
 	lw		$v0, -8($v0)
-	la		$a2, L751
+	la		$a2, L223
 	move	$a0, $v1
 	move	$a1, $v0
 	jal		tig_stringEqual
 
-L754:
-	beq		$v0, $zero, L755
-	j		 L757
-L755:
+L226:
+	beq		$v0, $zero, L227
+	j		 L229
+L227:
 	li		$v0, 0
 	addi	$a0, $sp, 36
 	move	$sp, $a0
@@ -989,21 +989,21 @@ L755:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L752:
+L224:
 	li		$v0, 1
-	j		L754
+	j		L226
 
-L757:
+L229:
 	lw		$v0, 0($fp)
 	lw		$v0, 0($v0)
 	addi	$s0, $v0, -8
 	jal		tig_getchar
 
 	sw		$v0, 0($s0)
-	j		L756
+	j		L228
 
-L821:
-L736:
+L293:
+L208:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$v1, $a1
@@ -1024,23 +1024,23 @@ L736:
 	move	$s1, $v1
 	li		$s0, 0
 	move	$a0, $fp
-	jal		L737
+	jal		L209
 
 	move	$a0, $fp
 	lw		$v0, 0($fp)
 	lw		$a1, -8($v0)
-	jal		L738
+	jal		L210
 
 	sw		$v0, 0($s1)
-L760:
+L232:
 	move	$a0, $fp
 	lw		$v0, 0($fp)
 	lw		$a1, -8($v0)
-	jal		L738
+	jal		L210
 
-	beq		$v0, $zero, L758
-	j		 L761
-L758:
+	beq		$v0, $zero, L230
+	j		 L233
+L230:
 	move	$v0, $s0
 	addi	$a0, $sp, 36
 	move	$sp, $a0
@@ -1057,7 +1057,7 @@ L758:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L761:
+L233:
 	li		$v0, 10
 	mult	$s0, $v0
 	mflo	$s0
@@ -1066,7 +1066,7 @@ L761:
 	jal		tig_ord
 
 	add		$s0, $s0, $v0
-	la		$v0, L759
+	la		$v0, L231
 	move	$a0, $v0
 	jal		tig_ord
 
@@ -1076,10 +1076,10 @@ L761:
 	jal		tig_getchar
 
 	sw		$v0, 0($s1)
-	j		L760
+	j		L232
 
-L825:
-L765:
+L297:
+L237:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$fp, $sp
@@ -1096,23 +1096,23 @@ L765:
 	sw		$ra, -32($sp)
 	addi	$v0, $sp, -36
 	move	$sp, $v0
-	lw		$a0, 0($fp)
-	move	$a1, $s1
-	jal		L736
-
-	move	$s0, $v0
 	li		$a0, 4
 	jal		tig_allocRecord
 
 	move	$s1, $v0
-	li		$a0, 0
-	sw		$a0, 0($v0)
+	li		$v1, 0
+	sw		$v1, 0($v0)
+	lw		$a0, 0($fp)
+	move	$a1, $s1
+	jal		L208
+
+	move	$s0, $v0
 	lw		$v0, 0($s1)
-	beq		$v0, $zero, L767
-	j		 L766
-L767:
+	beq		$v0, $zero, L239
+	j		 L238
+L239:
 	li		$s1, 0
-L768:
+L240:
 	move	$v0, $s1
 	addi	$a0, $sp, 36
 	move	$sp, $a0
@@ -1129,7 +1129,7 @@ L768:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L766:
+L238:
 	li		$a0, 8
 	jal		tig_allocRecord
 
@@ -1137,13 +1137,13 @@ L766:
 	sw		$s0, 0($v0)
 	addi	$s0, $v0, 4
 	lw		$a0, 0($fp)
-	jal		L765
+	jal		L237
 
 	sw		$v0, 0($s0)
-	j		L768
+	j		L240
 
-L832:
-L764:
+L304:
+L236:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$a0, $a2
@@ -1163,33 +1163,33 @@ L764:
 	move	$sp, $v0
 	move	$s1, $a1
 	move	$s0, $a0
-	beq		$s1, $zero, L769
-	j		L770
-L770:
+	beq		$s1, $zero, L241
+	j		L242
+L242:
 	li		$v0, 0
-L771:
-	beq		$v0, $zero, L785
-	j		 L784
-L785:
-	beq		$s0, $zero, L772
-	j		L773
-L773:
+L243:
+	beq		$v0, $zero, L257
+	j		 L256
+L257:
+	beq		$s0, $zero, L244
+	j		L245
+L245:
 	li		$v0, 0
-L774:
-	beq		$v0, $zero, L782
-	j		 L781
-L782:
+L246:
+	beq		$v0, $zero, L254
+	j		 L253
+L254:
 	lw		$v1, 0($s1)
 	lw		$v0, 0($s0)
 	slt		$v0, $v1, $v0
-	beqz	$v0, L776
-	j		L775
-L776:
+	beqz	$v0, L248
+	j		L247
+L248:
 	li		$v0, 0
-L777:
-	beq		$v0, $zero, L779
-	j		 L778
-L779:
+L249:
+	beq		$v0, $zero, L251
+	j		 L250
+L251:
 	li		$a0, 8
 	jal		tig_allocRecord
 
@@ -1200,13 +1200,13 @@ L779:
 	lw		$a0, 0($fp)
 	move	$a1, $s1
 	lw		$a2, 4($s0)
-	jal		L764
+	jal		L236
 
 	sw		$v0, 0($s2)
-L780:
+L252:
 	move	$s0, $s3
-L783:
-L786:
+L255:
+L258:
 	move	$v0, $s0
 	addi	$a0, $sp, 36
 	move	$sp, $a0
@@ -1223,26 +1223,26 @@ L786:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L769:
+L241:
 	li		$v0, 1
-	j		L771
+	j		L243
 
-L784:
-	j		L786
+L256:
+	j		L258
 
-L772:
+L244:
 	li		$v0, 1
-	j		L774
+	j		L246
 
-L781:
+L253:
 	move	$s0, $s1
-	j		L783
+	j		L255
 
-L775:
+L247:
 	li		$v0, 1
-	j		L777
+	j		L249
 
-L778:
+L250:
 	li		$a0, 8
 	jal		tig_allocRecord
 
@@ -1253,13 +1253,13 @@ L778:
 	lw		$a0, 0($fp)
 	lw		$a1, 4($s1)
 	move	$a2, $s0
-	jal		L764
+	jal		L236
 
 	sw		$v0, 0($s2)
-	j		L780
+	j		L252
 
-L837:
-L787:
+L309:
+L259:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$a0, $a1
@@ -1278,14 +1278,14 @@ L787:
 	addi	$v0, $sp, -36
 	move	$sp, $v0
 	move	$s0, $a0
-	slt		$v0, $zero, $s0	beqz	$v0, L789
-	j		L788
-L789:
+	slt		$v0, $zero, $s0	beqz	$v0, L261
+	j		L260
+L261:
 	li		$v0, 0
-L790:
-	beq		$v0, $zero, L793
-	j		 L792
-L793:
+L262:
+	beq		$v0, $zero, L265
+	j		 L264
+L265:
 	move	$v0, $s1
 	addi	$a0, $sp, 36
 	move	$sp, $a0
@@ -1302,17 +1302,17 @@ L793:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L788:
+L260:
 	li		$v0, 1
-	j		L790
+	j		L262
 
-L792:
+L264:
 	lw		$a0, 0($fp)
 	li		$v0, 10
 	div		$s0, $v0
 	mflo	$v0
 	move	$a1, $v0
-	jal		L787
+	jal		L259
 
 	li		$v0, 10
 	div		$s0, $v0
@@ -1321,7 +1321,7 @@ L792:
 	mult	$v1, $v0
 	mflo	$v0
 	sub		$s0, $s0, $v0
-	la		$v0, L791
+	la		$v0, L263
 	move	$a0, $v0
 	jal		tig_ord
 
@@ -1333,10 +1333,10 @@ L792:
 	jal		tig_print
 
 	move	$s1, $v0
-	j		L793
+	j		L265
 
-L842:
-L763:
+L314:
+L235:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$v1, $a1
@@ -1356,28 +1356,28 @@ L763:
 	move	$sp, $v0
 	move	$s0, $v1
 	slt		$v0, $s0, $zero
-	beqz	$v0, L795
-	j		L794
-L795:
+	beqz	$v0, L267
+	j		L266
+L267:
 	li		$v0, 0
-L796:
-	beq		$v0, $zero, L806
-	j		 L805
-L806:
-	slt		$v0, $zero, $s0	beqz	$v0, L799
-	j		L798
-L799:
+L268:
+	beq		$v0, $zero, L278
+	j		 L277
+L278:
+	slt		$v0, $zero, $s0	beqz	$v0, L271
+	j		L270
+L271:
 	li		$v0, 0
-L800:
-	beq		$v0, $zero, L803
-	j		 L802
-L803:
-	la		$v0, L801
+L272:
+	beq		$v0, $zero, L275
+	j		 L274
+L275:
+	la		$v0, L273
 	move	$a0, $v0
 	jal		tig_print
 
-L804:
-L807:
+L276:
+L279:
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -1393,12 +1393,12 @@ L807:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L794:
+L266:
 	li		$v0, 1
-	j		L796
+	j		L268
 
-L805:
-	la		$v0, L797
+L277:
+	la		$v0, L269
 	move	$a0, $v0
 	jal		tig_print
 
@@ -1406,23 +1406,23 @@ L805:
 	li		$v0, 0
 	sub		$v0, $v0, $s0
 	move	$a1, $v0
-	jal		L787
+	jal		L259
 
-	j		L807
+	j		L279
 
-L798:
+L270:
 	li		$v0, 1
-	j		L800
+	j		L272
 
-L802:
+L274:
 	move	$a0, $fp
 	move	$a1, $s0
-	jal		L787
+	jal		L259
 
-	j		L804
+	j		L276
 
-L847:
-L762:
+L319:
+L234:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$v1, $a1
@@ -1441,27 +1441,27 @@ L762:
 	addi	$v0, $sp, -36
 	move	$sp, $v0
 	move	$s0, $v1
-	beq		$s0, $zero, L808
-	j		L809
-L809:
+	beq		$s0, $zero, L280
+	j		L281
+L281:
 	li		$v0, 0
-L810:
-	beq		$v0, $zero, L814
-	j		 L813
-L814:
+L282:
+	beq		$v0, $zero, L286
+	j		 L285
+L286:
 	lw		$a0, 0($fp)
 	lw		$a1, 0($s0)
-	jal		L763
+	jal		L235
 
-	la		$v0, L812
+	la		$v0, L284
 	move	$a0, $v0
 	jal		tig_print
 
 	lw		$a0, 0($fp)
 	lw		$a1, 4($s0)
-	jal		L762
+	jal		L234
 
-L815:
+L287:
 	addi	$a0, $sp, 36
 	move	$sp, $a0
 	lw		$s0, 0($sp)
@@ -1477,18 +1477,18 @@ L815:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L808:
+L280:
 	li		$v0, 1
-	j		L810
+	j		L282
 
-L813:
-	la		$v0, L811
+L285:
+	la		$v0, L283
 	move	$a0, $v0
 	jal		tig_print
 
-	j		L815
+	j		L287
 
-L852:
+L324:
 tig_main:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
@@ -1511,26 +1511,25 @@ tig_main:
 
 	sw		$v0, 0($s0)
 	move	$a0, $fp
-	jal		L765
+	jal		L237
 
 	move	$s1, $v0
-	move	$a0, $fp
-	jal		L765
-
-	move	$s2, $v0
 	addi	$s0, $fp, -8
 	jal		tig_getchar
 
 	sw		$v0, 0($s0)
+	move	$a0, $fp
+	jal		L237
+
 	move	$s0, $fp
 	move	$a0, $fp
-	move	$a1, $s2
-	move	$a2, $s1
-	jal		L764
+	move	$a1, $s1
+	move	$a2, $v0
+	jal		L236
 
 	move	$a0, $s0
 	move	$a1, $v0
-	jal		L762
+	jal		L234
 
 	addi	$a0, $sp, 36
 	move	$sp, $a0
@@ -1547,4 +1546,4 @@ tig_main:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L857:
+L329:

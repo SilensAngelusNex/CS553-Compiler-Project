@@ -1,10 +1,10 @@
-L738:
+L210:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t1433, $a1
+	move	t584, $a1
 	move	$fp, $sp
-	addi	t1494, $sp, -8
-	move	$sp, t1494
+	addi	t645, $sp, -8
+	move	$sp, t645
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -14,38 +14,38 @@ L738:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1495, $sp, -36
-	move	$sp, t1495
-	move	t1426, t1433
-	lw		t1497, 0($fp)
-	lw		t1496, 0(t1497)
-	lw		$a0, -8(t1496)
+	addi	t646, $sp, -36
+	move	$sp, t646
+	move	t577, t584
+	lw		t648, 0($fp)
+	lw		t647, 0(t648)
+	lw		$a0, -8(t647)
 	jal		tig_ord
 
-	move	t1498, $v0
-	move	t1488, t1498
-	move	t1490, t1488
-	la		t1427, L739
-	move	$a0, t1427
+	move	t649, $v0
+	move	t639, t649
+	move	t641, t639
+	la		t578, L211
+	move	$a0, t578
 	jal		tig_ord
 
-	move	t1499, $v0
-	move	t1489, t1499
-	slt		t1500, t1490, t1489
-	beqz	t1500, L740
-	j		L741
-L741:
-	li		t1428, 0
-L742:
-	move	t1431, t1428
-	beq		t1431, $zero, L748
-	j		 L747
-L748:
-	li		t1432, 0
-L749:
-	move	$v0, t1432
-	addi	t1501, $sp, 36
-	move	$sp, t1501
+	move	t650, $v0
+	move	t640, t650
+	slt		t651, t641, t640
+	beqz	t651, L212
+	j		L213
+L213:
+	li		t579, 0
+L214:
+	move	t582, t579
+	beq		t582, $zero, L220
+	j		 L219
+L220:
+	li		t583, 0
+L221:
+	move	$v0, t583
+	addi	t652, $sp, 36
+	move	$sp, t652
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -59,45 +59,45 @@ L749:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L740:
-	li		t1428, 1
-	j		L742
+L212:
+	li		t579, 1
+	j		L214
 
-L747:
-	lw		t1503, 0($fp)
-	lw		t1502, 0(t1503)
-	lw		$a0, -8(t1502)
+L219:
+	lw		t654, 0($fp)
+	lw		t653, 0(t654)
+	lw		$a0, -8(t653)
 	jal		tig_ord
 
-	move	t1504, $v0
-	move	t1491, t1504
-	move	t1493, t1491
-	la		t1429, L743
-	move	$a0, t1429
+	move	t655, $v0
+	move	t642, t655
+	move	t644, t642
+	la		t580, L215
+	move	$a0, t580
 	jal		tig_ord
 
-	move	t1505, $v0
-	move	t1492, t1505
-	slt		t1506, t1492, t1493
-	beqz	t1506, L744
-	j		L745
-L745:
-	li		t1430, 0
-L746:
-	move	t1432, t1430
-	j		L749
+	move	t656, $v0
+	move	t643, t656
+	slt		t657, t643, t644
+	beqz	t657, L216
+	j		L217
+L217:
+	li		t581, 0
+L218:
+	move	t583, t581
+	j		L221
 
-L744:
-	li		t1430, 1
-	j		L746
+L216:
+	li		t581, 1
+	j		L218
 
-L816:
-L737:
+L288:
+L209:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t1513, $sp, -8
-	move	$sp, t1513
+	addi	t664, $sp, -8
+	move	$sp, t664
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -107,44 +107,44 @@ L737:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1514, $sp, -36
-	move	$sp, t1514
-L756:
-	move	t1508, $fp
-	lw		t1516, 0($fp)
-	lw		t1515, 0(t1516)
-	lw		t1507, -8(t1515)
-	la		t1434, L750
-	move	$a0, t1508
-	move	$a1, t1507
-	move	$a2, t1434
+	addi	t665, $sp, -36
+	move	$sp, t665
+L228:
+	move	t659, $fp
+	lw		t667, 0($fp)
+	lw		t666, 0(t667)
+	lw		t658, -8(t666)
+	la		t585, L222
+	move	$a0, t659
+	move	$a1, t658
+	move	$a2, t585
 	jal		tig_stringEqual
 
-	move	t1517, $v0
-	move	t1436, t1517
-	beq		t1436, $zero, L753
-	j		 L752
-L753:
-	move	t1510, $fp
-	lw		t1519, 0($fp)
-	lw		t1518, 0(t1519)
-	lw		t1509, -8(t1518)
-	la		t1435, L751
-	move	$a0, t1510
-	move	$a1, t1509
-	move	$a2, t1435
+	move	t668, $v0
+	move	t587, t668
+	beq		t587, $zero, L225
+	j		 L224
+L225:
+	move	t661, $fp
+	lw		t670, 0($fp)
+	lw		t669, 0(t670)
+	lw		t660, -8(t669)
+	la		t586, L223
+	move	$a0, t661
+	move	$a1, t660
+	move	$a2, t586
 	jal		tig_stringEqual
 
-	move	t1520, $v0
-	move	t1437, t1520
-L754:
-	move	t1438, t1437
-	beq		t1438, $zero, L755
-	j		 L757
-L755:
+	move	t671, $v0
+	move	t588, t671
+L226:
+	move	t589, t588
+	beq		t589, $zero, L227
+	j		 L229
+L227:
 	li		$v0, 0
-	addi	t1521, $sp, 36
-	move	$sp, t1521
+	addi	t672, $sp, 36
+	move	$sp, t672
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -158,30 +158,30 @@ L755:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L752:
-	li		t1437, 1
-	j		L754
+L224:
+	li		t588, 1
+	j		L226
 
-L757:
-	lw		t1524, 0($fp)
-	lw		t1523, 0(t1524)
-	addi	t1522, t1523, -8
-	move	t1512, t1522
+L229:
+	lw		t675, 0($fp)
+	lw		t674, 0(t675)
+	addi	t673, t674, -8
+	move	t663, t673
 	jal		tig_getchar
 
-	move	t1525, $v0
-	move	t1511, t1525
-	sw		t1511, 0(t1512)
-	j		L756
+	move	t676, $v0
+	move	t662, t676
+	sw		t662, 0(t663)
+	j		L228
 
-L821:
-L736:
+L293:
+L208:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t1441, $a1
+	move	t592, $a1
 	move	$fp, $sp
-	addi	t1534, $sp, -8
-	move	$sp, t1534
+	addi	t685, $sp, -8
+	move	$sp, t685
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -191,38 +191,38 @@ L736:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1535, $sp, -36
-	move	$sp, t1535
-	move	t1424, t1441
-	li		t1425, 0
+	addi	t686, $sp, -36
+	move	$sp, t686
+	move	t575, t592
+	li		t576, 0
 	move	$a0, $fp
-	jal		L737
+	jal		L209
 
-	move	t1536, $v0
-	move	t1537, t1424
-	move	t1527, t1537
+	move	t687, $v0
+	move	t688, t575
+	move	t678, t688
 	move	$a0, $fp
-	lw		t1538, 0($fp)
-	lw		$a1, -8(t1538)
-	jal		L738
+	lw		t689, 0($fp)
+	lw		$a1, -8(t689)
+	jal		L210
 
-	move	t1539, $v0
-	move	t1526, t1539
-	sw		t1526, 0(t1527)
-L760:
+	move	t690, $v0
+	move	t677, t690
+	sw		t677, 0(t678)
+L232:
 	move	$a0, $fp
-	lw		t1540, 0($fp)
-	lw		$a1, -8(t1540)
-	jal		L738
+	lw		t691, 0($fp)
+	lw		$a1, -8(t691)
+	jal		L210
 
-	move	t1541, $v0
-	move	t1440, t1541
-	beq		t1440, $zero, L758
-	j		 L761
-L758:
-	move	$v0, t1425
-	addi	t1542, $sp, 36
-	move	$sp, t1542
+	move	t692, $v0
+	move	t591, t692
+	beq		t591, $zero, L230
+	j		 L233
+L230:
+	move	$v0, t576
+	addi	t693, $sp, 36
+	move	$sp, t693
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -236,44 +236,44 @@ L758:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L761:
-	li		t1544, 10
-	mult	t1425, t1544
-	mflo	t1543
-	move	t1529, t1543
-	lw		t1545, 0($fp)
-	lw		$a0, -8(t1545)
+L233:
+	li		t695, 10
+	mult	t576, t695
+	mflo	t694
+	move	t680, t694
+	lw		t696, 0($fp)
+	lw		$a0, -8(t696)
 	jal		tig_ord
 
-	move	t1546, $v0
-	move	t1528, t1546
-	add		t1547, t1529, t1528
-	move	t1531, t1547
-	la		t1439, L759
-	move	$a0, t1439
+	move	t697, $v0
+	move	t679, t697
+	add		t698, t680, t679
+	move	t682, t698
+	la		t590, L231
+	move	$a0, t590
 	jal		tig_ord
 
-	move	t1548, $v0
-	move	t1530, t1548
-	sub		t1549, t1531, t1530
-	move	t1425, t1549
-	lw		t1551, 0($fp)
-	addi	t1550, t1551, -8
-	move	t1533, t1550
+	move	t699, $v0
+	move	t681, t699
+	sub		t700, t682, t681
+	move	t576, t700
+	lw		t702, 0($fp)
+	addi	t701, t702, -8
+	move	t684, t701
 	jal		tig_getchar
 
-	move	t1552, $v0
-	move	t1532, t1552
-	sw		t1532, 0(t1533)
-	j		L760
+	move	t703, $v0
+	move	t683, t703
+	sw		t683, 0(t684)
+	j		L232
 
-L825:
-L765:
+L297:
+L237:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t1555, $sp, -8
-	move	$sp, t1555
+	addi	t706, $sp, -8
+	move	$sp, t706
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -283,31 +283,31 @@ L765:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1556, $sp, -36
-	move	$sp, t1556
-	lw		$a0, 0($fp)
-	move	$a1, t1447
-	jal		L736
-
-	move	t1557, $v0
-	move	t1448, t1557
+	addi	t707, $sp, -36
+	move	$sp, t707
 	li		$a0, 4
 	jal		tig_allocRecord
 
-	move	t1558, $v0
-	move	t1446, t1558
-	li		t1559, 0
-	sw		t1559, 0($v0)
-	move	t1447, t1446
-	lw		t1450, 0(t1447)
-	beq		t1450, $zero, L767
-	j		 L766
-L767:
-	li		t1451, 0
-L768:
-	move	$v0, t1451
-	addi	t1560, $sp, 36
-	move	$sp, t1560
+	move	t708, $v0
+	move	t597, t708
+	li		t709, 0
+	sw		t709, 0($v0)
+	move	t598, t597
+	lw		$a0, 0($fp)
+	move	$a1, t598
+	jal		L208
+
+	move	t710, $v0
+	move	t599, t710
+	lw		t601, 0(t598)
+	beq		t601, $zero, L239
+	j		 L238
+L239:
+	li		t602, 0
+L240:
+	move	$v0, t602
+	addi	t711, $sp, 36
+	move	$sp, t711
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -321,33 +321,33 @@ L768:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L766:
+L238:
 	li		$a0, 8
 	jal		tig_allocRecord
 
-	move	t1561, $v0
-	move	t1449, t1561
-	sw		t1448, 0($v0)
-	addi	t1562, $v0, 4
-	move	t1554, t1562
+	move	t712, $v0
+	move	t600, t712
+	sw		t599, 0($v0)
+	addi	t713, $v0, 4
+	move	t705, t713
 	lw		$a0, 0($fp)
-	jal		L765
+	jal		L237
 
-	move	t1563, $v0
-	move	t1553, t1563
-	sw		t1553, 0(t1554)
-	move	t1451, t1449
-	j		L768
+	move	t714, $v0
+	move	t704, t714
+	sw		t704, 0(t705)
+	move	t602, t600
+	j		L240
 
-L832:
-L764:
+L304:
+L236:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t1463, $a1
-	move	t1464, $a2
+	move	t614, $a1
+	move	t615, $a2
 	move	$fp, $sp
-	addi	t1568, $sp, -8
-	move	$sp, t1568
+	addi	t719, $sp, -8
+	move	$sp, t719
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -357,66 +357,66 @@ L764:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1569, $sp, -36
-	move	$sp, t1569
-	move	t1444, t1463
-	move	t1445, t1464
-	beq		t1444, $zero, L769
-	j		L770
-L770:
-	li		t1452, 0
-L771:
-	move	t1461, t1452
-	beq		t1461, $zero, L785
-	j		 L784
-L785:
-	beq		t1445, $zero, L772
-	j		L773
-L773:
-	li		t1453, 0
-L774:
-	move	t1459, t1453
-	beq		t1459, $zero, L782
-	j		 L781
-L782:
-	lw		t1571, 0(t1444)
-	lw		t1572, 0(t1445)
-	slt		t1570, t1571, t1572
-	beqz	t1570, L776
-	j		L775
-L776:
-	li		t1454, 0
-L777:
-	move	t1457, t1454
-	beq		t1457, $zero, L779
-	j		 L778
-L779:
+	addi	t720, $sp, -36
+	move	$sp, t720
+	move	t595, t614
+	move	t596, t615
+	beq		t595, $zero, L241
+	j		L242
+L242:
+	li		t603, 0
+L243:
+	move	t612, t603
+	beq		t612, $zero, L257
+	j		 L256
+L257:
+	beq		t596, $zero, L244
+	j		L245
+L245:
+	li		t604, 0
+L246:
+	move	t610, t604
+	beq		t610, $zero, L254
+	j		 L253
+L254:
+	lw		t722, 0(t595)
+	lw		t723, 0(t596)
+	slt		t721, t722, t723
+	beqz	t721, L248
+	j		L247
+L248:
+	li		t605, 0
+L249:
+	move	t608, t605
+	beq		t608, $zero, L251
+	j		 L250
+L251:
 	li		$a0, 8
 	jal		tig_allocRecord
 
-	move	t1573, $v0
-	move	t1456, t1573
-	lw		t1574, 0(t1445)
-	sw		t1574, 0($v0)
-	addi	t1575, $v0, 4
-	move	t1567, t1575
+	move	t724, $v0
+	move	t607, t724
+	lw		t725, 0(t596)
+	sw		t725, 0($v0)
+	addi	t726, $v0, 4
+	move	t718, t726
 	lw		$a0, 0($fp)
-	move	$a1, t1444
-	lw		$a2, 4(t1445)
-	jal		L764
+	move	$a1, t595
+	lw		$a2, 4(t596)
+	jal		L236
 
-	move	t1576, $v0
-	move	t1566, t1576
-	sw		t1566, 0(t1567)
-	move	t1458, t1456
-L780:
-	move	t1460, t1458
-L783:
-	move	t1462, t1460
-L786:
-	move	$v0, t1462
-	addi	t1577, $sp, 36
-	move	$sp, t1577
+	move	t727, $v0
+	move	t717, t727
+	sw		t717, 0(t718)
+	move	t609, t607
+L252:
+	move	t611, t609
+L255:
+	move	t613, t611
+L258:
+	move	$v0, t613
+	addi	t728, $sp, 36
+	move	$sp, t728
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -430,55 +430,55 @@ L786:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L769:
-	li		t1452, 1
-	j		L771
+L241:
+	li		t603, 1
+	j		L243
 
-L784:
-	move	t1462, t1445
-	j		L786
+L256:
+	move	t613, t596
+	j		L258
 
-L772:
-	li		t1453, 1
-	j		L774
+L244:
+	li		t604, 1
+	j		L246
 
-L781:
-	move	t1460, t1444
-	j		L783
+L253:
+	move	t611, t595
+	j		L255
 
-L775:
-	li		t1454, 1
-	j		L777
+L247:
+	li		t605, 1
+	j		L249
 
-L778:
+L250:
 	li		$a0, 8
 	jal		tig_allocRecord
 
-	move	t1578, $v0
-	move	t1455, t1578
-	lw		t1579, 0(t1444)
-	sw		t1579, 0($v0)
-	addi	t1580, $v0, 4
-	move	t1565, t1580
+	move	t729, $v0
+	move	t606, t729
+	lw		t730, 0(t595)
+	sw		t730, 0($v0)
+	addi	t731, $v0, 4
+	move	t716, t731
 	lw		$a0, 0($fp)
-	lw		$a1, 4(t1444)
-	move	$a2, t1445
-	jal		L764
+	lw		$a1, 4(t595)
+	move	$a2, t596
+	jal		L236
 
-	move	t1581, $v0
-	move	t1564, t1581
-	sw		t1564, 0(t1565)
-	move	t1458, t1455
-	j		L780
+	move	t732, $v0
+	move	t715, t732
+	sw		t715, 0(t716)
+	move	t609, t606
+	j		L252
 
-L837:
-L787:
+L309:
+L259:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t1470, $a1
+	move	t621, $a1
 	move	$fp, $sp
-	addi	t1585, $sp, -8
-	move	$sp, t1585
+	addi	t736, $sp, -8
+	move	$sp, t736
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -488,21 +488,21 @@ L787:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1586, $sp, -36
-	move	$sp, t1586
-	move	t1465, t1470
-	slt		t1587, $zero, t1465	beqz	t1587, L789
-	j		L788
-L789:
-	li		t1466, 0
-L790:
-	move	t1468, t1466
-	beq		t1468, $zero, L793
-	j		 L792
-L793:
-	move	$v0, t1469
-	addi	t1588, $sp, 36
-	move	$sp, t1588
+	addi	t737, $sp, -36
+	move	$sp, t737
+	move	t616, t621
+	slt		t738, $zero, t616	beqz	t738, L261
+	j		L260
+L261:
+	li		t617, 0
+L262:
+	move	t619, t617
+	beq		t619, $zero, L265
+	j		 L264
+L265:
+	move	$v0, t620
+	addi	t739, $sp, 36
+	move	$sp, t739
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -516,54 +516,54 @@ L793:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L788:
-	li		t1466, 1
-	j		L790
+L260:
+	li		t617, 1
+	j		L262
 
-L792:
+L264:
 	lw		$a0, 0($fp)
-	li		t1590, 10
-	div		t1465, t1590
-	mflo	t1589
-	move	$a1, t1589
-	jal		L787
+	li		t741, 10
+	div		t616, t741
+	mflo	t740
+	move	$a1, t740
+	jal		L259
 
-	move	t1591, $v0
-	li		t1595, 10
-	div		t1465, t1595
-	mflo	t1594
-	li		t1596, 10
-	mult	t1594, t1596
-	mflo	t1593
-	sub		t1592, t1465, t1593
-	move	t1584, t1592
-	la		t1467, L791
-	move	$a0, t1467
+	move	t742, $v0
+	li		t746, 10
+	div		t616, t746
+	mflo	t745
+	li		t747, 10
+	mult	t745, t747
+	mflo	t744
+	sub		t743, t616, t744
+	move	t735, t743
+	la		t618, L263
+	move	$a0, t618
 	jal		tig_ord
 
-	move	t1597, $v0
-	move	t1583, t1597
-	add		t1598, t1584, t1583
-	move	$a0, t1598
+	move	t748, $v0
+	move	t734, t748
+	add		t749, t735, t734
+	move	$a0, t749
 	jal		tig_chr
 
-	move	t1599, $v0
-	move	t1582, t1599
-	move	$a0, t1582
+	move	t750, $v0
+	move	t733, t750
+	move	$a0, t733
 	jal		tig_print
 
-	move	t1600, $v0
-	move	t1469, t1600
-	j		L793
+	move	t751, $v0
+	move	t620, t751
+	j		L265
 
-L842:
-L763:
+L314:
+L235:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t1479, $a1
+	move	t630, $a1
 	move	$fp, $sp
-	addi	t1601, $sp, -8
-	move	$sp, t1601
+	addi	t752, $sp, -8
+	move	$sp, t752
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -573,40 +573,40 @@ L763:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1602, $sp, -36
-	move	$sp, t1602
-	move	t1443, t1479
-	slt		t1603, t1443, $zero
-	beqz	t1603, L795
-	j		L794
-L795:
-	li		t1471, 0
-L796:
-	move	t1477, t1471
-	beq		t1477, $zero, L806
-	j		 L805
-L806:
-	slt		t1604, $zero, t1443	beqz	t1604, L799
-	j		L798
-L799:
-	li		t1473, 0
-L800:
-	move	t1475, t1473
-	beq		t1475, $zero, L803
-	j		 L802
-L803:
-	la		t1474, L801
-	move	$a0, t1474
+	addi	t753, $sp, -36
+	move	$sp, t753
+	move	t594, t630
+	slt		t754, t594, $zero
+	beqz	t754, L267
+	j		L266
+L267:
+	li		t622, 0
+L268:
+	move	t628, t622
+	beq		t628, $zero, L278
+	j		 L277
+L278:
+	slt		t755, $zero, t594	beqz	t755, L271
+	j		L270
+L271:
+	li		t624, 0
+L272:
+	move	t626, t624
+	beq		t626, $zero, L275
+	j		 L274
+L275:
+	la		t625, L273
+	move	$a0, t625
 	jal		tig_print
 
-	move	t1605, $v0
-	move	t1476, t1605
-L804:
-	move	t1478, t1476
-L807:
-	move	$v0, t1478
-	addi	t1606, $sp, 36
-	move	$sp, t1606
+	move	t756, $v0
+	move	t627, t756
+L276:
+	move	t629, t627
+L279:
+	move	$v0, t629
+	addi	t757, $sp, 36
+	move	$sp, t757
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -620,47 +620,47 @@ L807:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L794:
-	li		t1471, 1
-	j		L796
+L266:
+	li		t622, 1
+	j		L268
 
-L805:
-	la		t1472, L797
-	move	$a0, t1472
+L277:
+	la		t623, L269
+	move	$a0, t623
 	jal		tig_print
 
-	move	t1607, $v0
+	move	t758, $v0
 	move	$a0, $fp
-	li		t1609, 0
-	sub		t1608, t1609, t1443
-	move	$a1, t1608
-	jal		L787
+	li		t760, 0
+	sub		t759, t760, t594
+	move	$a1, t759
+	jal		L259
 
-	move	t1610, $v0
-	move	t1478, t1610
-	j		L807
+	move	t761, $v0
+	move	t629, t761
+	j		L279
 
-L798:
-	li		t1473, 1
-	j		L800
+L270:
+	li		t624, 1
+	j		L272
 
-L802:
+L274:
 	move	$a0, $fp
-	move	$a1, t1443
-	jal		L787
+	move	$a1, t594
+	jal		L259
 
-	move	t1611, $v0
-	move	t1476, t1611
-	j		L804
+	move	t762, $v0
+	move	t627, t762
+	j		L276
 
-L847:
-L762:
+L319:
+L234:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
-	move	t1485, $a1
+	move	t636, $a1
 	move	$fp, $sp
-	addi	t1612, $sp, -8
-	move	$sp, t1612
+	addi	t763, $sp, -8
+	move	$sp, t763
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -670,38 +670,38 @@ L762:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1613, $sp, -36
-	move	$sp, t1613
-	move	t1442, t1485
-	beq		t1442, $zero, L808
-	j		L809
-L809:
-	li		t1480, 0
-L810:
-	move	t1483, t1480
-	beq		t1483, $zero, L814
-	j		 L813
-L814:
+	addi	t764, $sp, -36
+	move	$sp, t764
+	move	t593, t636
+	beq		t593, $zero, L280
+	j		L281
+L281:
+	li		t631, 0
+L282:
+	move	t634, t631
+	beq		t634, $zero, L286
+	j		 L285
+L286:
 	lw		$a0, 0($fp)
-	lw		$a1, 0(t1442)
-	jal		L763
+	lw		$a1, 0(t593)
+	jal		L235
 
-	move	t1614, $v0
-	la		t1482, L812
-	move	$a0, t1482
+	move	t765, $v0
+	la		t633, L284
+	move	$a0, t633
 	jal		tig_print
 
-	move	t1615, $v0
+	move	t766, $v0
 	lw		$a0, 0($fp)
-	lw		$a1, 4(t1442)
-	jal		L762
+	lw		$a1, 4(t593)
+	jal		L234
 
-	move	t1616, $v0
-	move	t1484, t1616
-L815:
-	move	$v0, t1484
-	addi	t1617, $sp, 36
-	move	$sp, t1617
+	move	t767, $v0
+	move	t635, t767
+L287:
+	move	$v0, t635
+	addi	t768, $sp, 36
+	move	$sp, t768
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -715,26 +715,26 @@ L815:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L808:
-	li		t1480, 1
-	j		L810
+L280:
+	li		t631, 1
+	j		L282
 
-L813:
-	la		t1481, L811
-	move	$a0, t1481
+L285:
+	la		t632, L283
+	move	$a0, t632
 	jal		tig_print
 
-	move	t1618, $v0
-	move	t1484, t1618
-	j		L815
+	move	t769, $v0
+	move	t635, t769
+	j		L287
 
-L852:
+L324:
 tig_main:
 	sw		$a0, 0($sp)
 	sw		$fp, -4($sp)
 	move	$fp, $sp
-	addi	t1625, $sp, -8
-	move	$sp, t1625
+	addi	t776, $sp, -8
+	move	$sp, t776
 	sw		$s0, 0($sp)
 	sw		$s1, -4($sp)
 	sw		$s2, -8($sp)
@@ -744,48 +744,48 @@ tig_main:
 	sw		$s6, -24($sp)
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
-	addi	t1626, $sp, -36
-	move	$sp, t1626
-	addi	t1627, $fp, -8
-	move	t1620, t1627
+	addi	t777, $sp, -36
+	move	$sp, t777
+	addi	t778, $fp, -8
+	move	t771, t778
 	jal		tig_getchar
 
-	move	t1628, $v0
-	move	t1619, t1628
-	sw		t1619, 0(t1620)
+	move	t779, $v0
+	move	t770, t779
+	sw		t770, 0(t771)
 	move	$a0, $fp
-	jal		L765
+	jal		L237
 
-	move	t1629, $v0
-	move	t1487, t1629
-	move	$a0, $fp
-	jal		L765
-
-	move	t1630, $v0
-	move	t1486, t1630
-	addi	t1631, $fp, -8
-	move	t1622, t1631
+	move	t780, $v0
+	move	t637, t780
+	addi	t781, $fp, -8
+	move	t773, t781
 	jal		tig_getchar
 
-	move	t1632, $v0
-	move	t1621, t1632
-	sw		t1621, 0(t1622)
-	move	t1624, $fp
+	move	t782, $v0
+	move	t772, t782
+	sw		t772, 0(t773)
 	move	$a0, $fp
-	move	$a1, t1486
-	move	$a2, t1487
-	jal		L764
+	jal		L237
 
-	move	t1633, $v0
-	move	t1623, t1633
-	move	$a0, t1624
-	move	$a1, t1623
-	jal		L762
+	move	t783, $v0
+	move	t638, t783
+	move	t775, $fp
+	move	$a0, $fp
+	move	$a1, t637
+	move	$a2, t638
+	jal		L236
 
-	move	t1634, $v0
-	move	$v0, t1634
-	addi	t1635, $sp, 36
-	move	$sp, t1635
+	move	t784, $v0
+	move	t774, t784
+	move	$a0, t775
+	move	$a1, t774
+	jal		L234
+
+	move	t785, $v0
+	move	$v0, t785
+	addi	t786, $sp, 36
+	move	$sp, t786
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)
 	lw		$s2, -8($sp)
@@ -799,4 +799,4 @@ tig_main:
 	lw		$fp, -4($fp)
 	jr		$ra
 
-L857:
+L329:

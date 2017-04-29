@@ -25,6 +25,9 @@ struct
 
 	val fragList: F.frag list ref = ref []
 
+	fun levelSize (L(f, _, _)) = F.size f
+	  |  levelSize (EMPTY) = levelSize outermost
+
 	fun getResult () = let val result = !fragList in fragList := []; clearOutermost (); result end
 
 	fun getLevelInfo (L(frame, p, u)) = (map (fn frameAccess => (L(frame, p, u) , frameAccess)) (removeFirst (removeFirst (F.formals frame))), (F.label frame))
@@ -397,8 +400,10 @@ struct
 	fun transSeq (a::[], level) = Ex(unEx(a, level))
 	  | transSeq (a::l, level) = Ex(T.ESEQ(unNx(a), unEx(transSeq(l, level), level)))
 	  | transSeq ([], level) = Ex(T.CONST(0))
-	fun transLet (d::decs, body, level) = Ex(T.ESEQ(unNx(d), unEx(transLet(decs, body, level), level)))
-	  | transLet ([], body, level) = Ex(unEx(body, level))
+
+	fun transLetHelp (d::decs, body, level) = Ex(T.ESEQ(unNx(d), unEx(transLetHelp(decs, body, level), level)))
+	  | transLetHelp ([], body, level) = Ex(unEx(body, level))
+	fun transLet (decs, body, level) = transLetHelp (List.rev decs, body, level)
 
 	fun addRecVal level (a::[], i) = T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.V0, T.CONST (i * 4))), unEx(a, level))
 	  | addRecVal level (a::l, i) = T.SEQ(T.MOVE (T.MEM (T.BINOP (T.PLUS, T.TEMP F.V0, T.CONST (i * 4))), unEx(a, level)), addRecVal level (l, i + 1))
@@ -474,6 +479,7 @@ struct
 
 	fun procEntry (formList, frame) =
 		let
+		(*	val _ = print ("-" ^ (Int.toString (F.size frame)) ^ "\n")	*)
 			val (moves, tempList) = moveArgs (F.size frame) (0, formList)
 		in
 			T.SEQ(

@@ -15,6 +15,7 @@ sig
 	val frag: level * F.access list * exp -> F.frag
 	val getLevelInfo : level -> access list * Temp.label
 	val getFormals : level -> F.access list
+	val levelSize : level -> int
 
 	val transOP : Absyn.oper * exp * exp * level -> exp
 	val transSeq : exp list * level -> exp

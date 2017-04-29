@@ -843,8 +843,8 @@ tig_main:
 	sw		$s7, -28($sp)
 	sw		$ra, -32($sp)
 	addi	$sp, $sp, -36
+	li		$v0, 0
 	la		$v0, L74
-	li		$a0, 0
 	addi	$sp, $sp, 36
 	lw		$s0, 0($sp)
 	lw		$s1, -4($sp)

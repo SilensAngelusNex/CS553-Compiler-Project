@@ -282,7 +282,7 @@ struct
                     val cond = Temp.newtemp()
                   in
                     emit(A.OPER{
-                            assem="\tslt\t\t'd0, 's1, 's0" ,
+                            assem="\tslt\t\t'd0, 's1, 's0\n",
                             src=[munchExp e1, Frame.R0],
                             dst=[cond, Frame.R0],
                             jump=NONE
